@@ -1,0 +1,132 @@
+﻿<Window x:Class="DDictionary.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <DockPanel Margin="0" LastChildFill="False" Grid.Row="1">
+            <Button x:Name="selectAllButton" Content="" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" TabIndex="1" ToolTip="Select all rows or clear selection" Click="OnSelectAllButton_Clicked" BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
+            <TextBox x:Name="textFilter" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Height="22" TabIndex="2" ToolTip="Enter substring for filtration" TextChanged="OnTextFilter_TextChanged"/>
+            <ComboBox x:Name="groupFilter" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" ToolTip="Select in the dropdown list groups that should be shown" KeyUp="GroupFilter_KeyUp">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel MinWidth="150" Background="Transparent" Orientation="Horizontal" MouseUp="OnGroupFilterItem_MouseUp">
+                            <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
+                            <TextBlock Text="{Binding Text}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button x:Name="clearFilter" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" TabIndex="4" ToolTip="Clear filter" Click="OnClearFilter_Click"/>
+            <Button Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,10,5" DockPanel.Dock="Right" Height="22" TabIndex="8"/>
+            <ComboBox Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="7"/>
+            <Button Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6"/>
+            <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="5"/>
+        </DockPanel>
+        <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 
+                  HeadersVisibility="Column" SelectionMode="Extended" BorderThickness="1" IsReadOnly="True"
+                  AutoGenerateColumns="False" SelectionChanged="OnMainDataGrid_SelectionChanged" 
+                  LayoutUpdated="OnMainDataGrid_LayoutUpdated">
+            <DataGrid.Resources>
+                <Style x:Key="ColumnElementStyle" TargetType="TextBlock">
+                    <Setter Property="Padding" Value="7,2,7,2" />
+                </Style>
+                <SolidColorBrush x:Key="HighlightBrush" Color="Yellow" />
+            </DataGrid.Resources>
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{x:Static SystemColors.MenuHighlightBrush}" />
+                            <Setter Property="BorderBrush" Value="{x:Static Brushes.Transparent}" /> <!-- To hide single cell selection -->
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightGreen" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{x:Static SystemColors.MenuHighlightBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id}" Header="WordId" ElementStyle="{DynamicResource ColumnElementStyle}" Visibility="Hidden"/>
+                <DataGridTemplateColumn CanUserSort="False" Header="Play">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="PlaySoundButton_Click" Content="Play">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Sound}" Value="{x:Null}">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn x:Name="mainDataGridWordColumn" Binding="{Binding Word}" Header="Word" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn Binding="{Binding Transcription}" Header="Transcription" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn x:Name="mainDataGridTranslationsColumn" Binding="{Binding Translations}" Header="Translations" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn x:Name="mainDataGridContextColumn" Binding="{Binding Context}" Header="Context" ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9"/>
+                <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTemplateColumn CanUserSort="False" Header="Show relations">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Click="ShowRelationsButton_Click" Content="Show relations">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Relations}" Value="">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Added, StringFormat={}{0:yyyy-MM-dd}}" Header="Added" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn Binding="{Binding Group}" Header="Group" ElementStyle="{StaticResource ColumnElementStyle}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" BorderBrush="#FF688CAF" BorderThickness="1">
+            <Label Content="Total words:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="5,2,0,2"/>
+            <Label x:Name="totalWordsLbl" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,2,5,2"/>
+            <Separator/>
+            <Label Content="Shown words:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="5,2,0,2"/>
+            <Label x:Name="shownWordsLbl" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,2,5,2"/>
+            <Separator/>
+            <Label Content="Selected words:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="5,2,0,2"/>
+            <Label x:Name="selectedWordsLbl" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,2,5,2"/>
+            <Separator/>
+            <Label VerticalAlignment="Center"/>
+        </StatusBar>
+        <Menu Margin="0">
+            <MenuItem Header="_File">
+                <MenuItem Header="E_xit"/>
+            </MenuItem>
+        </Menu>
+    </Grid>
+</Window>
