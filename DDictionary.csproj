@@ -58,7 +58,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Domain\Entities\JustWordDTO.cs" />
+    <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
+    <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
+    <Compile Include="Presentation\Converters\TranslationConverter.cs" />
+    <Compile Include="Presentation\Converters\WordGroupTranslator.cs" />
+    <Compile Include="Presentation\RelationsEditDlg.xaml.cs">
+      <DependentUpon>RelationsEditDlg.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Presentation\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -66,20 +74,24 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DAL\FiltrationCriteria.cs" />
-    <Compile Include="DAL\IDBFacade.cs" />
-    <Compile Include="DAL\ViewModels\ClauseDataGridDTO.cs" />
+    <Compile Include="Domain\FiltrationCriteria.cs" />
+    <Compile Include="Domain\IDBFacade.cs" />
+    <Compile Include="Presentation\ViewModels\DataGridClause.cs" />
     <Compile Include="DAL\DBFacade.cs" />
-    <Compile Include="DAL\ViewModels\CheckBoxItem.cs" />
-    <Compile Include="Domain\Clause.cs" />
-    <Compile Include="Domain\WordGroup.cs" />
-    <Compile Include="Domain\PartOfSpeech.cs" />
-    <Compile Include="Domain\Relation.cs" />
-    <Compile Include="Domain\Translation.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Presentation\ViewModels\CheckBoxItem.cs" />
+    <Compile Include="Domain\Entities\Clause.cs" />
+    <Compile Include="Domain\Entities\WordGroup.cs" />
+    <Compile Include="Domain\Entities\PartOfSpeech.cs" />
+    <Compile Include="Domain\Entities\Relation.cs" />
+    <Compile Include="Domain\Entities\Translation.cs" />
+    <Compile Include="Presentation\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Presentation\RelationsEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

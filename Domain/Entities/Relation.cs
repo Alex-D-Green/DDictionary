@@ -1,5 +1,5 @@
 ﻿
-namespace DDictionary.Domain
+namespace DDictionary.Domain.Entities
 {
     public class Relation
     {

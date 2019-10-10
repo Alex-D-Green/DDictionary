@@ -5,16 +5,20 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
 using DDictionary.DAL;
-using DDictionary.DAL.ViewModels;
 using DDictionary.Domain;
+using DDictionary.Domain.Entities;
+using DDictionary.Presentation.Converters;
+using DDictionary.Presentation.ViewModels;
 
 using PrgResources = DDictionary.Properties.Resources;
 
-namespace DDictionary
+
+namespace DDictionary.Presentation
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -68,14 +72,14 @@ namespace DDictionary
         /// <summary>
         /// Make ClauseDataGridDTO from Clause.
         /// </summary>
-        private static ClauseDataGridDTO MakeClauseDataGridDTO(Clause cl)
+        private static DataGridClause MakeClauseDataGridDTO(Clause cl)
         {
-            return new ClauseDataGridDTO() {
+            var ret = new DataGridClause() {
                 Id = cl.Id,
                 Sound = cl.Sound,
                 Word = cl.Word,
                 Transcription = cl.Transcription,
-                Translations = cl.Translations.Aggregate("", (s, o) => s += $"{o.ToString()}; ")
+                Translations = cl.Translations.Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
                                               .TrimEnd(' ', ';'),
                 Context = cl.Context,
                 Relations = cl.Relations.Select(o => o.To.Word)
@@ -83,16 +87,22 @@ namespace DDictionary
                                         .OrderBy(o => o)
                                         .Aggregate("", (s, o) => s += $"{o}; ")
                                         .TrimEnd(' ', ';'),
+                HasRelations = (cl.Relations.Count > 0),
                 Added = cl.Added,
                 Updated = cl.Updated,
                 Group = cl.Group.ToGradeStr()
             };
+
+            if(!ret.HasRelations) //There are no relations let's add the placeholder to allow user to add some
+                ret.Relations = $"[{PrgResources.AddRelationPlaceholder}]";
+
+            return ret;
         }
 
         /// <summary>
         /// Get all clauses that satisfy current filter (see <see cref="DDictionary.MainWindow.currentFilter"/>).
         /// </summary>
-        private IEnumerable<ClauseDataGridDTO> LoadData()
+        private IEnumerable<DataGridClause> LoadData()
         {
             return dbFacade.GetClauses(currentFilter).Select(o => MakeClauseDataGridDTO(o));
         }
@@ -104,7 +114,7 @@ namespace DDictionary
         {
             mainDataGrid.Items.Clear();
 
-            foreach(ClauseDataGridDTO item in LoadData())
+            foreach(DataGridClause item in LoadData())
                 mainDataGrid.Items.Add(item);
 
             ClearSorting();
@@ -117,7 +127,7 @@ namespace DDictionary
         /// </summary>
         private void HighlightCells(string substring)
         {
-            foreach(ClauseDataGridDTO item in mainDataGrid.Items.Cast<ClauseDataGridDTO>())
+            foreach(DataGridClause item in mainDataGrid.Items.Cast<DataGridClause>())
             {
                 updateHighlight(item.Word, (TextBlock)mainDataGridWordColumn.GetCellContent(item));
                 updateHighlight(item.Translations, (TextBlock)mainDataGridTranslationsColumn.GetCellContent(item));
@@ -307,7 +317,7 @@ namespace DDictionary
         /// </summary>
         private void ShowRelationsButton_Click(object sender, RoutedEventArgs e)
         {
-            var clauseDTO = (ClauseDataGridDTO)((FrameworkElement)sender).DataContext;
+            var clauseDTO = (DataGridClause)((FrameworkElement)sender).DataContext;
 
             if(String.IsNullOrEmpty(clauseDTO.Relations))
             {
@@ -333,7 +343,7 @@ namespace DDictionary
 
             try
             {
-                var clauseDTO = (ClauseDataGridDTO)ctrl.DataContext;
+                var clauseDTO = (DataGridClause)ctrl.DataContext;
 
                 if(String.IsNullOrEmpty(clauseDTO.Sound))
                 { //There is no sound for this clause
@@ -388,7 +398,7 @@ namespace DDictionary
             finally { ctrl.IsEnabled = true; }
 
 
-            string makeLocalFileName(ClauseDataGridDTO clause)
+            string makeLocalFileName(DataGridClause clause)
             { //Make an unique name for the sound file cuz original ones prone to repeat each other
                 return String.Concat(
                     clause.Id.ToString("x8"),                  //The new name consists of the clause id
@@ -407,6 +417,20 @@ namespace DDictionary
                 mainDataGrid.UpdateLayout();
                 HighlightCells(currentFilter.TextFilter);
             }
+        }
+
+        /// <summary>
+        /// Main data grid's buttons/hyperlinks handler.
+        /// </summary>
+        private void OnMainDataGrid_Click(object sender, RoutedEventArgs e)
+        {
+            if(!(e.OriginalSource is Hyperlink hyperlink))
+                return;
+
+            var dlg = new RelationsEditDlg(((DataGridClause)hyperlink.DataContext).Id) { Owner = this };
+
+            if(dlg.ShowDialog() == true)
+                UpdateDataGrid();
         }
 
         ////The example of highlightening a part of the text

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DDictionary.Domain
+namespace DDictionary.Domain.Entities
 {
     public class Clause
     {

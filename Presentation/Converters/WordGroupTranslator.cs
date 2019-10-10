@@ -1,16 +1,7 @@
-﻿
-namespace DDictionary.Domain
+﻿using DDictionary.Domain.Entities;
+
+namespace DDictionary.Presentation.Converters
 {
-    public enum WordGroup: byte
-    {
-        E_TotallyUnknown = 10,
-        D_NeedToMemorize = 20,
-        C_KindaKnown = 30,
-        B_WellKnown = 40,
-        A_DefinitelyKnown = 50
-    }
-
-
     public static class WordGroupTranslator
     {
         public static string ToGradeStr(this WordGroup group)

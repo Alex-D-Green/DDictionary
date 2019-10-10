@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using DDictionary.Domain;
+using DDictionary.Domain.Entities;
+
 
 namespace DDictionary.DAL
 {
@@ -14,12 +16,12 @@ namespace DDictionary.DAL
 
         private static readonly List<Clause> clauses = new List<Clause>();
 
+        private static int clausesId;
+        private static int translationsId;
+        private static int relationsId;
+
         static InMemoryMockStorage()
         {
-            int clausesId = 0;
-            int translationsId = 0;
-            int relationsId = 0;
-
             var apple = new Clause {
                 Id = ++clausesId,
                 Sound = "https://audiocdn.lingualeo.com/v2/2/3256-631152008.mp3",
@@ -39,8 +41,8 @@ namespace DDictionary.DAL
                 },
                 Context = "It's so delicious apple!",
                 Relations = new List<Relation>(),
-                Added = new DateTime(2019, 9, 1, 12, 0, 0),
-                Updated = new DateTime(2019, 9, 2, 12, 0, 0),
+                Added = new DateTime(2019, 9, 1, 12, 0, 0, DateTimeKind.Local),
+                Updated = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.A_DefinitelyKnown
             };
 
@@ -58,8 +60,8 @@ namespace DDictionary.DAL
                 },
                 Context = "I hate pears!",
                 Relations = new List<Relation>(),
-                Added = new DateTime(2019, 9, 2, 12, 0, 0),
-                Updated = new DateTime(2019, 9, 3, 12, 0, 0),
+                Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
+                Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.C_KindaKnown
             };
 
@@ -82,8 +84,8 @@ namespace DDictionary.DAL
                 },
                 Context = "personal computer",
                 Relations = new List<Relation>(),
-                Added = new DateTime(2019, 9, 12, 12, 0, 0),
-                Updated = new DateTime(2019, 9, 13, 12, 0, 0),
+                Added = new DateTime(2019, 9, 12, 12, 0, 0, DateTimeKind.Local),
+                Updated = new DateTime(2019, 9, 13, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.E_TotallyUnknown
             };
 
@@ -140,6 +142,45 @@ namespace DDictionary.DAL
         public int GetTotalClauses()
         {
             return clauses.Count;
+        }
+
+        public IEnumerable<JustWordDTO> GetJustWords()
+        {
+            return clauses.Select(o => new JustWordDTO { Id = o.Id, Word = o.Word });
+        }
+
+        public void AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
+        {
+            Clause from = clauses.Single(o => o.Id == fromClauseId);
+            Clause to = clauses.Single(o => o.Id == toClauseId);
+
+            if(relationId == 0)
+            { //New relation entity
+                ((List<Relation>)from.Relations).Add(new Relation { 
+                    Id = ++relationsId,
+                    From = from,
+                    To = to,
+                    Description = relDescription
+                });
+            }
+            else
+            {
+                Relation rel = from.Relations.Single(o => o.Id == relationId);
+                rel.From = from;
+                rel.To = to;
+                rel.Description = relDescription;
+            }
+
+            from.Updated = DateTime.Now;
+        }
+
+        public void RemoveRelation(int relationId)
+        {
+            Clause cl = clauses.Single(o => o.Relations.Any(r => r.Id == relationId));
+            
+            ((List<Relation>)cl.Relations).Remove(cl.Relations.Single(r => r.Id == relationId));
+
+            cl.Updated = DateTime.Now;
         }
 
 #pragma warning restore CA1822 // Mark members as static

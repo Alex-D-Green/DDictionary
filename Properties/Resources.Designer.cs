@@ -61,6 +61,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to add.
+        /// </summary>
+        internal static string AddRelationPlaceholder {
+            get {
+                return ResourceManager.GetString("AddRelationPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can not play sound: &quot;{0}&quot;
         ///
         ///{1}.
@@ -77,6 +86,15 @@ namespace DDictionary.Properties {
         internal static string ErrorCaption {
             get {
                 return ResourceManager.GetString("ErrorCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only {0} (the maximal count) out of {1} relations have been shown..
+        /// </summary>
+        internal static string ExceedMaxCountOfRelations {
+            get {
+                return ResourceManager.GetString("ExceedMaxCountOfRelations", resourceCulture);
             }
         }
         
@@ -113,6 +131,15 @@ namespace DDictionary.Properties {
         internal static string ThereAreNoRelations {
             get {
                 return ResourceManager.GetString("ThereAreNoRelations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;{0}&quot; relation to:.
+        /// </summary>
+        internal static string WordRelationTo {
+            get {
+                return ResourceManager.GetString("WordRelationTo", resourceCulture);
             }
         }
     }

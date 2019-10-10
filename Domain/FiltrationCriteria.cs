@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using DDictionary.Domain;
+using DDictionary.Domain.Entities;
 
-namespace DDictionary.DAL
+namespace DDictionary.Domain
 {
     /// <summary>
     /// The filtration criteria for fetching clauses.

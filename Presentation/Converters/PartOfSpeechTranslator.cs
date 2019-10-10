@@ -1,27 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DDictionary.Domain.Entities;
 
-namespace DDictionary.Domain
+namespace DDictionary.Presentation.Converters
 {
-    //https://www.thoughtco.com/part-of-speech-english-grammar-1691590
-
-    public enum PartOfSpeech: byte
-    {
-        Unknown,
-        Noun,
-        Pronoun,
-        Verb,
-        Adjective,
-        Adverb,
-        Preposition,
-        Conjunction, //and, but, or, so, yet, with
-        Interjection //ah, whoops, ouch, yabba dabba do!
-    }
-
-
     public static class PartOfSpeechTranslator
     {
         public static string ToShortString(this PartOfSpeech pos)

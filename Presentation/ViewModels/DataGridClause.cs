@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DDictionary.DAL.ViewModels
+namespace DDictionary.Presentation.ViewModels
 {
-    public sealed class ClauseDataGridDTO
+    public sealed class DataGridClause
     {
         public int Id { get; set; }
         public string Sound { get; set; }
@@ -11,6 +11,7 @@ namespace DDictionary.DAL.ViewModels
         public string Translations { get; set; }
         public string Context { get; set; }
         public string Relations { get; set; }
+        public bool HasRelations { get; set; }
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
         public string Group { get; set; }
