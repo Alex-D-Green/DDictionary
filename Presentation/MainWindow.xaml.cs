@@ -25,6 +25,11 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class MainWindow: Window
     {
+        /// <summary>The minimal main data grid's columns width that used when a column is "hidden".</summary>
+        public const double ZeroColumnWidth = 3; //This width could be used in the future to indicate skipped columns 
+                                                 //while importing data (e.g. printing).
+
+
         /// <summary>Folder to place downloaded sounds' files.</summary>
         private static readonly DirectoryInfo soundsCacheFolder = new DirectoryInfo(".\\sndCache");
 

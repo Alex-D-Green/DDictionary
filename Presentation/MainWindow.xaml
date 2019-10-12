@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DDictionary.Presentation"
         mc:Ignorable="d"
         Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200">
     <Grid Margin="0">
@@ -64,8 +65,7 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Id}" Header="WordId" ElementStyle="{DynamicResource ColumnElementStyle}" Visibility="Hidden"/>
-                <DataGridTemplateColumn CanUserSort="False" Header="Play">
+                <DataGridTemplateColumn CanUserSort="False" Header="Play" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Click="PlaySoundButton_Click" Content="Play">
@@ -83,12 +83,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn x:Name="mainDataGridWordColumn" Binding="{Binding Word}" Header="Word" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTextColumn Binding="{Binding Transcription}" Header="Transcription" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTextColumn x:Name="mainDataGridTranslationsColumn" Binding="{Binding Translations}" Header="Translations" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTextColumn x:Name="mainDataGridContextColumn" Binding="{Binding Context}" Header="Context" ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9"/>
-                <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTemplateColumn CanUserSort="False" Header="Show relations">
+                <DataGridTextColumn x:Name="mainDataGridWordColumn" Binding="{Binding Word}" Header="Word" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Transcription}" Header="Transcription" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn x:Name="mainDataGridTranslationsColumn" Binding="{Binding Translations}" Header="Translations" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn x:Name="mainDataGridContextColumn" Binding="{Binding Context}" Header="Context" ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTemplateColumn CanUserSort="False" Header="Show relations" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Click="ShowRelationsButton_Click" Content="Show relations">
@@ -106,12 +106,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Added, StringFormat={}{0:yyyy-MM-dd}}" Header="Added" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" ElementStyle="{StaticResource ColumnElementStyle}"/>
-                <DataGridTextColumn Binding="{Binding Group}" Header="Group" ElementStyle="{StaticResource ColumnElementStyle}"/>
+                <DataGridTextColumn Binding="{Binding Added, StringFormat={}{0:yyyy-MM-dd}}" Header="Added" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Group}" Header="Group" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" BorderBrush="#FF688CAF" BorderThickness="1">
+        <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}" BorderBrush="#FF688CAF" BorderThickness="1">
             <Label Content="Total words:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="5,2,0,2"/>
             <Label x:Name="totalWordsLbl" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,2,5,2"/>
             <Separator/>
