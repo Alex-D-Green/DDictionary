@@ -1,5 +1,8 @@
 ﻿using System;
 
+using DDictionary.Domain.Entities;
+
+
 namespace DDictionary.Presentation.ViewModels
 {
     public sealed class DataGridClause
@@ -14,6 +17,6 @@ namespace DDictionary.Presentation.ViewModels
         public bool HasRelations { get; set; }
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
-        public string Group { get; set; }
+        public WordGroup Group { get; set; }
     }
 }

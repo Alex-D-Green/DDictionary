@@ -14,6 +14,8 @@ using PrgResources = DDictionary.Properties.Resources;
 
 namespace DDictionary.Presentation
 {
+    //TODO: Implement "interconnected relations" behavior when the couple of relations is adding simultaneously.
+
     /// <summary>
     /// Interaction logic for RelationsEditDlg.xaml
     /// </summary>

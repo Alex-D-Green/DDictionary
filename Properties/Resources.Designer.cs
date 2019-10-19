@@ -135,6 +135,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Updated: {0:yyyy-MM-dd}.
+        /// </summary>
+        internal static string UpdateDate {
+            get {
+                return ResourceManager.GetString("UpdateDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;{0}&quot; relation to:.
         /// </summary>
         internal static string WordRelationTo {

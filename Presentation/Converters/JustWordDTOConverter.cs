@@ -7,7 +7,7 @@ using DDictionary.Domain.Entities;
 
 namespace DDictionary.Presentation.Converters
 {
-    public class JustWordDTOConverter: IValueConverter
+    public sealed class JustWordDTOConverter: IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

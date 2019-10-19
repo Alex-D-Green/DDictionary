@@ -95,7 +95,7 @@ namespace DDictionary.Presentation
                 HasRelations = (cl.Relations.Count > 0),
                 Added = cl.Added,
                 Updated = cl.Updated,
-                Group = cl.Group.ToGradeStr()
+                Group = cl.Group
             };
 
             if(!ret.HasRelations) //There are no relations let's add the placeholder to allow user to add some
@@ -425,9 +425,9 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
-        /// Main data grid's buttons/hyperlinks handler.
+        /// Main data grid's hyperlinks handler.
         /// </summary>
-        private void OnMainDataGrid_Click(object sender, RoutedEventArgs e)
+        private void OnMainDataGrid_HyperlinkClick(object sender, RoutedEventArgs e)
         {
             if(!(e.OriginalSource is Hyperlink hyperlink))
                 return;
@@ -437,34 +437,5 @@ namespace DDictionary.Presentation
             if(dlg.ShowDialog() == true)
                 UpdateDataGrid();
         }
-
-        ////The example of highlightening a part of the text
-        //private void HighlightText(TextBlock tb)
-        //{
-        //    var regex = new Regex("(" + textFilter.Text + ")", RegexOptions.IgnoreCase);
-
-        //    if(textFilter.Text.Length == 0)
-        //    {
-        //        string str = tb.Text;
-        //        tb.Inlines.Clear();
-        //        tb.Inlines.Add(str);
-        //        return;
-        //    }
-
-        //    string[] substrings = regex.Split(tb.Text);
-        //    tb.Inlines.Clear();
-
-        //    foreach(string str in substrings)
-        //    {
-        //        if(regex.Match(str).Success)
-        //        {
-        //            var runx = new Run(str);
-        //            runx.Background = Brushes.Yellow;
-        //            tb.Inlines.Add(runx);
-        //        }
-        //        else
-        //            tb.Inlines.Add(str);
-        //    }
-        //}
     }
 }

@@ -40,6 +40,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,10 +64,19 @@
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
     <Compile Include="Presentation\Converters\TranslationConverter.cs" />
+    <Compile Include="Presentation\Converters\WordGroupConverter.cs" />
     <Compile Include="Presentation\Converters\WordGroupTranslator.cs" />
+    <Compile Include="Presentation\InfoPopup.xaml.cs">
+      <DependentUpon>InfoPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\MainWindow.xaml.InfoPopup.cs" />
     <Compile Include="Presentation\RelationsEditDlg.xaml.cs">
       <DependentUpon>RelationsEditDlg.xaml</DependentUpon>
     </Compile>
+    <Page Include="Presentation\InfoPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Presentation\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -94,6 +105,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Presentation\ScreenInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

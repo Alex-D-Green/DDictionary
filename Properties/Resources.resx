@@ -144,6 +144,9 @@
     <value>This clause has no any related ones.</value>
     <comment>Not used</comment>
   </data>
+  <data name="UpdateDate" xml:space="preserve">
+    <value>Updated: {0:yyyy-MM-dd}</value>
+  </data>
   <data name="WordRelationTo" xml:space="preserve">
     <value>"{0}" relation to:</value>
   </data>
