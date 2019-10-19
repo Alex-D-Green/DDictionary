@@ -125,6 +125,9 @@
 
 {1}</value>
   </data>
+  <data name="ClausesDeletionConfirmation" xml:space="preserve">
+    <value>Delete {0} selected clause[s]?</value>
+  </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>An error occured!</value>
   </data>
@@ -135,6 +138,9 @@
     <value>File "{0}" not found!</value>
   </data>
   <data name="InformationCaption" xml:space="preserve">
+    <value>Attention please!</value>
+  </data>
+  <data name="QuestionCaption" xml:space="preserve">
     <value>Attention please!</value>
   </data>
   <data name="RelationsFilterTextTmpl" xml:space="preserve">

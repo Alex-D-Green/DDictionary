@@ -55,7 +55,7 @@ namespace DDictionary.Presentation
             #region Group filter initialization
 
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
-                groupFilter.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
+                groupFilterCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
 
             UpdateGroupFilterText();
 
@@ -63,7 +63,7 @@ namespace DDictionary.Presentation
 
             UpdateDataGrid();
 
-            textFilter.Focus();
+            textFilterEdit.Focus();
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace DDictionary.Presentation
         /// </summary>
         private IEnumerable<WordGroup> GetFilterGroups()
         {
-            return groupFilter.Items.Cast<CheckBoxItem<WordGroup>>().Where(o => o.IsSelected).Select(o => o.ItemValue);
+            return groupFilterCBox.Items.Cast<CheckBoxItem<WordGroup>>().Where(o => o.IsSelected).Select(o => o.ItemValue);
         }
 
         /// <summary>
@@ -182,6 +182,8 @@ namespace DDictionary.Presentation
         private void OnMainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedWordsLbl.Content = mainDataGrid.SelectedItems.Count;
+            
+            deleteBtn.IsEnabled = mainDataGrid.SelectedItems.Count > 0;
         }
 
         /// <summary>
@@ -204,22 +206,22 @@ namespace DDictionary.Presentation
         {
             if(currentFilter.RelatedFrom != null)
             {
-                groupFilter.Text = String.Format(PrgResources.RelationsFilterTextTmpl, currentFilter.RelatedFrom.Word);
+                groupFilterCBox.Text = String.Format(PrgResources.RelationsFilterTextTmpl, currentFilter.RelatedFrom.Word);
                 return;
             }
 
             WordGroup[] selected = GetFilterGroups().ToArray();
 
             if(selected.Length > 0)
-                groupFilter.Text = selected.Aggregate("", (s, o) => s += $"{o.ToGradeStr()}, ").TrimEnd(' ', ',');
+                groupFilterCBox.Text = selected.Aggregate("", (s, o) => s += $"{o.ToGradeStr()}, ").TrimEnd(' ', ',');
             else
-                groupFilter.Text = "";
+                groupFilterCBox.Text = "";
         }
 
         /// <summary>
         /// Select all rows or clear selection.
         /// </summary>
-        private void OnSelectAllButton_Clicked(object sender, RoutedEventArgs e)
+        private void OnSelectAllBtn_Clicked(object sender, RoutedEventArgs e)
         {
             if(!Equals(shownWordsLbl.Content, selectedWordsLbl.Content))
                 mainDataGrid.SelectAll();
@@ -232,14 +234,14 @@ namespace DDictionary.Presentation
         /// </summary>
         private void OnTextFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
-            textFilter.Background = textFilter.Text?.Length > 0 ? highlightBrush 
-                                                                : Brushes.Transparent;
+            textFilterEdit.Background = textFilterEdit.Text?.Length > 0 ? highlightBrush 
+                                                                        : Brushes.Transparent;
 
-            if(textFilter.Text == currentFilter.TextFilter)
+            if(textFilterEdit.Text == currentFilter.TextFilter)
                 return;
 
             currentFilter.RelatedFrom = null;
-            currentFilter.TextFilter = textFilter.Text;
+            currentFilter.TextFilter = textFilterEdit.Text;
 
             UpdateDataGrid();
             UpdateGroupFilterText();
@@ -248,7 +250,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Clear the filter.
         /// </summary>
-        private void OnClearFilter_Click(object sender, RoutedEventArgs e)
+        private void OnClearFilterBtn_Click(object sender, RoutedEventArgs e)
         {
             ClearFilter();
         }
@@ -259,14 +261,14 @@ namespace DDictionary.Presentation
         /// <param name="updateGrid">Refill the main data grid.</param>
         private void ClearFilter(bool updateGrid = true)
         {
-            foreach(CheckBoxItem<WordGroup> item in groupFilter.Items.Cast<CheckBoxItem<WordGroup>>())
+            foreach(CheckBoxItem<WordGroup> item in groupFilterCBox.Items.Cast<CheckBoxItem<WordGroup>>())
                 item.IsSelected = false; //Uncheck all groups in dropdown
 
-            groupFilter.Items.Refresh();
+            groupFilterCBox.Items.Refresh();
 
             currentFilter.Clear();
 
-            textFilter.Text = "";
+            textFilterEdit.Text = "";
 
             UpdateGroupFilterText();
 
@@ -294,26 +296,26 @@ namespace DDictionary.Presentation
             if(e.Key == Key.Space && 
                 (Keyboard.Modifiers & ModifierKeys.Alt) != ModifierKeys.Alt)
             {
-                if(groupFilter.IsDropDownOpen)
+                if(groupFilterCBox.IsDropDownOpen)
                 { //Check/uncheck current item of the dropdown
-                    if(groupFilter.SelectedItem is CheckBoxItem<WordGroup> sel)
+                    if(groupFilterCBox.SelectedItem is CheckBoxItem<WordGroup> sel)
                     {
                         sel.IsSelected = !sel.IsSelected;
 
-                        groupFilter.Items.Refresh();
+                        groupFilterCBox.Items.Refresh();
 
                         //To return ability of keyboard selection after refresh
-                        groupFilter.SelectedItem = null;
-                        groupFilter.SelectedItem = sel;
+                        groupFilterCBox.SelectedItem = null;
+                        groupFilterCBox.SelectedItem = sel;
 
                         //I wish but I can't restore combo box's text cuz then keyboard focus will be lost
                     }
                 }
                 else
-                    groupFilter.IsDropDownOpen = true; //Show the dropdown by Space key
+                    groupFilterCBox.IsDropDownOpen = true; //Show the dropdown by Space key
             }
 
-            if((e.Key == Key.Up || e.Key == Key.Down) && !groupFilter.IsDropDownOpen)
+            if((e.Key == Key.Up || e.Key == Key.Down) && !groupFilterCBox.IsDropDownOpen)
                 UpdateGroupFilterText(); //Restore shown text IN THE CLOSED combo box after keyboard "selection"
         }
 
@@ -436,6 +438,22 @@ namespace DDictionary.Presentation
 
             if(dlg.ShowDialog() == true)
                 UpdateDataGrid();
+        }
+
+        /// <summary>
+        /// Delete selected clauses button handler.
+        /// </summary>
+        private void OnDeleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(MessageBox.Show(this, String.Format(PrgResources.ClausesDeletionConfirmation, mainDataGrid.SelectedItems.Count), 
+                PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                return;
+
+            dbFacade.RemoveClauses(mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                             .Select(o => o.Id)
+                                                             .ToArray());
+
+            UpdateDataGrid();
         }
     }
 }

@@ -16,6 +16,8 @@ namespace DDictionary.Presentation
         //TODO: Add info about using InfoPopup, as a tooltip to "show popup" option.
         //Tell how to hover over the main data grid without showing popup (Shift key, click, some columns)...
 
+        //HACK: Show full information (in separate rows) about word's relations in InfoPopup?..
+
         public InfoPopup(DataGridClause clause)
         {
             if(clause is null)

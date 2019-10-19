@@ -18,23 +18,35 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Margin="0" LastChildFill="False" Grid.Row="1">
-            <Button x:Name="selectAllButton" Content="" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" TabIndex="1" ToolTip="Select all rows or clear selection" Click="OnSelectAllButton_Clicked" BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
-            <TextBox x:Name="textFilter" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Height="22" TabIndex="2" ToolTip="Enter substring for filtration" TextChanged="OnTextFilter_TextChanged"/>
-            <ComboBox x:Name="groupFilter" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" ToolTip="Select in the dropdown list groups that should be shown" KeyUp="GroupFilter_KeyUp">
+            <Button x:Name="selectAllBtn" Content="" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
+                    TabIndex="1" ToolTip="Select all rows or clear selection" Click="OnSelectAllBtn_Clicked" 
+                    BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
+            <TextBox x:Name="textFilterEdit" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
+                     Height="22" TabIndex="2" ToolTip="Enter substring for filtration" TextChanged="OnTextFilter_TextChanged"/>
+            <ComboBox x:Name="groupFilterCBox" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" 
+                      IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" 
+                      ToolTip="Select in the dropdown list groups that should be shown" KeyUp="GroupFilter_KeyUp">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel MinWidth="150" Background="Transparent" Orientation="Horizontal" MouseUp="OnGroupFilterItem_MouseUp">
+                        <StackPanel MinWidth="150" Background="Transparent" Orientation="Horizontal" 
+                                    MouseUp="OnGroupFilterItem_MouseUp">
                             <CheckBox IsChecked="{Binding IsSelected}" Width="20" />
                             <TextBlock Text="{Binding Text}" />
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Button x:Name="clearFilter" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" TabIndex="4" ToolTip="Clear filter" Click="OnClearFilter_Click"/>
-            <Button Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,10,5" DockPanel.Dock="Right" Height="22" TabIndex="8"/>
-            <ComboBox Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="7"/>
-            <Button Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6"/>
-            <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="5"/>
+            <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
+                    TabIndex="4" ToolTip="Clear filter" Click="OnClearFilterBtn_Click"/>
+            <Button Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,10,5" 
+                    DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False"/>
+            <ComboBox Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" 
+                      Height="22" TabIndex="7" IsEnabled="False"/>
+            <Button x:Name="deleteBtn" Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6" IsEnabled="False" 
+                    ToolTip="Delete selected clauses" Click="OnDeleteBtn_Click"/>
+            <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
+                    DockPanel.Dock="Right" Height="22" TabIndex="5" IsEnabled="False"/>
         </DockPanel>
         <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 
                   HeadersVisibility="Column" SelectionMode="Extended" BorderThickness="1" IsReadOnly="True"
@@ -51,7 +63,9 @@
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="{x:Static SystemColors.MenuHighlightBrush}" />
-                            <Setter Property="BorderBrush" Value="{x:Static Brushes.Transparent}" /> <!-- To hide single cell selection -->
+
+                            <!-- To hide certain cell selection -->
+                            <Setter Property="BorderBrush" Value="{x:Static Brushes.Transparent}" /> 
                         </Trigger>
                     </Style.Triggers>
                     <EventSetter Event="MouseEnter" Handler="OnMainDataGridCell_MouseEnter"/>
@@ -71,7 +85,8 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn x:Name="mainDataGridPlayColumn" CanUserSort="False" Header="Play" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
+                <DataGridTemplateColumn x:Name="mainDataGridPlayColumn" CanUserSort="False" Header="Play" 
+                                        MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Click="PlaySoundButton_Click" Content="Play">
@@ -89,12 +104,23 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn x:Name="mainDataGridWordColumn" Binding="{Binding Word}" Header="Word" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn Binding="{Binding Transcription}" Header="Transcription" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn x:Name="mainDataGridTranslationsColumn" Binding="{Binding Translations}" Header="Translations" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn x:Name="mainDataGridContextColumn" Binding="{Binding Context}" Header="Context" ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTemplateColumn x:Name="mainDataGridShowRelationsColumn" CanUserSort="False" Header="Show relations" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
+                <DataGridTextColumn x:Name="mainDataGridWordColumn" Binding="{Binding Word}" Header="Word" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Transcription}" Header="Transcription" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn x:Name="mainDataGridTranslationsColumn" Binding="{Binding Translations}" 
+                                    Header="Translations" ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn x:Name="mainDataGridContextColumn" Binding="{Binding Context}" Header="Context" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" 
+                                         ElementStyle="{StaticResource ColumnElementStyle}" 
+                                         MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTemplateColumn x:Name="mainDataGridShowRelationsColumn" CanUserSort="False" Header="Show relations" 
+                                        MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Click="ShowRelationsButton_Click" Content="Show relations">
@@ -112,12 +138,20 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Added, StringFormat={}{0:yyyy-MM-dd}}" Header="Added" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn Binding="{Binding Group, Converter={StaticResource WordGroupConverter}}" Header="Group" ElementStyle="{StaticResource ColumnElementStyle}" MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Added, StringFormat={}{0:yyyy-MM-dd}}" Header="Added" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Group, Converter={StaticResource WordGroupConverter}}" Header="Group" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}" BorderBrush="#FF688CAF" BorderThickness="1">
+        <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" 
+                   Background="{StaticResource {x:Static SystemColors.WindowBrushKey}}" BorderBrush="#FF688CAF" 
+                   BorderThickness="1">
             <Label Content="Total words:" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" Padding="5,2,0,2"/>
             <Label x:Name="totalWordsLbl" Content="0" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,2,5,2"/>
             <Separator/>

@@ -47,5 +47,11 @@ namespace DDictionary.Domain
         /// </summary>
         /// <param name="relationId">Relation id.</param>
         void RemoveRelation(int relationId);
+
+        /// <summary>
+        /// Remove these clauses.
+        /// </summary>
+        /// <param name="clauseIds">Ids of the clauses that should be deleted.</param>
+        void RemoveClauses(params int[] clauseIds);
     }
 }

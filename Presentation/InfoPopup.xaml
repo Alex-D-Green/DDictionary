@@ -10,21 +10,21 @@
         BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" 
         SizeToContent="WidthAndHeight" >
     <StackPanel Margin="5">
-        <DockPanel Margin="0,0,0,-5">
+        <DockPanel Margin="0,-5,0,-5">
             <Label x:Name="groupLbl" Content="Group" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" 
                FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
             <Label x:Name="dateLbl" Content="Updated: 2019-01-18" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Center" 
-               FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" DockPanel.Dock="Right"/>            
+               FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" DockPanel.Dock="Right"/>
         </DockPanel>
         <StackPanel Margin="0" Orientation="Horizontal">
             <Label x:Name="wordLbl" Content="Word" HorizontalAlignment="Left" Margin="0,0,5,0" VerticalAlignment="Center" 
-                   FontSize="16" FontWeight="Bold"/>
+                   FontSize="16" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
             <Label x:Name="transcriptionLbl" Content="[Transcription]" HorizontalAlignment="Left" Margin="0" 
-                   VerticalAlignment="Center"/>
+                   VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
         </StackPanel>
         <Label x:Name="translationsLbl" Content="Translations" HorizontalAlignment="Left" Margin="0,-5,0,0" 
-               VerticalAlignment="Center"/>
-        <Label x:Name="relationsLbl" Content="Relations" HorizontalAlignment="Left" Margin="0,-5" VerticalAlignment="Center" 
+               VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
+        <Label x:Name="relationsLbl" Content="Relations" HorizontalAlignment="Left" Margin="0,-5,0,0" VerticalAlignment="Center" 
                FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
     </StackPanel>
 </Window>

@@ -81,6 +81,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete {0} selected clause[s]?.
+        /// </summary>
+        internal static string ClausesDeletionConfirmation {
+            get {
+                return ResourceManager.GetString("ClausesDeletionConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured!.
         /// </summary>
         internal static string ErrorCaption {
@@ -113,6 +122,15 @@ namespace DDictionary.Properties {
         internal static string InformationCaption {
             get {
                 return ResourceManager.GetString("InformationCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attention please!.
+        /// </summary>
+        internal static string QuestionCaption {
+            get {
+                return ResourceManager.GetString("QuestionCaption", resourceCulture);
             }
         }
         

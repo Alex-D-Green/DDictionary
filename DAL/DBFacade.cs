@@ -183,6 +183,22 @@ namespace DDictionary.DAL
             cl.Updated = DateTime.Now;
         }
 
+        public void RemoveClauses(params int[] clauseIds)
+        {
+            foreach(var clause in clauseIds)
+                RemoveClause(clause);
+        }
+
+        private void RemoveClause(int id)
+        {
+            Clause clauseToRemove = clauses.Single(o => o.Id == id);
+
+            foreach(Relation relation in clauses.SelectMany(o => o.Relations).Where(o => o.To.Id == clauseToRemove.Id).ToArray())
+                RemoveRelation(relation.Id);
+
+            clauses.Remove(clauseToRemove);
+        }
+
 #pragma warning restore CA1822 // Mark members as static
     }
 }
