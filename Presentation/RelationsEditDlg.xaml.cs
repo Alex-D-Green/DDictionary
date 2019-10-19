@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,13 +15,21 @@ using PrgResources = DDictionary.Properties.Resources;
 
 namespace DDictionary.Presentation
 {
-    //TODO: Implement "interconnected relations" behavior when the couple of relations is adding simultaneously.
-
     /// <summary>
     /// Interaction logic for RelationsEditDlg.xaml
     /// </summary>
     public partial class RelationsEditDlg: Window
     {
+        private sealed class RelationDTO
+        {
+            public int Id { get; set; }
+            public int ToWordId { get; set; }
+            public string Description { get; set; }
+            public bool DescriptionWasChanged { get; set; }
+            public bool MakeInterconnected { get; set; }
+        }
+
+
         /// <summary>The maximal count of handling relations.</summary>
         public const int MaxCountOfRelations = 10;
 
@@ -87,29 +96,34 @@ namespace DDictionary.Presentation
             FixHeight();
         }
 
-
         /// <summary>
         /// Add new relation row (a panel with respective elements) to the dialog.
         /// </summary>
-        private void AddRelationRow(int relId, string word, int wordId, string descr)
+        private void AddRelationRow(int relId, string word, int wordId, string descr, bool makeInterconnected = false)
         {
             var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relationRow));
             int addPanelIdx = mainStackPanel.Children.IndexOf(addNewRelationPanel);
 
+            var relationDTO = new RelationDTO {
+                Id = relId,
+                ToWordId = wordId,
+                Description = descr,
+                MakeInterconnected = makeInterconnected
+            };
+
             copy.Visibility = Visibility.Visible;
-            copy.Tag = relId;
+            copy.Tag = relationDTO;
 
             var newToWordLbl = (Label)copy.FindName(nameof(toWordLbl));
             newToWordLbl.Content = word;
-            newToWordLbl.Tag = wordId;
 
             var newDescrTBox = (TextBox)copy.FindName(nameof(descrTBox));
             newDescrTBox.Text = descr;
             newDescrTBox.TabIndex = addPanelIdx;
-            newDescrTBox.Tag = false; //Change mark
             newDescrTBox.TextChanged += (s, e) => 
-            { 
-                newDescrTBox.Tag = true; //Mark this record as changed
+            {
+                relationDTO.Description = newDescrTBox.Text;
+                relationDTO.DescriptionWasChanged = true;
                 ChangesHaveBeenMade();
             };
 
@@ -193,9 +207,10 @@ namespace DDictionary.Presentation
         {
             var word = (JustWordDTO)listOfWordsCBox.SelectedItem;
 
-            AddRelationRow(0, word.Word, word.Id, newRelationDescrTBox.Text);
+            AddRelationRow(0, word.Word, word.Id, newRelationDescrTBox.Text, interconnectedCheck.IsChecked == true);
 
             newRelationDescrTBox.Text = ""; //To prevent duplication
+            interconnectedCheck.IsChecked = false;
             ChangesHaveBeenMade();
         }
 
@@ -237,17 +252,19 @@ namespace DDictionary.Presentation
             for(int i=relationRowIdx+1; i<addPanelIdx; i++)
             {
                 var rowPanel = (FrameworkElement)mainStackPanel.Children[i];
-                var tb = (TextBox)rowPanel.FindName(nameof(descrTBox));
+                var relationDTO = (RelationDTO)rowPanel.Tag;
 
-                var relId = (int)rowPanel.Tag;
-
-                if(relId != 0 && !(bool)tb.Tag)
-                    continue; //The existed record hasn't been changed
-
-                var relDescr = tb.Text;
-                var toWordId = (int)((Label)rowPanel.FindName(nameof(toWordLbl))).Tag;
+                if(relationDTO.Id != 0 && !relationDTO.DescriptionWasChanged)
+                    continue; //This, existed record hasn't been changed
                 
-                dbFacade.AddOrUpdateRelation(relId, clause.Id, toWordId, relDescr);
+                dbFacade.AddOrUpdateRelation(relationDTO.Id, clause.Id, relationDTO.ToWordId, relationDTO.Description);
+
+                if(relationDTO.MakeInterconnected)
+                { //Add relation to the other side
+                    Debug.Assert(relationDTO.Id == 0);
+
+                    dbFacade.AddOrUpdateRelation(0, relationDTO.ToWordId, clause.Id, relationDTO.Description);
+                }
             }
         }
     }
