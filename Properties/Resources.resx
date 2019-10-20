@@ -137,6 +137,9 @@
   <data name="FileNotFoundError" xml:space="preserve">
     <value>File "{0}" not found!</value>
   </data>
+  <data name="GroupChangeConfirmation" xml:space="preserve">
+    <value>Move these {1} selected clause[s] to group "{0}"?</value>
+  </data>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>
   </data>

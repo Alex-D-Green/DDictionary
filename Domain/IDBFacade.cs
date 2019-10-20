@@ -53,5 +53,12 @@ namespace DDictionary.Domain
         /// </summary>
         /// <param name="clauseIds">Ids of the clauses that should be deleted.</param>
         void RemoveClauses(params int[] clauseIds);
+
+        /// <summary>
+        /// "Move" these clauses to the destination group.
+        /// </summary>
+        /// <param name="toGroup">The destination group.</param>
+        /// <param name="clauseIds">Ids of the clauses that should be moved.</param>
+        void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds);
     }
 }

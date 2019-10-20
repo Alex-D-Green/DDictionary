@@ -199,6 +199,14 @@ namespace DDictionary.DAL
             clauses.Remove(clauseToRemove);
         }
 
+        public void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds)
+        {
+            foreach(var id in clauseIds)
+                clauses.Single(o => o.Id == id).Group = toGroup;
+
+            //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
+        }
+
 #pragma warning restore CA1822 // Mark members as static
     }
 }

@@ -25,7 +25,7 @@
                      Height="22" TabIndex="2" ToolTip="Enter substring for filtration" TextChanged="OnTextFilter_TextChanged"/>
             <ComboBox x:Name="groupFilterCBox" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" 
                       IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" 
-                      ToolTip="Select in the dropdown list groups that should be shown" KeyUp="GroupFilter_KeyUp">
+                      ToolTip="Select in the dropdown list groups that should be shown" KeyUp="OnGroupFilterCBox_KeyUp">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel MinWidth="150" Background="Transparent" Orientation="Horizontal" 
@@ -37,11 +37,12 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
-                    TabIndex="4" ToolTip="Clear filter" Click="OnClearFilterBtn_Click"/>
+                    TabIndex="4" ToolTip="Clear filter" Click="OnClearFilterBtn_Click" IsEnabled="False"/>
             <Button Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,10,5" 
                     DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False"/>
-            <ComboBox Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" DockPanel.Dock="Right" 
-                      Height="22" TabIndex="7" IsEnabled="False"/>
+            <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
+                      DockPanel.Dock="Right" Height="22" TabIndex="7" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
+                      DropDownClosed="OnToGroupCBox_DropDownClosed" ToolTip="Move selected words to the group"/>
             <Button x:Name="deleteBtn" Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
                     Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6" IsEnabled="False" 
                     ToolTip="Delete selected clauses" Click="OnDeleteBtn_Click"/>

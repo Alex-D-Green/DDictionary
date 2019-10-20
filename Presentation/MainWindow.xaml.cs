@@ -52,10 +52,13 @@ namespace DDictionary.Presentation
         {
             InitializeComponent();
 
-            #region Group filter initialization
+            #region ComboBoxes with groups initialization
 
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
+            {
                 groupFilterCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
+                toGroupCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
+            }
 
             UpdateGroupFilterText();
 
@@ -182,8 +185,34 @@ namespace DDictionary.Presentation
         private void OnMainDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             selectedWordsLbl.Content = mainDataGrid.SelectedItems.Count;
-            
-            deleteBtn.IsEnabled = mainDataGrid.SelectedItems.Count > 0;
+
+            toGroupCBox.IsEnabled = deleteBtn.IsEnabled = mainDataGrid.SelectedItems.Count > 0;
+        }
+
+        /// <summary>
+        /// Move selected words to the selected group and clear combo box selection.
+        /// </summary>
+        private void OnToGroupCBox_DropDownClosed(object sender, EventArgs e)
+        {
+            if(toGroupCBox.SelectedItem is null)
+                return;
+
+            try
+            {
+                var toGroup = (CheckBoxItem<WordGroup>)toGroupCBox.SelectedItem;
+
+                if(MessageBox.Show(this,
+                    String.Format(PrgResources.GroupChangeConfirmation, toGroup, mainDataGrid.SelectedItems.Count),
+                    PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                    return;
+
+                dbFacade.MoveClausesToGroup(toGroup.ItemValue, mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                                                         .Select(o => o.Id)
+                                                                                         .ToArray());
+
+                UpdateDataGrid();
+            }
+            finally { toGroupCBox.SelectedItem = null; }
         }
 
         /// <summary>
@@ -197,6 +226,7 @@ namespace DDictionary.Presentation
 
             UpdateDataGrid();
             UpdateGroupFilterText();
+            UpdateClearFilterButtonState();
         }
 
         /// <summary>
@@ -245,6 +275,17 @@ namespace DDictionary.Presentation
 
             UpdateDataGrid();
             UpdateGroupFilterText();
+            UpdateClearFilterButtonState();
+        }
+
+        /// <summary>
+        /// Enable/disable "Clear filter" button depending on current filter state.
+        /// </summary>
+        private void UpdateClearFilterButtonState()
+        {
+            clearFilterBtn.IsEnabled = currentFilter.TextFilter?.Length > 0 ||
+                                       currentFilter.RelatedFrom != null ||
+                                       currentFilter.ShownGroups.Any();
         }
 
         /// <summary>
@@ -274,6 +315,8 @@ namespace DDictionary.Presentation
 
             if(updateGrid)
                 UpdateDataGrid();
+
+            UpdateClearFilterButtonState();
         }
 
         /// <summary>
@@ -291,10 +334,9 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Keyboard handler for groupFilter combo box.
         /// </summary>
-        private void GroupFilter_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnGroupFilterCBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Key == Key.Space && 
-                (Keyboard.Modifiers & ModifierKeys.Alt) != ModifierKeys.Alt)
+            if(e.Key == Key.Space && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
             {
                 if(groupFilterCBox.IsDropDownOpen)
                 { //Check/uncheck current item of the dropdown
@@ -320,6 +362,18 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
+        /// Keyboard handler for toGroup combo box.
+        /// </summary>
+        private void OnToGroupCBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Space && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt) && !toGroupCBox.IsDropDownOpen)
+                toGroupCBox.IsDropDownOpen = true; //Show the dropdown by Space key
+
+            if((e.Key == Key.Up || e.Key == Key.Down) && !toGroupCBox.IsDropDownOpen)
+                toGroupCBox.SelectedItem = null; //Restore shown text IN THE CLOSED combo box after keyboard "selection"
+        }
+
+        /// <summary>
         /// Handle "Show relations" column button click.
         /// </summary>
         private void ShowRelationsButton_Click(object sender, RoutedEventArgs e)
@@ -337,6 +391,7 @@ namespace DDictionary.Presentation
             
             UpdateDataGrid();
             UpdateGroupFilterText();
+            UpdateClearFilterButtonState();
         }
 
         /// <summary>
