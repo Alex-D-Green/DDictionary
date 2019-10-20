@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -118,14 +119,33 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Refill main data grid with accordance to current filter.
         /// </summary>
-        private void UpdateDataGrid()
+        /// <param name="clearSorting">Set clauses in the default order.</param>
+        private void UpdateDataGrid(bool clearSorting = false)
         {
-            mainDataGrid.Items.Clear();
+            //Only one column could have sorting
+            Debug.Assert(mainDataGrid.Items.SortDescriptions.Count <= 1);
 
+            //Remember sorting if any
+            SortDescription? sorting = mainDataGrid.Items.SortDescriptions.Count > 0
+                ? mainDataGrid.Items.SortDescriptions[0]
+                : (SortDescription?)null;
+
+            mainDataGrid.Items.Clear();
+            
             foreach(DataGridClause item in LoadData())
                 mainDataGrid.Items.Add(item);
 
             ClearSorting();
+
+            if(!clearSorting && sorting.HasValue)
+            { //Restore sorting
+                mainDataGrid.Items.SortDescriptions.Add(sorting.Value); //Sorting itself
+
+                mainDataGrid.Columns.First(o => o.SortMemberPath == sorting.Value.PropertyName)
+                                    .SortDirection = sorting.Value.Direction; //Column header arrow
+
+                mainDataGrid.Items.Refresh();
+            }
 
             UpdateStatusBar();
         }
@@ -273,7 +293,7 @@ namespace DDictionary.Presentation
             currentFilter.RelatedFrom = null;
             currentFilter.TextFilter = textFilterEdit.Text;
 
-            UpdateDataGrid();
+            UpdateDataGrid(clearSorting: true); //Cuz clauses in the special order after text filtration
             UpdateGroupFilterText();
             UpdateClearFilterButtonState();
         }
@@ -285,7 +305,7 @@ namespace DDictionary.Presentation
         {
             clearFilterBtn.IsEnabled = currentFilter.TextFilter?.Length > 0 ||
                                        currentFilter.RelatedFrom != null ||
-                                       currentFilter.ShownGroups.Any();
+                                       currentFilter.ShownGroups?.Any() == true;
         }
 
         /// <summary>
