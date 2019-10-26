@@ -88,7 +88,9 @@ namespace DDictionary.Presentation
                 Sound = cl.Sound,
                 Word = cl.Word,
                 Transcription = cl.Transcription,
-                Translations = cl.Translations.Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
+                Translations = cl.Translations.OrderBy(o => o.Index)
+                                              .Select(o => o.Translation)
+                                              .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
                                               .TrimEnd(' ', ';'),
                 Context = cl.Context,
                 Relations = cl.Relations.Select(o => o.To.Word)

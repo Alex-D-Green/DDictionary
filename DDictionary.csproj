@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
+    <Compile Include="Domain\Entities\TranslationLink.cs" />
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
     <Compile Include="Presentation\Converters\TranslationConverter.cs" />
