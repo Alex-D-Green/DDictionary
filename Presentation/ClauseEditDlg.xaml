@@ -48,7 +48,8 @@
             <DockPanel Margin="0,15,0,0">
                 <Button x:Name="deleteClauseBtn" Content="Delete" Width="60" Padding="2" TabIndex="200"/>
                 <Button x:Name="saveClauseBtn" Content="Save" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="202"/>
-                <Button Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="201"/>
+                <Button x:Name="newClauseBtn" Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="201"
+                        Click="OnNewClauseBtn_Click"/>
             </DockPanel>
         </StackPanel>
     </Grid>

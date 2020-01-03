@@ -28,7 +28,7 @@ namespace DDictionary.Presentation
 
 
         /// <summary>The editing clause (<c>null</c> for new one).</summary>
-        private readonly Clause clause;
+        private Clause clause;
 
         /// <summary>The list of removed translations' ids.</summary>
         private readonly List<int> removedTranslations = new List<int>();
@@ -50,6 +50,8 @@ namespace DDictionary.Presentation
 
             if(clauseId.HasValue)
                 clause = dbFacade.GetClauseById(clauseId.Value);
+            else
+                CreateNewClause();
 
             InitializeComponent();
 
@@ -64,6 +66,22 @@ namespace DDictionary.Presentation
                 groupCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
 
             UpdateInfo();
+        }
+
+        /// <summary>
+        /// Create a new empty clause and put it into <see cref="DDictionary.Presentation.ClauseEditDlg.clause"/>.
+        /// </summary>
+        private void CreateNewClause()
+        {
+            clause = new Clause
+            {
+                Id = 0, //A new clause mark
+                Group = WordGroup.E_TotallyUnknown,
+                Added = DateTime.Now,
+
+                Relations = new List<Relation>(),
+                Translations = new List<TranslationLink>()
+            };
         }
 
         /// <summary>
@@ -83,24 +101,9 @@ namespace DDictionary.Presentation
             removedTranslations.Clear();
 
             translationsPanel.Children[0].Visibility = Visibility.Collapsed; //To hide the "template" row
-            deleteClauseBtn.IsEnabled = (clause != null);
+            deleteClauseBtn.IsEnabled = clause.Id != 0;
 
             Activated += OnClauseEditDlg_Activated; //To do initial actions when form will be shown
-
-            if(clause is null)
-            { //Brand new clause
-                groupCBox.SelectedItem = null;
-                wordLbl.Text = null;
-                transcriptionLbl.Text = null;
-                UpdatePlaySoundButtonState();
-                contextEdit.Text = null;
-                relationsLbl.Text = null; //There is no a word yet so what to do with relations?..
-
-                UpdateAddButtonState();
-
-                saveClauseBtn.IsEnabled = false;
-                return;
-            }
 
             groupCBox.SelectedItem = groupCBox.Items.Cast<CheckBoxItem<WordGroup>>()
                                                     .Single(o => o.ItemValue == clause.Group);
@@ -173,8 +176,9 @@ namespace DDictionary.Presentation
                 Part = part
             };
 
+            copy.Name = null; //To show that it's a new item
             copy.Visibility = Visibility.Visible;
-            copy.Tag = transaltionDTO;
+            //copy.Tag = transaltionDTO; //???
 
             var newTranslationLbl = (TextBlock)copy.FindName(nameof(translationLbl));
             newTranslationLbl.Text = text;
@@ -305,6 +309,33 @@ namespace DDictionary.Presentation
             SoundManager.StopPlaying();
 
             base.OnClosed(e);
+        }
+
+        /// <summary>
+        /// Handle New clause button click.
+        /// </summary>
+        private void OnNewClauseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(saveClauseBtn?.IsEnabled == true &&
+               MessageBox.Show(this, PrgResources.ChangesDiscardingWarning, PrgResources.InformationCaption,
+                               MessageBoxButton.OKCancel, MessageBoxImage.Warning) != MessageBoxResult.OK)
+            { 
+                return; 
+            }
+
+            CreateNewClause();
+            UpdateInfo();
+
+            //Remove all old added translations
+            FrameworkElement[] toRemove = translationsPanel.Children.OfType<FrameworkElement>()
+                                                                    .Where(o => o.Name == null) //The item that was added
+                                                                    .ToArray();
+            LooseHeight();
+
+            foreach(FrameworkElement item in toRemove)
+                translationsPanel.Children.Remove(item);
+
+            FixHeight();
         }
     }
 }

@@ -92,6 +92,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All not saved changes will be discard!.
+        /// </summary>
+        internal static string ChangesDiscardingWarning {
+            get {
+                return ResourceManager.GetString("ChangesDiscardingWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete {0} selected clause[s]?.
         /// </summary>
         internal static string ClausesDeletionConfirmation {

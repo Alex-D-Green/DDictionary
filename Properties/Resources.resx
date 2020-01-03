@@ -130,6 +130,9 @@
 
 {1}</value>
   </data>
+  <data name="ChangesDiscardingWarning" xml:space="preserve">
+    <value>All not saved changes will be discard!</value>
+  </data>
   <data name="ClausesDeletionConfirmation" xml:space="preserve">
     <value>Delete {0} selected clause[s]?</value>
   </data>
