@@ -43,7 +43,7 @@ namespace DDictionary.Presentation.Converters
             if(relations?.Any() != true) //There are no relations let's add the placeholder to allow user to add some
                 return $"[{Properties.Resources.AddRelationPlaceholder}]";
 
-            return relations.Select(o => o.To.Word)
+            return relations.Select(o => o.ToClause.Word)
                             .Distinct()
                             .OrderBy(o => o)
                             .Aggregate("", (s, o) => s += $"{o}; ")

@@ -69,7 +69,7 @@ namespace DDictionary.Presentation
             //Show rows of relations
             foreach(Relation rel in clause.Relations)
             {
-                AddRelationRow(rel.Id, rel.To.Word, rel.To.Id, rel.Description);
+                AddRelationRow(rel.Id, rel.ToClause.Word, rel.ToClause.Id, rel.Description);
 
                 if(countOfRelations == MaxCountOfRelations)
                     break; //The maximal amount has been shown

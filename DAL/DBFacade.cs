@@ -98,12 +98,12 @@ namespace DDictionary.DAL
             };
 
             ((List<Relation>)apple.Relations).Add(
-                new Relation { Id = ++relationsId, From = apple, To = pear, Description = "Фрукты" });
+                new Relation { Id = ++relationsId, ToClause = pear, Description = "Фрукты" });
             ((List<Relation>)apple.Relations).Add(
-                new Relation { Id = ++relationsId, From = apple, To = computer, Description = "Apple Inc." });
+                new Relation { Id = ++relationsId, ToClause = computer, Description = "Apple Inc." });
 
             ((List<Relation>)computer.Relations).Add(
-                new Relation { Id = ++relationsId, From = computer, To = apple, Description = "Apple Inc." });
+                new Relation { Id = ++relationsId, ToClause = apple, Description = "Apple Inc." });
 
             clauses.Add(apple);
             clauses.Add(pear);
@@ -124,7 +124,7 @@ namespace DDictionary.DAL
             var ret = clauses.AsEnumerable();
 
             if(filter.RelatedFrom != null)
-                ret = ret.Where(o => filter.RelatedFrom.Relations.Any(r => r.To.Id == o.Id));
+                ret = ret.Where(o => filter.RelatedFrom.Relations.Any(r => r.ToClause.Id == o.Id));
 
             if(filter.ShownGroups?.Any() == true)
                 ret = ret.Where(o => filter.ShownGroups.Contains(o.Group));
@@ -137,7 +137,7 @@ namespace DDictionary.DAL
                 //Secondary targets (excluding the word itself)
                 var ret2 = ret.Where(o => !o.Word.Contains(filter.TextFilter) &&
                                           (o.Context.Contains(filter.TextFilter) ||
-                                           o.Relations.Any(r => r.To.Word.Contains(filter.TextFilter)) ||
+                                           o.Relations.Any(r => r.ToClause.Word.Contains(filter.TextFilter)) ||
                                            o.Translations.Any(t => t.Text.Contains(filter.TextFilter))));
 
                 //To get the words' matches in the beginning
@@ -166,16 +166,14 @@ namespace DDictionary.DAL
             { //New relation entity
                 ((List<Relation>)from.Relations).Add(new Relation { 
                     Id = ++relationsId,
-                    From = from,
-                    To = to,
+                    ToClause = to,
                     Description = relDescription
                 });
             }
             else
             {
                 Relation rel = from.Relations.Single(o => o.Id == relationId);
-                rel.From = from;
-                rel.To = to;
+                rel.ToClause = to;
                 rel.Description = relDescription;
             }
 
@@ -201,7 +199,7 @@ namespace DDictionary.DAL
         {
             Clause clauseToRemove = clauses.Single(o => o.Id == id);
 
-            foreach(Relation relation in clauses.SelectMany(o => o.Relations).Where(o => o.To.Id == clauseToRemove.Id).ToArray())
+            foreach(Relation relation in clauses.SelectMany(o => o.Relations).Where(o => o.ToClause.Id == clauseToRemove.Id).ToArray())
                 RemoveRelation(relation.Id);
 
             clauses.Remove(clauseToRemove);
