@@ -79,43 +79,11 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
-        /// Make ClauseDataGridDTO from Clause.
-        /// </summary>
-        private static DataGridClause MakeClauseDataGridDTO(Clause cl)
-        {
-            var ret = new DataGridClause() {
-                Id = cl.Id,
-                Sound = cl.Sound,
-                Word = cl.Word,
-                Transcription = cl.Transcription,
-                Translations = cl.Translations.OrderBy(o => o.Index)
-                                              .Select(o => o.Translation)
-                                              .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
-                                              .TrimEnd(' ', ';'),
-                Context = cl.Context,
-                Relations = cl.Relations.Select(o => o.To.Word)
-                                        .Distinct()
-                                        .OrderBy(o => o)
-                                        .Aggregate("", (s, o) => s += $"{o}; ")
-                                        .TrimEnd(' ', ';'),
-                HasRelations = (cl.Relations.Count > 0),
-                Added = cl.Added,
-                Updated = cl.Updated,
-                Group = cl.Group
-            };
-
-            if(!ret.HasRelations) //There are no relations let's add the placeholder to allow user to add some
-                ret.Relations = $"[{PrgResources.AddRelationPlaceholder}]";
-
-            return ret;
-        }
-
-        /// <summary>
         /// Get all clauses that satisfy current filter (see <see cref="DDictionary.MainWindow.currentFilter"/>).
         /// </summary>
         private IEnumerable<DataGridClause> LoadData()
         {
-            return dbFacade.GetClauses(currentFilter).Select(o => MakeClauseDataGridDTO(o));
+            return dbFacade.GetClauses(currentFilter).Select(o => o.MakeClauseDataGrid());
         }
 
         /// <summary>
@@ -419,76 +387,25 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Handle play sound column button click.
         /// </summary>
-        /// <seealso cref="DDictionary.MainWindow.mediaPlayer"/>
+        /// <seealso cref="DDictionary.Presentation.SoundManager"/>
         private async void PlaySoundButton_Click(object sender, RoutedEventArgs e)
         {
             var ctrl = (FrameworkElement)sender;
             ctrl.IsEnabled = false; //Temporary disabled to prevent multiple clicking
 
-            try
+            try 
             {
                 var clauseDTO = (DataGridClause)ctrl.DataContext;
 
-                if(String.IsNullOrEmpty(clauseDTO.Sound))
-                { //There is no sound for this clause
-                    Debug.WriteLine($"Broken link in {nameof(PlaySoundButton_Click)}()!");
-                    return;
-                }
+                await SoundManager.PlaySoundAsync(clauseDTO.Id, clauseDTO.Sound); 
+            }
+            catch(IOException ex)
+            {
+                Debug.WriteLine(ex.ToString());
 
-                try
-                {
-                    var source = new Uri(clauseDTO.Sound);
-
-                    if(!source.IsFile)
-                    { //Let's try to download this file
-                        if(!soundsCacheFolder.Exists)
-                            soundsCacheFolder.Create();
-
-                        var localFile = new FileInfo(
-                            Path.Combine(soundsCacheFolder.FullName, makeLocalFileName(clauseDTO)) );
-
-                        if(!localFile.Exists)
-                        { //It's not in the cache yet
-                            using(var client = new System.Net.WebClient())
-                                await client.DownloadFileTaskAsync(source, localFile.FullName);
-                        }
-
-                        source = new Uri(localFile.FullName); //Now it's path to local cached file
-                    }
-
-                    if(!File.Exists(source.AbsolutePath))
-                    {
-                        MessageBox.Show(this, String.Format(PrgResources.FileNotFoundError, source.AbsolutePath),
-                            PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-
-                        return;
-                    }
-
-                    //Play sound file
-                    if(mediaPlayer.Source != source)
-                        mediaPlayer.Open(source);
-
-                    mediaPlayer.Stop(); //To stop previous play
-                    mediaPlayer.Play();
-                }
-                catch(Exception ex)
-                {
-                    Debug.WriteLine(ex.ToString());
-
-                    MessageBox.Show(this, String.Format(PrgResources.CannotPlaySound, clauseDTO.Sound, ex.Message),
-                        PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally { ctrl.IsEnabled = true; }
-
-
-            string makeLocalFileName(DataGridClause clause)
-            { //Make an unique name for the sound file cuz original ones prone to repeat each other
-                return String.Concat(
-                    clause.Id.ToString("x8"),                  //The new name consists of the clause id
-                    clause.Sound.GetHashCode().ToString("x8"), //and the hash of the original source path.
-                    Path.GetExtension(clause.Sound));          //File extension remains the same.
-            }
         }
 
         /// <summary>
@@ -531,6 +448,30 @@ namespace DDictionary.Presentation
                                                              .ToArray());
 
             UpdateDataGrid();
+        }
+
+        /// <summary>
+        /// Add new clause button handler.
+        /// </summary>
+        private void OnAddWordButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new ClauseEditDlg(null) { Owner = this };
+
+            if(dlg.ShowDialog() == true)
+                UpdateDataGrid();
+        }
+
+        /// <summary>
+        /// Edit clause button handler.
+        /// </summary>
+        private void OnDataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Debug.Assert(sender is DataGridRow row && row.DataContext is DataGridClause);
+
+            var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id) { Owner = this };
+
+            if(dlg.ShowDialog() == true)
+                UpdateDataGrid();
         }
     }
 }

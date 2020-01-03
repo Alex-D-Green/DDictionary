@@ -47,7 +47,8 @@
                     Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6" IsEnabled="False" 
                     ToolTip="Delete selected clauses" Click="OnDeleteBtn_Click"/>
             <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
-                    DockPanel.Dock="Right" Height="22" TabIndex="5" IsEnabled="False"/>
+                    DockPanel.Dock="Right" Height="22" TabIndex="5" Click="OnAddWordButton_Click"
+                    ToolTip="Add new clause to the dictionary"/>
         </DockPanel>
         <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 
                   HeadersVisibility="Column" SelectionMode="Extended" BorderThickness="1" IsReadOnly="True"
@@ -83,6 +84,7 @@
                         </Trigger>
                     </Style.Triggers>
                     <EventSetter Event="PreviewMouseDown" Handler="OnDataGridRow_PreviewMouseDown"/>
+                    <EventSetter Event="MouseDoubleClick" Handler="OnDataGridRow_MouseDoubleClick"/>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>

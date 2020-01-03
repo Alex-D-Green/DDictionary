@@ -19,7 +19,6 @@
             <TextBox x:Name="descrTBox" Text="" Margin="5" Height="22" TabIndex="1" VerticalContentAlignment="Center"/>
         </DockPanel>
         <DockPanel Margin="5,0,5,5" x:Name="addNewRelationPanel">
-
             <ComboBox x:Name="listOfWordsCBox" Margin="5" Width="150" Height="22" TabIndex="1000" 
                       SelectionChanged="OnListOfWordsCBox_SelectionChanged">
                 <ComboBox.ItemTemplate>
@@ -38,9 +37,9 @@
         </DockPanel>
         <DockPanel Margin="5,25,5,5" LastChildFill="False">
             <Button Content="Cancel" DockPanel.Dock="Right" Margin="5" Width="100" Height="22" TabIndex="2002" 
-                    Click="OnCancelButton_Click"/>
+                    Click="OnCancelButton_Click" IsCancel="True"/>
             <Button x:Name="acceptBtn" Content="Accept" DockPanel.Dock="Right" Margin="5" Width="100" Height="22" 
-                    TabIndex="2001" Click="OnAcceptButton_Click" IsEnabled="False"/>
+                    TabIndex="2001" Click="OnAcceptButton_Click" IsEnabled="False" IsDefault="True"/>
         </DockPanel>
     </StackPanel>
 </Window>

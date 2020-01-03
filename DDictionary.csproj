@@ -61,6 +61,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
+    <Compile Include="Presentation\ClauseEditDlg.xaml.cs">
+      <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Converters\ClauseToDataGridClauseMapper.cs" />
     <Compile Include="Domain\Entities\TranslationLink.cs" />
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
@@ -74,6 +78,10 @@
     <Compile Include="Presentation\RelationsEditDlg.xaml.cs">
       <DependentUpon>RelationsEditDlg.xaml</DependentUpon>
     </Compile>
+    <Page Include="Presentation\ClauseEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Presentation\InfoPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -88,6 +96,10 @@
     </Compile>
     <Compile Include="Domain\FiltrationCriteria.cs" />
     <Compile Include="Domain\IDBFacade.cs" />
+    <Compile Include="Presentation\SoundManager.cs" />
+    <Compile Include="Presentation\SoundRefEditDlg.xaml.cs">
+      <DependentUpon>SoundRefEditDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\ViewModels\DataGridClause.cs" />
     <Compile Include="DAL\DBFacade.cs" />
     <Compile Include="Presentation\ViewModels\CheckBoxItem.cs" />
@@ -101,6 +113,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Presentation\RelationsEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\SoundRefEditDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,6 +145,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

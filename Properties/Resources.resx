@@ -125,6 +125,11 @@
 
 {1}</value>
   </data>
+  <data name="CannotRefreshSound" xml:space="preserve">
+    <value>Can not refresh sound: "{0}"
+
+{1}</value>
+  </data>
   <data name="ClausesDeletionConfirmation" xml:space="preserve">
     <value>Delete {0} selected clause[s]?</value>
   </data>
@@ -133,6 +138,9 @@
   </data>
   <data name="ExceedMaxCountOfRelations" xml:space="preserve">
     <value>Only {0} (the maximal count) out of {1} relations have been shown.</value>
+  </data>
+  <data name="ExceedMaxCountOfTranslations" xml:space="preserve">
+    <value>Only {0} (the maximal count) out of {1} translations have been shown.</value>
   </data>
   <data name="FileNotFoundError" xml:space="preserve">
     <value>File "{0}" not found!</value>
@@ -148,6 +156,9 @@
   </data>
   <data name="RelationsFilterTextTmpl" xml:space="preserve">
     <value>"{0}" relations</value>
+  </data>
+  <data name="SelectSoundFileTitle" xml:space="preserve">
+    <value>Select a sound file for the word</value>
   </data>
   <data name="ThereAreNoRelations" xml:space="preserve">
     <value>This clause has no any related ones.</value>

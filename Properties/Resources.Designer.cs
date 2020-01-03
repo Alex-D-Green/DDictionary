@@ -81,6 +81,17 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can not refresh sound: &quot;{0}&quot;
+        ///
+        ///{1}.
+        /// </summary>
+        internal static string CannotRefreshSound {
+            get {
+                return ResourceManager.GetString("CannotRefreshSound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete {0} selected clause[s]?.
         /// </summary>
         internal static string ClausesDeletionConfirmation {
@@ -104,6 +115,15 @@ namespace DDictionary.Properties {
         internal static string ExceedMaxCountOfRelations {
             get {
                 return ResourceManager.GetString("ExceedMaxCountOfRelations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only {0} (the maximal count) out of {1} translations have been shown..
+        /// </summary>
+        internal static string ExceedMaxCountOfTranslations {
+            get {
+                return ResourceManager.GetString("ExceedMaxCountOfTranslations", resourceCulture);
             }
         }
         
@@ -149,6 +169,15 @@ namespace DDictionary.Properties {
         internal static string RelationsFilterTextTmpl {
             get {
                 return ResourceManager.GetString("RelationsFilterTextTmpl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a sound file for the word.
+        /// </summary>
+        internal static string SelectSoundFileTitle {
+            get {
+                return ResourceManager.GetString("SelectSoundFileTitle", resourceCulture);
             }
         }
         

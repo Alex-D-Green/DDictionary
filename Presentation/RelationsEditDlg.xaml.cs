@@ -52,7 +52,7 @@ namespace DDictionary.Presentation
         public RelationsEditDlg(int clauseId)
         {
             if(clauseId <= 0)
-                throw new ArgumentOutOfRangeException(nameof(clause));
+                throw new ArgumentOutOfRangeException(nameof(clauseId));
 
 
             clause = dbFacade.GetClauseById(clauseId);
