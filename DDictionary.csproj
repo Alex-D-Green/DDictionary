@@ -65,7 +65,6 @@
       <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="Presentation\Converters\ClauseToDataGridClauseMapper.cs" />
-    <Compile Include="Domain\Entities\TranslationLink.cs" />
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
     <Compile Include="Presentation\Converters\TranslationConverter.cs" />

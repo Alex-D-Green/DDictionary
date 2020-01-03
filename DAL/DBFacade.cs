@@ -18,7 +18,6 @@ namespace DDictionary.DAL
 
         private static int clausesId;
         private static int translationsId;
-        private static int translationLinksId;
         private static int relationsId;
 
         static InMemoryMockStorage()
@@ -29,24 +28,18 @@ namespace DDictionary.DAL
                 Sound = "https://audiocdn.lingualeo.com/v2/2/3256-631152008.mp3",
                 Word = "apple",
                 Transcription = "æpl",
-                Translations = new List<TranslationLink> {
-                    new TranslationLink {
-                        Id = ++translationLinksId,
+                Translations = new List<Translation> {
+                    new Translation {
+                        Id = ++translationsId,
                         Index = ++translationIdx,
-                        Translation = new Translation {
-                            Id = ++translationsId,
-                            Part = PartOfSpeech.Noun,
-                            Text = "яблоко"
-                        },
+                        Part = PartOfSpeech.Noun,
+                        Text = "яблоко"
                     },
-                    new TranslationLink {
-                        Id = ++translationLinksId,
+                    new Translation {
+                        Id = ++translationsId,
                         Index = ++translationIdx,
-                        Translation = new Translation {
-                            Id = ++translationsId,
-                            Part = PartOfSpeech.Adjective,
-                            Text = "яблочный"
-                        },
+                        Part = PartOfSpeech.Adjective,
+                        Text = "яблочный"
                     },
                 },
                 Context = "It's so delicious apple!",
@@ -62,15 +55,12 @@ namespace DDictionary.DAL
                 Sound = "https://audiocdn.lingualeo.com/v2/2/29775-631152008.mp3",
                 Word = "pear",
                 Transcription = "pɛə",
-                Translations = new List<TranslationLink> {
-                    new TranslationLink {
-                        Id = ++translationLinksId,
+                Translations = new List<Translation> {
+                    new Translation {
+                        Id = ++translationsId,
                         Index = ++translationIdx,
-                        Translation = new Translation {
-                            Id = ++translationsId,
-                            Part = PartOfSpeech.Noun,
-                            Text = "груша"
-                        },
+                        Part = PartOfSpeech.Noun,
+                        Text = "груша"
                     },
                 },
                 Context = "I hate pears!",
@@ -86,24 +76,18 @@ namespace DDictionary.DAL
                 Sound = null,
                 Word = "computer",
                 Transcription = "kəm'pju:tə",
-                Translations = new List<TranslationLink> {
-                    new TranslationLink {
-                        Id = ++translationLinksId,
+                Translations = new List<Translation> {
+                    new Translation {
+                        Id = ++translationsId,
                         Index = ++translationIdx,
-                        Translation = new Translation {
-                            Id = ++translationsId,
-                            Part = PartOfSpeech.Noun,
-                            Text = "компьютер"
-                        },
+                        Part = PartOfSpeech.Noun,
+                        Text = "компьютер"
                     },
-                    new TranslationLink {
-                        Id = ++translationLinksId,
+                    new Translation {
+                        Id = ++translationsId,
                         Index = ++translationIdx,
-                        Translation = new Translation {
-                            Id = ++translationsId,
-                            Part = PartOfSpeech.Adjective,
-                            Text = "компьютерный, машинный"
-                        },
+                        Part = PartOfSpeech.Adjective,
+                        Text = "компьютерный, машинный"
                     },
                 },
                 Context = "personal computer",
@@ -154,7 +138,7 @@ namespace DDictionary.DAL
                 var ret2 = ret.Where(o => !o.Word.Contains(filter.TextFilter) &&
                                           (o.Context.Contains(filter.TextFilter) ||
                                            o.Relations.Any(r => r.To.Word.Contains(filter.TextFilter)) ||
-                                           o.Translations.Any(t => t.Translation.Text.Contains(filter.TextFilter))));
+                                           o.Translations.Any(t => t.Text.Contains(filter.TextFilter))));
 
                 //To get the words' matches in the beginning
                 ret = ret1.Concat(ret2);

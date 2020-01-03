@@ -24,7 +24,6 @@ namespace DDictionary.Presentation.Converters
                 Word = cl.Word,
                 Transcription = cl.Transcription,
                 Translations = cl.Translations.OrderBy(o => o.Index)
-                                              .Select(o => o.Translation)
                                               .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
                                               .TrimEnd(' ', ';'),
                 Context = cl.Context,

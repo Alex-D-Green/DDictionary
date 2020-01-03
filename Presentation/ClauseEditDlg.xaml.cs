@@ -80,7 +80,7 @@ namespace DDictionary.Presentation
                 Added = DateTime.Now,
 
                 Relations = new List<Relation>(),
-                Translations = new List<TranslationLink>()
+                Translations = new List<Translation>()
             };
         }
 
@@ -115,7 +115,7 @@ namespace DDictionary.Presentation
             relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(clause.Relations);
 
             //Show rows of translations
-            foreach(Translation tr in clause.Translations.OrderBy(o => o.Index).Select(o => o.Translation))
+            foreach(Translation tr in clause.Translations.OrderBy(o => o.Index))
             {
                 AddTranslationRow(tr.Id, tr.Text, tr.Part);
 

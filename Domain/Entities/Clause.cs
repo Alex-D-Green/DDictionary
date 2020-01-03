@@ -9,7 +9,7 @@ namespace DDictionary.Domain.Entities
         public string Sound { get; set; }
         public string Word { get; set; }
         public string Transcription { get; set; }
-        public IReadOnlyCollection<TranslationLink> Translations { get; set; }
+        public IReadOnlyCollection<Translation> Translations { get; set; }
         public string Context { get; set; }
         public IReadOnlyCollection<Relation> Relations { get; set; }
         public DateTime Added { get; set; }
