@@ -12,7 +12,7 @@ namespace DDictionary.Presentation.Converters
         /// <summary>
         /// Make ClauseDataGrid from Clause.
         /// </summary>
-        public static DataGridClause MakeClauseDataGrid(this Clause cl)
+        public static DataGridClause MapToDataGridClause(this Clause cl)
         {
             if(cl is null)
                 throw new System.ArgumentNullException(nameof(cl));
@@ -27,7 +27,7 @@ namespace DDictionary.Presentation.Converters
                                               .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
                                               .TrimEnd(' ', ';'),
                 Context = cl.Context,
-                Relations = MakeRelationsString(cl.Relations),
+                Relations = MakeRelationsString(cl.Relations.Select(o => o.ToClause.Word)),
                 HasRelations = (cl.Relations.Count > 0),
                 Added = cl.Added,
                 Updated = cl.Updated,
@@ -38,13 +38,12 @@ namespace DDictionary.Presentation.Converters
         /// <summary>
         /// Get a string representation of the relations.
         /// </summary>
-        public static string MakeRelationsString(IEnumerable<Relation> relations)
+        public static string MakeRelationsString(IEnumerable<string> relations)
         {
             if(relations?.Any() != true) //There are no relations let's add the placeholder to allow user to add some
                 return $"[{Properties.Resources.AddRelationPlaceholder}]";
 
-            return relations.Select(o => o.ToClause.Word)
-                            .Distinct()
+            return relations.Distinct()
                             .OrderBy(o => o)
                             .Aggregate("", (s, o) => s += $"{o}; ")
                             .TrimEnd(' ', ';');

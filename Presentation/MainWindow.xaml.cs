@@ -83,7 +83,7 @@ namespace DDictionary.Presentation
         /// </summary>
         private IEnumerable<DataGridClause> LoadData()
         {
-            return dbFacade.GetClauses(currentFilter).Select(o => o.MakeClauseDataGrid());
+            return dbFacade.GetClauses(currentFilter).Select(o => o.MapToDataGridClause());
         }
 
         /// <summary>
@@ -428,10 +428,30 @@ namespace DDictionary.Presentation
             if(!(e.OriginalSource is Hyperlink hyperlink))
                 return;
 
-            var dlg = new RelationsEditDlg(((DataGridClause)hyperlink.DataContext).Id) { Owner = this };
+            Clause cl = dbFacade.GetClauseById(((DataGridClause)hyperlink.DataContext).Id);
+            RelationDTO[] relLst = cl.Relations.Select(o => o.MapToRelationDTO()).ToArray();
+
+            var dlg = new RelationsEditDlg(cl.Id, cl.Word, relLst) { Owner = this };
 
             if(dlg.ShowDialog() == true)
+            {
+                foreach(int relId in cl.Relations.Select(o => o.Id).Except(dlg.Relations.Select(o => o.Id)).ToArray())
+                    dbFacade.RemoveRelation(relId);
+
+                foreach(RelationDTO rel in dlg.Relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
+                {
+                    dbFacade.AddOrUpdateRelation(rel.Id, cl.Id, rel.ToWordId, rel.Description);
+
+                    if(rel.MakeInterconnected)
+                    { //Add relation to the other side
+                        Debug.Assert(rel.Id == 0);
+
+                        dbFacade.AddOrUpdateRelation(0, rel.ToWordId, cl.Id, rel.Description);
+                    }
+                }
+
                 UpdateDataGrid();
+            }
         }
 
         /// <summary>

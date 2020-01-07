@@ -41,6 +41,9 @@ namespace DDictionary.Presentation
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
 
+        /// <summary>All clause's relations.</summary>
+        private List<RelationDTO> relations { get; } = new List<RelationDTO>();
+
 
         public ClauseEditDlg(int? clauseId)
         {
@@ -49,7 +52,10 @@ namespace DDictionary.Presentation
 
 
             if(clauseId.HasValue)
+            {
                 clause = dbFacade.GetClauseById(clauseId.Value);
+                relations.AddRange(clause.Relations.Select(o => o.MapToRelationDTO()));
+            }
             else
                 CreateNewClause();
 
@@ -112,7 +118,7 @@ namespace DDictionary.Presentation
             transcriptionLbl.Text = clause.Transcription;
             UpdatePlaySoundButtonState();
             contextEdit.Text = clause.Context;
-            relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(clause.Relations);
+            UpdateRelations();
 
             //Show rows of translations
             foreach(Translation tr in clause.Translations.OrderBy(o => o.Index))
@@ -135,7 +141,7 @@ namespace DDictionary.Presentation
 
         private void UpdateRelations()
         {
-            relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(clause.Relations);
+            relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(relations.Select(o => o.ToWord));
         }
 
         /// <summary>
@@ -270,7 +276,9 @@ namespace DDictionary.Presentation
         /// </summary>
         private void OnSoundRefBtn_Click(object sender, RoutedEventArgs e)
         {
-            //What to do when there is no saved clause yet?..
+            //For all new clauses id = 0 is used, 
+            //so firstly the external sound will be cached according to this id (for every new clause) 
+            //but after the new clause will be saved the program needs to cache sound again with the correct clause's id.
 
             var dlg = new SoundRefEditDlg(clause) { Owner = this };
 
@@ -294,10 +302,13 @@ namespace DDictionary.Presentation
 
         private void OnRelationsLbl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var dlg = new RelationsEditDlg(clause.Id) { Owner = this };
+            var dlg = new RelationsEditDlg(clause.Id, clause.Word, relations) { Owner = this };
 
             if(dlg.ShowDialog() == true)
             {
+                relations.Clear();
+                relations.AddRange(dlg.Relations);
+                
                 UpdateRelations();
 
                 ChangesHaveBeenMade();

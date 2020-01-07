@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,25 +19,8 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class RelationsEditDlg: Window
     {
-        private sealed class RelationDTO
-        {
-            public int Id { get; set; }
-            public int ToWordId { get; set; }
-            public string Description { get; set; }
-            public bool DescriptionWasChanged { get; set; }
-            public bool MakeInterconnected { get; set; }
-        }
-
-
         /// <summary>The maximal count of handling relations.</summary>
         public const int MaxCountOfRelations = 10;
-
-
-        /// <summary>The clause which relations are editing.</summary>
-        private readonly Clause clause;
-
-        /// <summary>The list of removed relations' ids.</summary>
-        private readonly List<int> removedRelations = new List<int>();
 
 
         /// <summary>The count of relations in the dialog.</summary>
@@ -48,36 +30,45 @@ namespace DDictionary.Presentation
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
 
+        /// <summary>All clause's relations.</summary>
+        private List<RelationDTO> relations { get; } = new List<RelationDTO>();
 
-        public RelationsEditDlg(int clauseId)
+
+        /// <summary>All clause's relations.</summary>
+        /// <value><see cref="DDictionary.Presentation.RelationsEditDlg.relations"/></value>
+        public IReadOnlyCollection<RelationDTO> Relations { get => relations; }
+
+
+        public RelationsEditDlg(int clauseId, string word, IEnumerable<RelationDTO> relations)
         {
-            if(clauseId <= 0)
+            if(clauseId < 0)
                 throw new ArgumentOutOfRangeException(nameof(clauseId));
 
 
-            clause = dbFacade.GetClauseById(clauseId);
+            if(relations?.Any() == true)
+                this.relations.AddRange(relations);
 
             InitializeComponent();
 
-            wordLbl.Content = String.Format(PrgResources.WordRelationTo, clause.Word);
+            wordLbl.Content = String.Format(PrgResources.WordRelationTo, word);
 
             //Initialize the list of all words in the dictionary except this clause's word itself
             listOfWordsCBox.ItemsSource = dbFacade.GetJustWords()
-                                                  .Where(o => o.Id != clause.Id)
+                                                  .Where(o => o.Id != clauseId)
                                                   .OrderBy(o => o.Word);
 
             //Show rows of relations
-            foreach(Relation rel in clause.Relations)
+            foreach(RelationDTO rel in Relations)
             {
-                AddRelationRow(rel.Id, rel.ToClause.Word, rel.ToClause.Id, rel.Description);
+                AddRelationRow(rel);
 
                 if(countOfRelations == MaxCountOfRelations)
                     break; //The maximal amount has been shown
             }
 
-            if(clause.Relations.Count > MaxCountOfRelations)
+            if(Relations.Count > MaxCountOfRelations)
                 MessageBox.Show(this, 
-                    String.Format(PrgResources.ExceedMaxCountOfRelations, MaxCountOfRelations, clause.Relations.Count), 
+                    String.Format(PrgResources.ExceedMaxCountOfRelations, MaxCountOfRelations, Relations.Count), 
                     PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
 
             mainStackPanel.Children[1].Visibility = Visibility.Collapsed; //To hide the "template" row
@@ -99,28 +90,22 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Add new relation row (a panel with respective elements) to the dialog.
         /// </summary>
-        private void AddRelationRow(int relId, string word, int wordId, string descr, bool makeInterconnected = false)
+        /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.AddRelationRow(int, string, int, string, bool)"/>
+        private void AddRelationRow(RelationDTO relationDTO)
         {
             var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relationRow));
             int addPanelIdx = mainStackPanel.Children.IndexOf(addNewRelationPanel);
-
-            var relationDTO = new RelationDTO {
-                Id = relId,
-                ToWordId = wordId,
-                Description = descr,
-                MakeInterconnected = makeInterconnected
-            };
 
             copy.Visibility = Visibility.Visible;
             copy.Tag = relationDTO;
 
             var newToWordLbl = (Label)copy.FindName(nameof(toWordLbl));
-            newToWordLbl.Content = word;
+            newToWordLbl.Content = relationDTO.ToWord;
 
             var newDescrTBox = (TextBox)copy.FindName(nameof(descrTBox));
-            newDescrTBox.Text = descr;
+            newDescrTBox.Text = relationDTO.Description;
             newDescrTBox.TabIndex = addPanelIdx;
-            newDescrTBox.TextChanged += (s, e) => 
+            newDescrTBox.TextChanged += (s, e) =>
             {
                 relationDTO.Description = newDescrTBox.Text;
                 relationDTO.DescriptionWasChanged = true;
@@ -128,13 +113,11 @@ namespace DDictionary.Presentation
             };
 
             var newRemoveBtn = (Button)copy.FindName(nameof(removeBtn));
-            newRemoveBtn.Click += (s, e) => 
+            newRemoveBtn.Click += (s, e) =>
             {
                 LooseHeight();
 
                 mainStackPanel.Children.Remove(copy);
-                if(relId != 0)
-                    removedRelations.Add(relId);
 
                 FixHeight();
 
@@ -153,6 +136,23 @@ namespace DDictionary.Presentation
 
             countOfRelations++;
             UpdateAddButtonState();
+        }
+
+        /// <summary>
+        /// Add new relation row (a panel with respective elements) to the dialog.
+        /// </summary>
+        /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.AddRelationRow(RelationDTO)"/>
+        private void AddRelationRow(int relId, string word, int wordId, string descr, bool makeInterconnected = false)
+        {
+            var relationDTO = new RelationDTO {
+                Id = relId,
+                ToWordId = wordId,
+                ToWord = word,
+                Description = descr,
+                MakeInterconnected = makeInterconnected
+            };
+
+            AddRelationRow(relationDTO);
         }
 
         /// <summary>
@@ -244,27 +244,14 @@ namespace DDictionary.Presentation
             int relationRowIdx = mainStackPanel.Children.IndexOf(relationRow);
             int addPanelIdx = mainStackPanel.Children.IndexOf(addNewRelationPanel);
 
-            //Removing all deleted relations
-            foreach(int relId in removedRelations)
-                dbFacade.RemoveRelation(relId);
+            relations.Clear();
 
-            //Create/update changed relations
             for(int i=relationRowIdx+1; i<addPanelIdx; i++)
             {
                 var rowPanel = (FrameworkElement)mainStackPanel.Children[i];
                 var relationDTO = (RelationDTO)rowPanel.Tag;
 
-                if(relationDTO.Id != 0 && !relationDTO.DescriptionWasChanged)
-                    continue; //This, existed record hasn't been changed
-                
-                dbFacade.AddOrUpdateRelation(relationDTO.Id, clause.Id, relationDTO.ToWordId, relationDTO.Description);
-
-                if(relationDTO.MakeInterconnected)
-                { //Add relation to the other side
-                    Debug.Assert(relationDTO.Id == 0);
-
-                    dbFacade.AddOrUpdateRelation(0, relationDTO.ToWordId, clause.Id, relationDTO.Description);
-                }
+                relations.Add(relationDTO);
             }
         }
     }

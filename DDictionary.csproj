@@ -61,12 +61,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
+    <Compile Include="Domain\Entities\RelationDTO.cs" />
     <Compile Include="Presentation\ClauseEditDlg.xaml.cs">
       <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="Presentation\Converters\ClauseToDataGridClauseMapper.cs" />
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
+    <Compile Include="Presentation\Converters\RelationToRelationDTOMapper.cs" />
     <Compile Include="Presentation\Converters\TranslationConverter.cs" />
     <Compile Include="Presentation\Converters\WordGroupConverter.cs" />
     <Compile Include="Presentation\Converters\WordGroupTranslator.cs" />
