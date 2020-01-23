@@ -28,25 +28,12 @@ namespace DDictionary.Domain
         int GetTotalClauses();
 
         /// <summary>
-        /// Get all words with their ids.
+        /// Add or update clause data. If the id of the <paramref name="clause"/> equals 0 then a new 
+        /// clause will be created otherwise the existing one will be updated.
         /// </summary>
-        IEnumerable<JustWordDTO> GetJustWords();
-
-        /// <summary>
-        /// Add or update relation data. If <paramref name="relationId"/> equals 0 then a new relation will be created 
-        /// otherwise the existing one will be updated.
-        /// </summary>
-        /// <param name="relationId">Relation id or 0 (for new ones).</param>
-        /// <param name="fromClauseId">From clause id.</param>
-        /// <param name="toClauseId">To clause id.</param>
-        /// <param name="relDescription">Relation's description.</param>
-        void AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription);
-
-        /// <summary>
-        /// Remove given relation.
-        /// </summary>
-        /// <param name="relationId">Relation id.</param>
-        void RemoveRelation(int relationId);
+        /// <param name="clause">Clause data.</param>
+        /// <returns>The id of the created/updated clause.</returns>
+        int AddOrUpdateClause(ClauseUpdateDTO clause);
 
         /// <summary>
         /// Remove these clauses.
@@ -60,5 +47,42 @@ namespace DDictionary.Domain
         /// <param name="toGroup">The destination group.</param>
         /// <param name="clauseIds">Ids of the clauses that should be moved.</param>
         void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds);
+
+        /// <summary>
+        /// Get all words with their ids.
+        /// </summary>
+        IEnumerable<JustWordDTO> GetJustWords();
+
+        /// <summary>
+        /// Add or update relation data. If <paramref name="relationId"/> equals 0 then a new relation will be created 
+        /// otherwise the existing one will be updated.
+        /// </summary>
+        /// <param name="relationId">Relation id or 0 (for new ones).</param>
+        /// <param name="fromClauseId">From clause id.</param>
+        /// <param name="toClauseId">To clause id.</param>
+        /// <param name="relDescription">Relation's description.</param>
+        /// <returns>The id of the created/updated relation.</returns>
+        int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription);
+
+        /// <summary>
+        /// Remove given relations.
+        /// </summary>
+        /// <param name="relationIds">Relations ids.</param>
+        void RemoveRelations(params int[] relationIds);
+
+        /// <summary>
+        /// Add or update translation data. If the id of the <paramref name="translation"/> equals 0 then a new 
+        /// translation will be created otherwise the existing one will be updated.
+        /// </summary>
+        /// <param name="translation">Translation data.</param>
+        /// <param name="toClauseId">Id of the clause that the translation belongs to.</param>
+        /// <returns>The id of the created/updated translation.</returns>
+        int AddOrUpdateTranslation(Translation translation, int toClauseId);
+
+        /// <summary>
+        /// Remove given translations.
+        /// </summary>
+        /// <param name="translationIds">Translations ids.</param>
+        void RemoveTranslations(params int[] translationIds);
     }
 }

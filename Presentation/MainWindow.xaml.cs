@@ -435,8 +435,9 @@ namespace DDictionary.Presentation
 
             if(dlg.ShowDialog() == true)
             {
-                foreach(int relId in cl.Relations.Select(o => o.Id).Except(dlg.Relations.Select(o => o.Id)).ToArray())
-                    dbFacade.RemoveRelation(relId);
+                dbFacade.RemoveRelations(cl.Relations.Select(o => o.Id)
+                                                     .Except(dlg.Relations.Select(o => o.Id))
+                                                     .ToArray());
 
                 foreach(RelationDTO rel in dlg.Relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
                 {

@@ -157,30 +157,41 @@ namespace DDictionary.DAL
             return clauses.Select(o => new JustWordDTO { Id = o.Id, Word = o.Word });
         }
 
-        public void AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
+        public int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
         {
             Clause from = clauses.Single(o => o.Id == fromClauseId);
             Clause to = clauses.Single(o => o.Id == toClauseId);
+            Relation ret = null;
 
             if(relationId == 0)
             { //New relation entity
-                ((List<Relation>)from.Relations).Add(new Relation { 
+                ret = new Relation {
                     Id = ++relationsId,
                     ToClause = to,
                     Description = relDescription
-                });
+                };
+
+                ((List<Relation>)from.Relations).Add(ret);
             }
             else
             {
-                Relation rel = from.Relations.Single(o => o.Id == relationId);
-                rel.ToClause = to;
-                rel.Description = relDescription;
+                ret = from.Relations.Single(o => o.Id == relationId);
+                ret.ToClause = to;
+                ret.Description = relDescription;
             }
 
             from.Updated = DateTime.Now;
+
+            return ret.Id;
         }
 
-        public void RemoveRelation(int relationId)
+        public void RemoveRelations(params int[] relationIds)
+        {
+            foreach(var relation in relationIds)
+                RemoveRelation(relation);
+        }
+
+        private void RemoveRelation(int relationId)
         {
             Clause cl = clauses.Single(o => o.Relations.Any(r => r.Id == relationId));
             
@@ -211,6 +222,72 @@ namespace DDictionary.DAL
                 clauses.Single(o => o.Id == id).Group = toGroup;
 
             //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
+        }
+
+        public int AddOrUpdateTranslation(Translation translation, int toClauseId)
+        {
+            Clause cl = clauses.Single(o => o.Id == toClauseId);
+            var trLst = (List<Translation>)cl.Translations;
+            Translation ret = null;
+
+            if(translation.Id == 0)
+            {
+                ret = new Translation {
+                    Id = ++translationsId,
+                    Index = translation.Index,
+                    Part = translation.Part,
+                    Text = translation.Text
+                };
+
+                trLst.Add(ret);
+            }
+            else
+            {
+                ret = trLst.Single(o => o.Id == translation.Id);
+
+                ret.Index = translation.Index;
+                ret.Part = translation.Part;
+                ret.Text = translation.Text;
+            }
+
+            cl.Updated = DateTime.Now;
+
+            return ret.Id;
+        }
+
+        public void RemoveTranslations(params int[] translationIds)
+        {
+            foreach(var translation in translationIds)
+                RemoveTranslation(translation);
+        }
+
+        private void RemoveTranslation(int translationId)
+        {
+            Clause cl = clauses.Single(o => o.Translations.Any(tr => tr.Id == translationId));
+
+            ((List<Translation>)cl.Translations).Remove(cl.Translations.Single(tr => tr.Id == translationId));
+
+            cl.Updated = DateTime.Now;
+        }
+
+        public int AddOrUpdateClause(ClauseUpdateDTO clause)
+        {
+            DateTime now = DateTime.Now;
+
+            Clause cl = clause.Id == 0 ? new Clause { Id = ++clausesId, Added = now } 
+                                       : clauses.Single(o => o.Id == clause.Id);
+
+            cl.Context = clause.Context;
+            cl.Group = clause.Group;
+            cl.Sound = clause.Sound;
+            cl.Transcription = clause.Transcription;
+            cl.Word = clause.Word;
+            cl.Updated = now;
+
+            if(clause.Id == 0)
+                clauses.Add(cl);
+
+            return cl.Id;
         }
 
 #pragma warning restore CA1822 // Mark members as static

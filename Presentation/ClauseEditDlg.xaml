@@ -18,37 +18,39 @@
                      Margin="5" TabIndex="11" IsEnabled="False"/>
             <StackPanel Margin="0,15">
                 <ComboBox x:Name="groupCBox" Width="150" Margin="5" TabIndex="20" SelectionChanged="OnSomeDataWasChanged"/>
-                <TextBox x:Name="wordLbl" Text="Word" HorizontalAlignment="Center" Margin="5" FontSize="16" FontWeight="Bold" 
+                <TextBox x:Name="wordEdit" Text="Word" HorizontalAlignment="Center" Margin="5" FontSize="16" FontWeight="Bold" 
                          TextAlignment="Center" Padding="15,5" TabIndex="21" TextChanged="OnSomeDataWasChanged"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                     <Button Content="#" Padding="5,2" TabIndex="22" Click="OnSoundRefBtn_Click"/>
                     <Button x:Name="playBtn" Content="Play" Padding="10,2" Margin="0,0,5,0" TabIndex="23" 
                             Click="OnPlayBtn_Click"/>
-                    <TextBox x:Name="transcriptionLbl" Text="Transcription" Padding="10,2" TabIndex="24" 
+                    <TextBox x:Name="transcriptionEdit" Text="Transcription" Padding="10,2" TabIndex="24" 
                              TextChanged="OnSomeDataWasChanged"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>
         <StackPanel x:Name="translationsPanel" Grid.Row="1" Margin="0,10">
             <DockPanel x:Name="translationRow" Margin="5,0,5,5" HorizontalAlignment="Center">
-                <Button Content="↑" Padding="5,2" TabIndex="50"/>
-                <Button Content="↓" Padding="5,2" TabIndex="51"/>
+                <Button x:Name="trUpBtn" Content="↑" Padding="5,2" TabIndex="50"/>
+                <Button x:Name="trDownBtn" Content="↓" Padding="5,2" TabIndex="51"/>
                 <TextBlock x:Name="translationLbl" Text="Translation (part)" Margin="15,0" Padding="2"/>
-                <Button Content="X" Padding="5,2" TabIndex="52"/>
+                <Button x:Name="trRemoveBtn" Content="X" Padding="5,2" TabIndex="52"/>
             </DockPanel>
             <Button x:Name="addTranslationBtn" Content="Add translation" HorizontalAlignment="Center" Margin="5" Padding="15,2" 
-                    TabIndex="100"/>
+                    TabIndex="200" Click="OnAddTranslationBtn_Click"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="5">
             <TextBox x:Name="contextEdit" Text="Context" Margin="5" FontSize="10" TextAlignment="Center" Padding="5" 
-                     TabIndex="101" TextChanged="OnSomeDataWasChanged"/>
+                     TabIndex="201" TextChanged="OnSomeDataWasChanged"/>
             <TextBlock x:Name="relationsLbl" Text="Relations" TextAlignment="Center" Margin="5" Padding="5" FontSize="10" 
                        Foreground="Blue" TextDecorations="Underline" Cursor="Hand" HorizontalAlignment="Center"
-                       MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp"/>
+                       MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp" 
+                       Focusable="True" KeyboardNavigation.TabIndex="202" KeyUp="OnRelationsLbl_KeyUp"/>
             <DockPanel Margin="0,15,0,0">
-                <Button x:Name="deleteClauseBtn" Content="Delete" Width="60" Padding="2" TabIndex="200"/>
-                <Button x:Name="saveClauseBtn" Content="Save" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="202"/>
-                <Button x:Name="newClauseBtn" Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="201"
+                <Button x:Name="deleteClauseBtn" Content="Delete" Width="60" Padding="2" TabIndex="300"/>
+                <Button x:Name="saveClauseBtn" Content="Save" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="302"
+                        Click="OnSaveClauseBtn_Click"/>
+                <Button x:Name="newClauseBtn" Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="301"
                         Click="OnNewClauseBtn_Click"/>
             </DockPanel>
         </StackPanel>

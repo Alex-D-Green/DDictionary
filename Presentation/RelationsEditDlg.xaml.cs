@@ -26,6 +26,9 @@ namespace DDictionary.Presentation
         /// <summary>The count of relations in the dialog.</summary>
         private int countOfRelations;
 
+        /// <summary>The tab index for the new row of relation.</summary>
+        private int newRelationRowTabIdx;
+
 
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
@@ -91,6 +94,7 @@ namespace DDictionary.Presentation
         /// Add new relation row (a panel with respective elements) to the dialog.
         /// </summary>
         /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.AddRelationRow(int, string, int, string, bool)"/>
+        /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.newRelationRowTabIdx"/>
         private void AddRelationRow(RelationDTO relationDTO)
         {
             var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relationRow));
@@ -104,7 +108,7 @@ namespace DDictionary.Presentation
 
             var newDescrTBox = (TextBox)copy.FindName(nameof(descrTBox));
             newDescrTBox.Text = relationDTO.Description;
-            newDescrTBox.TabIndex = addPanelIdx;
+            newDescrTBox.TabIndex = ++newRelationRowTabIdx;
             newDescrTBox.TextChanged += (s, e) =>
             {
                 relationDTO.Description = newDescrTBox.Text;
@@ -125,7 +129,7 @@ namespace DDictionary.Presentation
                 UpdateAddButtonState();
                 ChangesHaveBeenMade();
             };
-            newRemoveBtn.TabIndex = addPanelIdx + 1;
+            newRemoveBtn.TabIndex = ++newRelationRowTabIdx;
 
             LooseHeight();
 
@@ -244,14 +248,17 @@ namespace DDictionary.Presentation
             int relationRowIdx = mainStackPanel.Children.IndexOf(relationRow);
             int addPanelIdx = mainStackPanel.Children.IndexOf(addNewRelationPanel);
 
-            relations.Clear();
+            if(relations.Count > MaxCountOfRelations)
+                relations.RemoveRange(0, MaxCountOfRelations); //Clear only "editable" range of the collection
+            else
+                relations.Clear();
 
-            for(int i=relationRowIdx+1; i<addPanelIdx; i++)
+            for(int i=relationRowIdx+1, idx=0; i<addPanelIdx; i++, idx++)
             {
                 var rowPanel = (FrameworkElement)mainStackPanel.Children[i];
                 var relationDTO = (RelationDTO)rowPanel.Tag;
 
-                relations.Add(relationDTO);
+                relations.Insert(idx, relationDTO); //To save order in case if the collection exceed "editable" range
             }
         }
     }

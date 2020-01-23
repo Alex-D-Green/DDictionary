@@ -24,5 +24,26 @@ namespace DDictionary.Presentation.Converters
                     return pos.ToString();
             }
         }
+
+        public static string ToFullString(this PartOfSpeech pos)
+        {
+            //TODO: Put full strings for the PartOfSpeech into resources.
+
+            switch(pos)
+            {
+                case PartOfSpeech.Unknown: return "unknown";
+                case PartOfSpeech.Noun: return "noun";
+                case PartOfSpeech.Pronoun: return "pronoun";
+                case PartOfSpeech.Verb: return "verb";
+                case PartOfSpeech.Adjective: return "adjective";
+                case PartOfSpeech.Adverb: return "adverb";
+                case PartOfSpeech.Preposition: return "preposition";
+                case PartOfSpeech.Conjunction: return "conjunction";
+                case PartOfSpeech.Interjection: return "interjection";
+
+                default:
+                    return pos.ToString();
+            }
+        }
     }
 }

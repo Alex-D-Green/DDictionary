@@ -60,6 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
     <Compile Include="Domain\Entities\RelationDTO.cs" />
     <Compile Include="Presentation\ClauseEditDlg.xaml.cs">
@@ -101,6 +102,9 @@
     <Compile Include="Presentation\SoundRefEditDlg.xaml.cs">
       <DependentUpon>SoundRefEditDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\TranslationsEditDlg.xaml.cs">
+      <DependentUpon>TranslationsEditDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\ViewModels\DataGridClause.cs" />
     <Compile Include="DAL\DBFacade.cs" />
     <Compile Include="Presentation\ViewModels\CheckBoxItem.cs" />
@@ -118,6 +122,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Presentation\SoundRefEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\TranslationsEditDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

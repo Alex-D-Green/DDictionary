@@ -100,6 +100,9 @@
                                             <DataTrigger Binding="{Binding Sound}" Value="{x:Null}">
                                                 <Setter Property="IsEnabled" Value="False"/>
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding Sound}" Value="">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                            </DataTrigger>                                            
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>

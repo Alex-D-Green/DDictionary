@@ -9,9 +9,9 @@ namespace DDictionary.Domain.Entities
         public string Sound { get; set; }
         public string Word { get; set; }
         public string Transcription { get; set; }
-        public IReadOnlyCollection<Translation> Translations { get; set; }
+        public IReadOnlyCollection<Translation> Translations { get; set; } = new List<Translation>();
         public string Context { get; set; }
-        public IReadOnlyCollection<Relation> Relations { get; set; }
+        public IReadOnlyCollection<Relation> Relations { get; set; } = new List<Relation>();
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
         public WordGroup Group { get; set; }
