@@ -191,6 +191,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete &quot;{0}&quot; clause?.
+        /// </summary>
+        internal static string TheClauseDeletionConfirmation {
+            get {
+                return ResourceManager.GetString("TheClauseDeletionConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This clause has no any related ones..
         /// </summary>
         internal static string ThereAreNoRelations {

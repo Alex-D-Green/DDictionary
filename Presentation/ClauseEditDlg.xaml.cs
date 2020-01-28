@@ -19,6 +19,8 @@ using PrgResources = DDictionary.Properties.Resources;
 
 namespace DDictionary.Presentation
 {
+    //TODO: Remake Clause Edit Dialog to see clause's relations right away without any clicks!
+
     /// <summary>
     /// Interaction logic for ClauseEditDlg.xaml
     /// </summary>
@@ -28,35 +30,43 @@ namespace DDictionary.Presentation
         public const int MaxCountOfTranslations = 10;
 
 
+        /// <summary>All clause's relations.</summary>
+        private readonly List<RelationDTO> relations = new List<RelationDTO>();
+
+        /// <summary>All clause's translations.</summary>
+        private readonly List<Translation> translations = new List<Translation>();
+
+        /// <summary>The list of "scrollable" clauses' ids.</summary>
+        private readonly IList<int> clausesIdsLst;
+
+
         /// <summary>The editing clause (<c>null</c> for new one).</summary>
         private Clause clause;
 
         /// <summary>The count of translations in the dialog.</summary>
         private int countOfShownTranslations;
 
+        /// <summary>The mark that some changes have been made (not necessary with the currently opened clause).</summary>
+        private bool dataWasUpdated;
+                          
 
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
 
-        /// <summary>All clause's relations.</summary>
-        private List<RelationDTO> relations { get; } = new List<RelationDTO>();
-
-        /// <summary>All clause's translations.</summary>
-        private List<Translation> translations { get; } = new List<Translation>();
+        /// <summary>Fires when a clause is changed (and saved).</summary>
+        public event Action ClausesWereUpdated;
 
 
-        public ClauseEditDlg(int? clauseId)
+        public ClauseEditDlg(int? clauseId, IList<int> clausesIdsLst = null)
         {
             if(clauseId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(clauseId));
 
 
+            this.clausesIdsLst = clausesIdsLst ?? new List<int>(0);
+
             if(clauseId.HasValue)
-            {
-                clause = dbFacade.GetClauseById(clauseId.Value);
-                relations.AddRange(clause.Relations.Select(o => o.MapToRelationDTO()));
-                translations.AddRange(clause.Translations);
-            }
+                LoadClauseData(clauseId.Value);
             else
                 CreateNewClause();
 
@@ -72,7 +82,7 @@ namespace DDictionary.Presentation
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
                 groupCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
 
-            UpdateInfo();
+            UpdateWindowInfo();
         }
 
         /// <summary>
@@ -89,7 +99,21 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
-        /// Any clause's data was changed.
+        /// Load a clause with the given id and put it into <see cref="DDictionary.Presentation.ClauseEditDlg.clause"/>.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException" />
+        private void LoadClauseData(int clauseId)
+        {
+            Clause cl = dbFacade.GetClauseById(clauseId) ?? 
+                throw new InvalidOperationException($"The clause with id = {clauseId} is not found.");
+
+            clause = cl;
+            relations.AddRange(clause.Relations.Select(o => o.MapToRelationDTO()));
+            translations.AddRange(clause.Translations);
+        }
+
+        /// <summary>
+        /// Any currently opened clause's data was changed.
         /// </summary>
         private void OnSomeDataWasChanged(object sender, EventArgs e)
         {
@@ -99,12 +123,12 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Refill window's controls according to the <see cref="clause"/> data.
         /// </summary>
-        private void UpdateInfo()
+        private void UpdateWindowInfo()
         {
             countOfShownTranslations = 0;
 
             translationsPanel.Children[0].Visibility = Visibility.Collapsed; //To hide the "template" row
-            deleteClauseBtn.IsEnabled = clause.Id != 0;
+            UpdateDeleteButtonState();
 
             Activated += OnClauseEditDlg_Activated; //To do initial actions when form will be shown
 
@@ -135,6 +159,7 @@ namespace DDictionary.Presentation
 
             UpdateAddButtonState();
             UpdateTranslationsArrowsState();
+            UpdateScrollBttonsState();
 
             saveClauseBtn.IsEnabled = false;
         }
@@ -144,6 +169,11 @@ namespace DDictionary.Presentation
             relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(relations.Select(o => o.ToWord));
         }
 
+        private void UpdateDeleteButtonState()
+        {
+            deleteClauseBtn.IsEnabled = clause.Id != 0;
+        }
+
         /// <summary>
         /// Update play sound button state depending on 
         /// <see cref="DDictionary.Presentation.ClauseEditDlg.clause"/>.
@@ -151,6 +181,19 @@ namespace DDictionary.Presentation
         private void UpdatePlaySoundButtonState()
         {
             playBtn.IsEnabled = !String.IsNullOrEmpty(clause?.Sound);
+        }
+
+        /// <summary>
+        /// Update state of the "scroll" buttons (move to the next/previous clause buttons).
+        /// </summary>
+        /// <seealso cref = "DDictionary.Presentation.ClauseEditDlg.clausesIdsLst" />.
+        private void UpdateScrollBttonsState()
+        {
+            scrollLeftBtn.IsEnabled = 
+                clausesIdsLst.Count > 0 && clausesIdsLst[0] != clause.Id;
+
+            scrollRightBtn.IsEnabled = 
+                clausesIdsLst.Count > 0 && clausesIdsLst[clausesIdsLst.Count - 1] != clause.Id && clause.Id != 0;
         }
 
         /// <summary>
@@ -409,6 +452,8 @@ namespace DDictionary.Presentation
         {
             e.Cancel = !DiscardingChangesIsApproved();
 
+            DialogResult = dataWasUpdated; //True if any changes have been made even not with the currently opened clause
+
             base.OnClosing(e);
         }
 
@@ -420,6 +465,17 @@ namespace DDictionary.Presentation
             if(!DiscardingChangesIsApproved())
                 return;
 
+            ClearWindow();
+
+            CreateNewClause();
+            UpdateWindowInfo();
+        }
+
+        /// <summary>
+        /// Clear window controls and lists of the clause data.
+        /// </summary>
+        private void ClearWindow()
+        {
             relations.Clear();
             translations.Clear();
 
@@ -433,13 +489,10 @@ namespace DDictionary.Presentation
                 translationsPanel.Children.Remove(item);
 
             FixHeight();
-
-            CreateNewClause();
-            UpdateInfo();
         }
 
         /// <summary>
-        /// Discarding changes is approved or there are no changes in the clause's data.
+        /// Discarding changes is approved or there are no changes in the currently opened clause's data.
         /// </summary>
         /// <remarks>If there are any changes then message box will be shown.</remarks>
         private bool DiscardingChangesIsApproved()
@@ -465,7 +518,7 @@ namespace DDictionary.Presentation
                 Word = wordEdit.Text
             };
 
-            int clauseId = dbFacade.AddOrUpdateClause(clauseDTO);
+            clause.Id = dbFacade.AddOrUpdateClause(clauseDTO);
 
             //Handle relations
             dbFacade.RemoveRelations(clause.Relations.Select(o => o.Id)
@@ -474,13 +527,13 @@ namespace DDictionary.Presentation
 
             foreach(RelationDTO rel in relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
             {
-                dbFacade.AddOrUpdateRelation(rel.Id, clauseId, rel.ToWordId, rel.Description);
+                dbFacade.AddOrUpdateRelation(rel.Id, clause.Id, rel.ToWordId, rel.Description);
 
                 if(rel.MakeInterconnected)
                 { //Add relation to the other side
                     Debug.Assert(rel.Id == 0);
 
-                    dbFacade.AddOrUpdateRelation(0, rel.ToWordId, clauseId, rel.Description);
+                    dbFacade.AddOrUpdateRelation(0, rel.ToWordId, clause.Id, rel.Description);
                 }
             }
 
@@ -492,15 +545,77 @@ namespace DDictionary.Presentation
             for(int i=0; i<translations.Count; i++)
             {
                 translations[i].Index = i; //Correcting items indices according to collection
-                dbFacade.AddOrUpdateTranslation(translations[i], clauseId);
+                dbFacade.AddOrUpdateTranslation(translations[i], clause.Id);
             }
 
+            dataWasUpdated = true; //Data was changed
 
-            //Implement Next/Previous buttons.
-            //Implement Delete button.
+            if(clauseDTO.Id == 0)
+            { //Adding the new clause to the scroll list
+                clausesIdsLst.Add(clause.Id);
 
-            DialogResult = true;
-            Close();
+                UpdateDeleteButtonState();
+            }
+
+            ClausesWereUpdated?.Invoke();
+        }
+
+        /// <summary>
+        /// Handle one of two "scroll" buttons click depending on <paramref name="sender"/>.
+        /// </summary>
+        private void OnScrollBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.Assert(sender == scrollLeftBtn || sender == scrollRightBtn);
+
+            if(!DiscardingChangesIsApproved())
+                return;
+
+            int idx = clause.Id == 0 ? clausesIdsLst.Count 
+                                     : clausesIdsLst.IndexOf(clause.Id);
+
+            idx += (sender == scrollLeftBtn ? -1 : 1);
+            Debug.Assert(idx >= 0 && idx < clausesIdsLst.Count);
+
+            ClearWindow();
+            LoadClauseData(clausesIdsLst[idx]);
+            UpdateWindowInfo();
+        }
+
+        /// <summary>
+        /// Handle Delete button click.
+        /// </summary>
+        private void OnDeleteClauseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(Keyboard.Modifiers != ModifierKeys.Control &&
+               MessageBox.Show(this, String.Format(PrgResources.TheClauseDeletionConfirmation, wordEdit.Text),
+                   PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                return;
+
+            int id = clause.Id;
+
+            dbFacade.RemoveClauses(id);
+            dataWasUpdated = true; //Data was changed
+
+            int idx = clausesIdsLst.IndexOf(id);
+            if(idx != -1)
+                clausesIdsLst.RemoveAt(idx);
+
+            ClausesWereUpdated?.Invoke();
+
+            if(clausesIdsLst.Count == 0)
+            { //There are no clauses to move at, so leave empty window
+                ClearWindow();
+
+                CreateNewClause();
+                UpdateWindowInfo();
+
+                return;
+            }
+
+            //Move to another clause
+            ClearWindow();
+            LoadClauseData(clausesIdsLst[idx < clausesIdsLst.Count ? idx : clausesIdsLst.Count-1]);
+            UpdateWindowInfo();
         }
     }
 }

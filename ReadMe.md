@@ -8,7 +8,7 @@ The key features of the program is:
   - Ranging words by groups depending on how well they are known.
 
 Todo list:
-- [ ] Add create/edit clause dialog;
+- [x] Add create/edit clause dialog;
 - [ ] Implement work with SQLite DB;
 - [ ] Implement export functionality;
 - [ ] Implement main menu and finish GUI.

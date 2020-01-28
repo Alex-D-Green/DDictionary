@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -476,10 +477,13 @@ namespace DDictionary.Presentation
         /// </summary>
         private void OnAddWordButton_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new ClauseEditDlg(null) { Owner = this };
+            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
+
+            var dlg = new ClauseEditDlg(null, lst) { Owner = this };
+            dlg.ClausesWereUpdated += () => UpdateDataGrid();
 
             if(dlg.ShowDialog() == true)
-                UpdateDataGrid();
+                UpdateDataGrid(); //Just in case
         }
 
         /// <summary>
@@ -489,10 +493,13 @@ namespace DDictionary.Presentation
         {
             Debug.Assert(sender is DataGridRow row && row.DataContext is DataGridClause);
 
-            var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id) { Owner = this };
+            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
+
+            var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id, lst) { Owner = this };
+            dlg.ClausesWereUpdated += () => UpdateDataGrid();
 
             if(dlg.ShowDialog() == true)
-                UpdateDataGrid();
+                UpdateDataGrid(); //Just in case
         }
     }
 }

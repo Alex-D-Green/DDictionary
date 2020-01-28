@@ -14,6 +14,7 @@ namespace DDictionary.Domain
         /// <summary>
         /// Get dictionary clause by id.
         /// </summary>
+        /// <returns>The clause with the given id or <c>null</c>, if there is no such one.</returns>
         Clause GetClauseById(int id);
 
         /// <summary>

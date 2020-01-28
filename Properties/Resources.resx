@@ -163,6 +163,9 @@
   <data name="SelectSoundFileTitle" xml:space="preserve">
     <value>Select a sound file for the word</value>
   </data>
+  <data name="TheClauseDeletionConfirmation" xml:space="preserve">
+    <value>Delete "{0}" clause?</value>
+  </data>
   <data name="ThereAreNoRelations" xml:space="preserve">
     <value>This clause has no any related ones.</value>
     <comment>Not used</comment>
