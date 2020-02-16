@@ -43,7 +43,7 @@ namespace DDictionary.Presentation
 
 
         /// <summary>The object to work with data storage.</summary>
-        private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
+        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
         /// <summary>The brush to highlight cells.</summary>
         private Brush highlightBrush
@@ -101,12 +101,14 @@ namespace DDictionary.Presentation
                 ? mainDataGrid.Items.SortDescriptions[0]
                 : (SortDescription?)null;
 
-            mainDataGrid.Items.Clear();
-            
-            foreach(DataGridClause item in LoadData())
-                mainDataGrid.Items.Add(item);
+            //Clear sorting
+            mainDataGrid.Items.SortDescriptions.Clear();
 
-            ClearSorting();
+            foreach(DataGridColumn col in mainDataGrid.Columns)
+                col.SortDirection = null;
+
+            //Update items
+            mainDataGrid.ItemsSource = LoadData();
 
             if(!clearSorting && sorting.HasValue)
             { //Restore sorting
@@ -137,30 +139,14 @@ namespace DDictionary.Presentation
 
             void updateHighlight(string text, TextBlock tb)
             {
-                if(tb == null)
-                {
-                    Debug.WriteLine($"Wrong type of the cell content in {nameof(HighlightCells)}()!");
+                if(tb is null) 
                     return;
-                }
 
                 if(substring?.Length > 0 && text?.Contains(substring) == true)
                     tb.Background = highlightBrush;
                 else
                     tb.Background = Brushes.Transparent;
             }
-        }
-
-        /// <summary>
-        /// Set the default clauses order (without sorting by grid header).
-        /// </summary>
-        private void ClearSorting()
-        {
-            mainDataGrid.Items.SortDescriptions.Clear();
-
-            foreach(DataGridColumn col in mainDataGrid.Columns)
-                col.SortDirection = null;
-
-            mainDataGrid.Items.Refresh();
         }
 
         private void UpdateStatusBar()
@@ -415,10 +401,7 @@ namespace DDictionary.Presentation
         private void OnMainDataGrid_LayoutUpdated(object sender, EventArgs e)
         {
             if(currentFilter.TextFilter?.Length > 0)
-            { //Highlight the cells
-                mainDataGrid.UpdateLayout();
                 HighlightCells(currentFilter.TextFilter);
-            }
         }
 
         /// <summary>

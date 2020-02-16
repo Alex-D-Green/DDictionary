@@ -21,6 +21,9 @@ namespace DDictionary.Presentation
 {
     //TODO: Remake Clause Edit Dialog to see clause's relations right away without any clicks!
 
+    //HACK: Implement the Clause Edit Dialog closing by click outside of the dialog?..
+    //https://stackoverflow.com/a/10301550
+
     /// <summary>
     /// Interaction logic for ClauseEditDlg.xaml
     /// </summary>
@@ -51,7 +54,7 @@ namespace DDictionary.Presentation
                           
 
         /// <summary>The object to work with data storage.</summary>
-        private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
+        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
         /// <summary>Fires when a clause is changed (and saved).</summary>
         public event Action ClausesWereUpdated;
@@ -527,14 +530,10 @@ namespace DDictionary.Presentation
 
             foreach(RelationDTO rel in relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
             {
-                dbFacade.AddOrUpdateRelation(rel.Id, clause.Id, rel.ToWordId, rel.Description);
+                rel.Id = dbFacade.AddOrUpdateRelation(rel.Id, clause.Id, rel.ToWordId, rel.Description);
 
-                if(rel.MakeInterconnected)
-                { //Add relation to the other side
-                    Debug.Assert(rel.Id == 0);
-
+                if(rel.MakeInterconnected) //Add relation to the other side
                     dbFacade.AddOrUpdateRelation(0, rel.ToWordId, clause.Id, rel.Description);
-                }
             }
 
             //Handle translations
@@ -545,7 +544,7 @@ namespace DDictionary.Presentation
             for(int i=0; i<translations.Count; i++)
             {
                 translations[i].Index = i; //Correcting items indices according to collection
-                dbFacade.AddOrUpdateTranslation(translations[i], clause.Id);
+                translations[i].Id = dbFacade.AddOrUpdateTranslation(translations[i], clause.Id);
             }
 
             dataWasUpdated = true; //Data was changed

@@ -31,7 +31,7 @@ namespace DDictionary.Presentation
 
 
         /// <summary>The object to work with data storage.</summary>
-        private IDBFacade dbFacade { get; set; } = new InMemoryMockStorage(); //Dependency Injection
+        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
         /// <summary>All clause's relations.</summary>
         private List<RelationDTO> relations { get; } = new List<RelationDTO>();
@@ -59,6 +59,10 @@ namespace DDictionary.Presentation
             listOfWordsCBox.ItemsSource = dbFacade.GetJustWords()
                                                   .Where(o => o.Id != clauseId)
                                                   .OrderBy(o => o.Word);
+
+            //TODO: Fix the first slow opening of the words list in the RelationsEditDlg!
+            //Probably the dropdown should be replaced with the textbox + autocompletion & dynamic search 
+            //from the data source or something like that.
 
             //Show rows of relations
             foreach(RelationDTO rel in Relations)

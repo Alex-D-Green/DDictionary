@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -12,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("das2010@bk.ru")]
 [assembly: AssemblyProduct("DDictionary")]
-[assembly: AssemblyCopyright("Copyright ©  Dyachenko Alexander 2019")]
+[assembly: AssemblyCopyright("Copyright © Alex Dyachenko 2019-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

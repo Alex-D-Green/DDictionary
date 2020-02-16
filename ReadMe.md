@@ -9,6 +9,6 @@ The key features of the program is:
 
 Todo list:
 - [x] Add create/edit clause dialog;
-- [ ] Implement work with SQLite DB;
+- [x] Implement work with SQLite DB;
 - [ ] Implement export functionality;
 - [ ] Implement main menu and finish GUI.

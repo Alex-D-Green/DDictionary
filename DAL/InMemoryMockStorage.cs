@@ -8,8 +8,6 @@ using DDictionary.Domain.Entities;
 
 namespace DDictionary.DAL
 {
-    //https://www.youtube.com/watch?v=ayp3tHEkRc0
-
     public sealed class InMemoryMockStorage: IDBFacade
     {
 #pragma warning disable CA1822 // Mark members as static
@@ -97,17 +95,40 @@ namespace DDictionary.DAL
                 Group = WordGroup.E_TotallyUnknown
             };
 
-            ((List<Relation>)apple.Relations).Add(
-                new Relation { Id = ++relationsId, ToClause = pear, Description = "Фрукты" });
-            ((List<Relation>)apple.Relations).Add(
-                new Relation { Id = ++relationsId, ToClause = computer, Description = "Apple Inc." });
-
-            ((List<Relation>)computer.Relations).Add(
-                new Relation { Id = ++relationsId, ToClause = apple, Description = "Apple Inc." });
+            apple.Relations.Add(new Relation { Id = ++relationsId, ToClause = pear, Description = "Фрукты" });
+            apple.Relations.Add(new Relation { Id = ++relationsId, ToClause = computer, Description = "Apple Inc." });
+            
+            computer.Relations.Add(new Relation { Id = ++relationsId, ToClause = apple, Description = "Apple Inc." });
 
             clauses.Add(apple);
             clauses.Add(pear);
             clauses.Add(computer);
+
+            for(int i = 0; i < 5000; i++)
+            {
+                var clause = new Clause
+                {
+                    Id = ++clausesId,
+                    Sound = "https://audiocdn.lingualeo.com/v2/2/29775-631152008.mp3",
+                    Word = $"pear{i}",
+                    Transcription = "pɛə",
+                    Translations = new List<Translation> {
+                        new Translation {
+                            Id = ++translationsId,
+                            Index = ++translationIdx,
+                            Part = PartOfSpeech.Noun,
+                            Text = "груша"
+                        },
+                    },
+                    Context = "I hate pears!",
+                    Relations = new List<Relation>(),
+                    Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
+                    Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
+                    Group = WordGroup.C_KindaKnown
+                };
+
+                clauses.Add(clause);
+            }
         }
 
         public Clause GetClauseById(int id)
@@ -119,7 +140,6 @@ namespace DDictionary.DAL
         {
             if(filter is null)
                 filter = new FiltrationCriteria(); //Empty filter - without filtration
-
 
             var ret = clauses.AsEnumerable();
 
@@ -171,7 +191,7 @@ namespace DDictionary.DAL
                     Description = relDescription
                 };
 
-                ((List<Relation>)from.Relations).Add(ret);
+                from.Relations.Add(ret);
             }
             else
             {
@@ -195,7 +215,7 @@ namespace DDictionary.DAL
         {
             Clause cl = clauses.Single(o => o.Relations.Any(r => r.Id == relationId));
             
-            ((List<Relation>)cl.Relations).Remove(cl.Relations.Single(r => r.Id == relationId));
+            cl.Relations.Remove(cl.Relations.Single(r => r.Id == relationId));
 
             cl.Updated = DateTime.Now;
         }
@@ -227,7 +247,6 @@ namespace DDictionary.DAL
         public int AddOrUpdateTranslation(Translation translation, int toClauseId)
         {
             Clause cl = clauses.Single(o => o.Id == toClauseId);
-            var trLst = (List<Translation>)cl.Translations;
             Translation ret = null;
 
             if(translation.Id == 0)
@@ -239,11 +258,11 @@ namespace DDictionary.DAL
                     Text = translation.Text
                 };
 
-                trLst.Add(ret);
+                cl.Translations.Add(ret);
             }
             else
             {
-                ret = trLst.Single(o => o.Id == translation.Id);
+                ret = cl.Translations.Single(o => o.Id == translation.Id);
 
                 ret.Index = translation.Index;
                 ret.Part = translation.Part;
@@ -265,7 +284,7 @@ namespace DDictionary.DAL
         {
             Clause cl = clauses.Single(o => o.Translations.Any(tr => tr.Id == translationId));
 
-            ((List<Translation>)cl.Translations).Remove(cl.Translations.Single(tr => tr.Id == translationId));
+            cl.Translations.Remove(cl.Translations.Single(tr => tr.Id == translationId));
 
             cl.Updated = DateTime.Now;
         }
