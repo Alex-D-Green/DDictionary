@@ -148,6 +148,14 @@
   <data name="FileNotFoundError" xml:space="preserve">
     <value>File "{0}" not found!</value>
   </data>
+  <data name="FileWasSuccessivelySaved" xml:space="preserve">
+    <value>The file was successively saved</value>
+  </data>
+  <data name="FilterIsActivated" xml:space="preserve">
+    <value>Only clauses that are shown according to the current filter will be saved. To save all clauses, it's needed to clear the filter first.
+
+Continue and save only filtered clauses?</value>
+  </data>
   <data name="GroupChangeConfirmation" xml:space="preserve">
     <value>Move these {1} selected clause[s] to group "{0}"?</value>
   </data>

@@ -97,7 +97,8 @@ namespace DDictionary.DAL
 
             if(filter.ShownGroups?.Any() == true)
             {
-                string gr = filter.ShownGroups.Aggregate(new StringBuilder(), (s, g) => s.AppendFormat("{0}, ", (byte)g))
+                string gr = filter.ShownGroups.Distinct()
+                                              .Aggregate(new StringBuilder(), (s, g) => s.AppendFormat("{0}, ", (byte)g))
                                               .ToString().Trim(' ', ',');
 
                 sql.AppendFormat("    {0} [cl].[Group] IN ({1})\n", nextJoin, gr);

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using DDictionary.Domain.Entities;
@@ -28,6 +30,14 @@ namespace DDictionary.Domain
         /// </summary>
         public Clause RelatedFrom { get; set; }
 
+        /// <summary>
+        /// The filter is empty (there is no filtration).
+        /// </summary>
+        public bool Empty 
+        { 
+            get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && ShownGroups?.Any() != true);
+        }
+
 
         /// <summary>
         /// Clear all properties (there will not be any filtration).
@@ -37,6 +47,8 @@ namespace DDictionary.Domain
             TextFilter = "";
             ShownGroups = Enumerable.Empty<WordGroup>();
             RelatedFrom = null;
+
+            Debug.Assert(Empty);
         }
     }
 }

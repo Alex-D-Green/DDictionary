@@ -38,8 +38,9 @@
             </ComboBox>
             <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
                     TabIndex="4" ToolTip="Clear filter" Click="OnClearFilterBtn_Click" IsEnabled="False"/>
-            <Button Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,10,5" 
-                    DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False"/>
+            <Button x:Name="exportBtn" Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
+                    Margin="5,5,10,5" DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False" 
+                    Click="OnExportBtn_Click" ToolTip="Export the dictionary into a CSV file"/>
             <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                       DockPanel.Dock="Right" Height="22" TabIndex="7" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
                       DropDownClosed="OnToGroupCBox_DropDownClosed" ToolTip="Move selected words to the group"/>

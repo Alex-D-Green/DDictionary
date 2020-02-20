@@ -146,6 +146,26 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The file was successively saved.
+        /// </summary>
+        internal static string FileWasSuccessivelySaved {
+            get {
+                return ResourceManager.GetString("FileWasSuccessivelySaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only clauses that are shown according to the current filter will be saved. To save all clauses, it&apos;s needed to clear the filter first.
+        ///
+        ///Continue and save only filtered clauses?.
+        /// </summary>
+        internal static string FilterIsActivated {
+            get {
+                return ResourceManager.GetString("FilterIsActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move these {1} selected clause[s] to group &quot;{0}&quot;?.
         /// </summary>
         internal static string GroupChangeConfirmation {

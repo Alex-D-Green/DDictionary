@@ -1,8 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -11,11 +12,14 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-using DDictionary.DAL;
+using CsvHelper;
+
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
+
+using Microsoft.Win32;
 
 using PrgResources = DDictionary.Properties.Resources;
 
@@ -119,6 +123,8 @@ namespace DDictionary.Presentation
 
                 mainDataGrid.Items.Refresh();
             }
+
+            exportBtn.IsEnabled = mainDataGrid.Items.Count > 0;
 
             UpdateStatusBar();
         }
@@ -483,6 +489,46 @@ namespace DDictionary.Presentation
 
             if(dlg.ShowDialog() == true)
                 UpdateDataGrid(); //Just in case
+        }
+
+
+        /// <summary>
+        /// Export button handler.
+        /// </summary>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
+        private async void OnExportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(!currentFilter.Empty &&
+               MessageBox.Show(this, PrgResources.FilterIsActivated, PrgResources.QuestionCaption,
+                   MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.Cancel)
+                return;
+
+            var dlg = new SaveFileDialog
+            {
+                OverwritePrompt = true,
+                DefaultExt = "csv",
+                Filter = "Csv files (*.csv)|*.csv|All files (*.*)|*.*",
+                FileName = $"{DateTime.Now.ToString("yyyy-MM-dd")}.csv"
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            try
+            {
+                exportBtn.IsEnabled = false; //To prevent simultaneous saving
+
+                using(var writer = new StreamWriter(dlg.FileName))
+                using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                    await csv.WriteRecordsAsync(dbFacade.GetClauses(currentFilter).Select(o => o.MapToCsvClause()));
+
+                MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+            finally
+            { exportBtn.IsEnabled = mainDataGrid.Items.Count > 0; }
         }
     }
 }
