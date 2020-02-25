@@ -131,6 +131,8 @@ namespace DDictionary.DAL
             }
         }
 
+        public event ErrorHandler OnErrorOccurs;
+
         public Clause GetClauseById(int id)
         {
             return clauses.SingleOrDefault(o => o.Id == id);

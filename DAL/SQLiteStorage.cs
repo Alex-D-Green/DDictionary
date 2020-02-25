@@ -60,6 +60,8 @@ namespace DDictionary.DAL
             //}
         }
 
+        public event ErrorHandler OnErrorOccurs;
+
         public Clause GetClauseById(int id)
         {
             const string sql = 
@@ -69,7 +71,12 @@ namespace DDictionary.DAL
                  "    LEFT JOIN [Clauses] [cl2] ON [cl2].[Id] = [rl].[ToClauseId]\n" +
                  "    WHERE [cl].[Id] = @ClauseId; ";
 
-            return GetClauses(sql, new { ClauseId = id }).SingleOrDefault();
+            try
+            {
+                return GetClauses(sql, new { ClauseId = id }).SingleOrDefault();
+            }
+            catch(Exception e) when(HandleError(e))
+            { return null; }
         }
 
         public IEnumerable<Clause> GetClauses(FiltrationCriteria filter = null)
@@ -133,49 +140,64 @@ namespace DDictionary.DAL
 
         private IEnumerable<Clause> GetClauses(string sql, object parameters = null)
         {
-            using(IDbConnection cnn = GetConnection())
+            try
             {
-                var clauseDictionary = new Dictionary<int, Clause>();
+                using(IDbConnection cnn = GetConnection())
+                {
+                    var clauseDictionary = new Dictionary<int, Clause>();
 
-                IEnumerable<Clause> clauses =
-                    cnn.Query<Clause, Translation, Relation, Clause, Clause>(sql,
-                        (clause, translation, relation, clauseTo) =>
-                        {
-                            if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
+                    IEnumerable<Clause> clauses =
+                        cnn.Query<Clause, Translation, Relation, Clause, Clause>(sql,
+                            (clause, translation, relation, clauseTo) =>
                             {
-                                clauseEntry = clause;
-                                clauseDictionary.Add(clauseEntry.Id, clauseEntry);
-                            }
+                                if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
+                                {
+                                    clauseEntry = clause;
+                                    clauseDictionary.Add(clauseEntry.Id, clauseEntry);
+                                }
 
-                            if(translation != null && !clauseEntry.Translations.Any(o => o.Id == translation.Id))
-                                clauseEntry.Translations.Add(translation);
+                                if(translation != null && !clauseEntry.Translations.Any(o => o.Id == translation.Id))
+                                    clauseEntry.Translations.Add(translation);
 
-                            if(relation != null && !clauseEntry.Relations.Any(o => o.Id == relation.Id))
-                            {
-                                relation.ToClause = clauseTo;
-                                clauseEntry.Relations.Add(relation);
-                            }
+                                if(relation != null && !clauseEntry.Relations.Any(o => o.Id == relation.Id))
+                                {
+                                    relation.ToClause = clauseTo;
+                                    clauseEntry.Relations.Add(relation);
+                                }
 
-                            return clauseEntry;
-                        },
-                        parameters)
-                    .Distinct();
+                                return clauseEntry;
+                            },
+                            parameters)
+                        .Distinct();
 
-                return clauses;
+                    return clauses;
+                }
             }
+            catch(Exception e) when(HandleError(e))
+            { return Enumerable.Empty<Clause>(); }
         }
 
         public int GetTotalClauses()
         {
-            using(IDbConnection cnn = GetConnection())
-                return cnn.ExecuteScalar<int>("SELECT Count(*) FROM [Clauses]");
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    return cnn.ExecuteScalar<int>("SELECT Count(*) FROM [Clauses]");
+            }
+            catch(Exception e) when(HandleError(e))
+            { return 0; }
         }
 
         public IEnumerable<JustWordDTO> GetJustWords()
         {
-            using(IDbConnection cnn = GetConnection())
-                return cnn.Query<JustWordDTO>("SELECT [Id], [Word] FROM [Clauses]");
-        }
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    return cnn.Query<JustWordDTO>("SELECT [Id], [Word] FROM [Clauses]");
+            }
+            catch(Exception e) when(HandleError(e))
+            { return Enumerable.Empty<JustWordDTO>(); }
+    }
 
         public int AddOrUpdateClause(ClauseUpdateDTO clause)
         {
@@ -184,45 +206,52 @@ namespace DDictionary.DAL
 
             DateTime now = DateTime.Now;
 
-            if(clause.Id == 0)
-            { //Insert a new record
-                const string sql =
-                    "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Group]) " +
-                    "VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Group);\n" + 
-                    "SELECT last_insert_rowid(); ";
+            try
+            {
+                if(clause.Id == 0)
+                { //Insert a new record
+                    const string sql =
+                        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Group]) " +
+                        "VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Group);\n" +
+                        "SELECT last_insert_rowid(); ";
 
-                using(IDbConnection cnn = GetConnection())
-                    return cnn.Query<int>(sql, new {
-                        Sound = clause.Sound,
-                        Word = clause.Word,
-                        Transcription = clause.Transcription,
-                        Context = clause.Context,
-                        Added = now,
-                        Updated = now,
-                        Group = clause.Group
-                    })
-                    .Single();
+                    using(IDbConnection cnn = GetConnection())
+                        return cnn.Query<int>(sql, new
+                        {
+                            Sound = clause.Sound,
+                            Word = clause.Word,
+                            Transcription = clause.Transcription,
+                            Context = clause.Context,
+                            Added = now,
+                            Updated = now,
+                            Group = clause.Group
+                        })
+                        .Single();
+                }
+                else
+                { //Update an existing record
+                    const string sql =
+                        "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
+                        " [Context] = @Context, [Updated] = @Updated, [Group] = @Group " +
+                        "WHERE Id = @Id; ";
+
+                    using(IDbConnection cnn = GetConnection())
+                        cnn.Execute(sql, new
+                        {
+                            Id = clause.Id,
+                            Sound = clause.Sound,
+                            Word = clause.Word,
+                            Transcription = clause.Transcription,
+                            Context = clause.Context,
+                            Updated = now,
+                            Group = clause.Group
+                        });
+
+                    return clause.Id;
+                }
             }
-            else
-            { //Update an existing record
-                const string sql =
-                    "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
-                    " [Context] = @Context, [Updated] = @Updated, [Group] = @Group " +
-                    "WHERE Id = @Id; ";
-
-                using(IDbConnection cnn = GetConnection())
-                    cnn.Execute(sql, new {
-                        Id = clause.Id,
-                        Sound = clause.Sound,
-                        Word = clause.Word,
-                        Transcription = clause.Transcription,
-                        Context = clause.Context,
-                        Updated = now,
-                        Group = clause.Group
-                    });
-
-                return clause.Id;
-            }
+            catch(Exception e) when(HandleError(e))
+            { return 0; }
         }
 
         public void RemoveClauses(params int[] clauseIds)
@@ -233,8 +262,13 @@ namespace DDictionary.DAL
             string nums = clauseIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
                                    .ToString().Trim(' ', ',');
 
-            using(IDbConnection cnn = GetConnection())
-                cnn.Execute($"DELETE FROM [Clauses] WHERE [Id] IN ({nums}); ");
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    cnn.Execute($"DELETE FROM [Clauses] WHERE [Id] IN ({nums}); ");
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
         }
 
         public void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds)
@@ -245,36 +279,46 @@ namespace DDictionary.DAL
             string nums = clauseIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
                                    .ToString().Trim(' ', ',');
 
-            using(IDbConnection cnn = GetConnection())
-                cnn.Execute($"UPDATE [Clauses] SET [Group] = {(byte)toGroup} WHERE [Id] IN ({nums}); ");
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    cnn.Execute($"UPDATE [Clauses] SET [Group] = {(byte)toGroup} WHERE [Id] IN ({nums}); ");
 
-            //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
+                //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
         }
 
         public int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
         {
-            if(relationId == 0)
-            { //Insert a new record
-                const string sql = 
-                    "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description]) VALUES (@From, @To, @Descr);\n" +
-                    "SELECT last_insert_rowid(); ";
+            try
+            {
+                if(relationId == 0)
+                { //Insert a new record
+                    const string sql =
+                        "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description]) VALUES (@From, @To, @Descr);\n" +
+                        "SELECT last_insert_rowid(); ";
 
-                using(IDbConnection cnn = GetConnection())
-                    return cnn.Query<int>(sql, new { From = fromClauseId, To = toClauseId, Descr = relDescription })
-                              .Single();
+                    using(IDbConnection cnn = GetConnection())
+                        return cnn.Query<int>(sql, new { From = fromClauseId, To = toClauseId, Descr = relDescription })
+                                  .Single();
+                }
+                else
+                { //Update an existing record
+                    const string sql =
+                        "UPDATE [Relations] SET [FromClauseId] = @From, [ToClauseId] = @To, [Description] = @Descr " +
+                        "WHERE [Id] = @Id; ";
+
+                    using(IDbConnection cnn = GetConnection())
+                        cnn.Execute(sql,
+                            new { Id = relationId, From = fromClauseId, To = toClauseId, Descr = relDescription });
+
+                    return relationId;
+                }
             }
-            else
-            { //Update an existing record
-                const string sql = 
-                    "UPDATE [Relations] SET [FromClauseId] = @From, [ToClauseId] = @To, [Description] = @Descr " + 
-                    "WHERE [Id] = @Id; ";
-
-                using(IDbConnection cnn = GetConnection())
-                    cnn.Execute(sql,
-                        new { Id = relationId, From = fromClauseId, To = toClauseId, Descr = relDescription });
-
-                return relationId;
-            }
+            catch(Exception e) when(HandleError(e))
+            { return 0; }
         }
 
         public void RemoveRelations(params int[] relationIds)
@@ -285,8 +329,13 @@ namespace DDictionary.DAL
             string nums = relationIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
                                      .ToString().Trim(' ', ',');
 
-            using(IDbConnection cnn = GetConnection())
-                cnn.Execute($"DELETE FROM [Relations] WHERE [Id] IN ({nums}); ");
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    cnn.Execute($"DELETE FROM [Relations] WHERE [Id] IN ({nums}); ");
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
         }
 
         public int AddOrUpdateTranslation(Translation translation, int toClauseId)
@@ -294,30 +343,35 @@ namespace DDictionary.DAL
             if(translation is null)
                 throw new ArgumentNullException(nameof(translation));
 
-            if(translation.Id == 0)
-            { //Insert a new record
-                const string sql = 
-                    "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) " + 
-                    "VALUES (@Index, @Text, @Part, @ClauseId);\n" +
-                    "SELECT last_insert_rowid(); ";
+            try
+            {
+                if(translation.Id == 0)
+                { //Insert a new record
+                    const string sql =
+                        "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) " +
+                        "VALUES (@Index, @Text, @Part, @ClauseId);\n" +
+                        "SELECT last_insert_rowid(); ";
 
-                using(IDbConnection cnn = GetConnection())
-                    return cnn.Query<int>(sql, 
-                                          new { translation.Index, translation.Text, translation.Part, ClauseId = toClauseId })
-                              .Single();
+                    using(IDbConnection cnn = GetConnection())
+                        return cnn.Query<int>(sql,
+                                              new { translation.Index, translation.Text, translation.Part, ClauseId = toClauseId })
+                                  .Single();
+                }
+                else
+                { //Update an existing record
+                    const string sql =
+                        "UPDATE [Translations] SET [Index] = @Index, [Text] = @Text, [Part] = @Part, [ClauseId] = @ClauseId " +
+                        "WHERE [Id] = @Id; ";
+
+                    using(IDbConnection cnn = GetConnection())
+                        cnn.Execute(sql,
+                            new { translation.Id, translation.Index, translation.Text, translation.Part, ClauseId = toClauseId });
+
+                    return translation.Id;
+                }
             }
-            else
-            { //Update an existing record
-                const string sql = 
-                    "UPDATE [Translations] SET [Index] = @Index, [Text] = @Text, [Part] = @Part, [ClauseId] = @ClauseId " + 
-                    "WHERE [Id] = @Id; ";
-
-                using(IDbConnection cnn = GetConnection())
-                    cnn.Execute(sql,
-                        new { translation.Id, translation.Index, translation.Text, translation.Part, ClauseId = toClauseId });
-
-                return translation.Id;
-            }
+            catch(Exception e) when(HandleError(e))
+            { return 0; }
         }
 
         public void RemoveTranslations(params int[] translationIds)
@@ -328,16 +382,40 @@ namespace DDictionary.DAL
             string nums = translationIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
                                         .ToString().Trim(' ', ',');
 
-            using(IDbConnection cnn = GetConnection())
-                cnn.Execute($"DELETE FROM [Translations] WHERE [Id] IN ({nums}); ");
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    cnn.Execute($"DELETE FROM [Translations] WHERE [Id] IN ({nums}); ");
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
         }
 
         /// <summary>
         /// Get connection to SQLite database with default connection string.
         /// </summary>
-        private static IDbConnection GetConnection()
+        private IDbConnection GetConnection()
         {
-            return new SQLiteConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString);
+            try
+            {
+                return new SQLiteConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString);
+            }
+            catch(Exception e) when(HandleError(e))
+            { return null; }
+        }
+
+        /// <summary>
+        /// Rises <see cref="OnErrorOccurs"/> event.
+        /// </summary>
+        /// <param name="e">An exception to handle.</param>
+        /// <returns><c>true</c> if somebody handled the exception, otherwise <c>false</c>.</returns>
+        private bool HandleError(Exception e)
+        {
+            bool handled = false;
+
+            OnErrorOccurs?.Invoke(e, ref handled);
+
+            return handled;
         }
     }
 }

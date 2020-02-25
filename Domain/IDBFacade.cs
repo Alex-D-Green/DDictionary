@@ -1,16 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using DDictionary.Domain.Entities;
 
 namespace DDictionary.Domain
 {
-    //TODO: Make sure that in the all places where IDBFacade is used there is a data exception handling!
+    /// <summary>
+    /// Error handler delegate.
+    /// </summary>
+    /// <param name="e">Exception.</param>
+    /// <param name="handled">Handler should return <c>true</c> if the error is handled or leave it otherwise.</param>
+    public delegate void ErrorHandler(Exception e, ref bool handled);
+
 
     /// <summary>
     /// The object to work with data storage.
     /// </summary>
     public interface IDBFacade
     {
+        /// <summary>
+        /// The event fires when a Data Access Level error occurs (e.g. IO error, Sql error etc.).
+        /// </summary>
+        event ErrorHandler OnErrorOccurs;
+
+
         /// <summary>
         /// Get dictionary clause by id.
         /// </summary>
