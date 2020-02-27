@@ -153,17 +153,27 @@ namespace DDictionary.DAL
 
             if(!String.IsNullOrEmpty(filter.TextFilter))
             {
-                //Primary search target (the word itself)
-                var ret1 = ret.Where(o => o.Word.Contains(filter.TextFilter));
+                const StringComparison sc = StringComparison.OrdinalIgnoreCase;
 
-                //Secondary targets (excluding the word itself)
-                var ret2 = ret.Where(o => !o.Word.Contains(filter.TextFilter) &&
-                                          (o.Context.Contains(filter.TextFilter) ||
-                                           o.Relations.Any(r => r.ToClause.Word.Contains(filter.TextFilter)) ||
-                                           o.Translations.Any(t => t.Text.Contains(filter.TextFilter))));
+                //Primary search target (the word itself - the beginning is matched), in alphabet order
+                var ret1 = ret.Where(o => o.Word.IndexOf(filter.TextFilter, sc) == 0)
+                              .OrderBy(o => o.Word);
+
+                //Secondary target (the word itself except primary target - matched but not the beginning)
+                var ret2 = ret.Where(o => o.Word.IndexOf(filter.TextFilter, sc) > 0);
+
+                //Tertiary target (relations, excluding the word itself)
+                var ret3 = ret.Where(o => o.Word.IndexOf(filter.TextFilter, sc) < 0 &&
+                                          o.Relations.Any(r => r.ToClause.Word.IndexOf(filter.TextFilter, sc) >= 0));
+
+                //Quaternary targets (excluding all previous targets)
+                var ret4 = ret.Where(o => o.Word.IndexOf(filter.TextFilter, sc) < 0 && 
+                                          !o.Relations.Any(r => r.ToClause.Word.IndexOf(filter.TextFilter, sc) >= 0) &&
+                                          (o.Context.IndexOf(filter.TextFilter, sc) >= 0 ||
+                                           o.Translations.Any(t => t.Text.IndexOf(filter.TextFilter, sc) >= 0) ) );
 
                 //To get the words' matches in the beginning
-                ret = ret1.Concat(ret2);
+                ret = ret1.Concat(ret2).Concat(ret3).Concat(ret4);
             }
 
             return ret;
