@@ -13,6 +13,8 @@ namespace DDictionary.Presentation.ViewModels
         public string Relations { get; set; }
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
+        public DateTime Watched { get; set; }
+        public int WatchedCount { get; set; }
         public string Group { get; set; }
     }
 }

@@ -20,11 +20,12 @@ namespace DDictionary.DAL
     {
         static SQLiteStorage()
         {
-            //using(IDbConnection cnn = GetConnection())
+            //using(IDbConnection cnn = new SQLiteStorage().GetConnection())
             //{
             //    const string sql1 =
-            //        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Group]) " +
-            //        "VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Group); ";
+            //        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Watched]," + 
+            //        " [WatchedCount], [Group])\n" +
+            //        "    VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group); ";
 
             //    const string sql2 =
             //        "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) " +
@@ -39,6 +40,7 @@ namespace DDictionary.DAL
             //        Context = "I hate pears!",
             //        Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
             //        Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
+            //        Watched = new DateTime(2019, 9, 4, 12, 0, 0, DateTimeKind.Local),
             //        Group = WordGroup.C_KindaKnown
             //    };
 
@@ -64,6 +66,10 @@ namespace DDictionary.DAL
 
         public Clause GetClauseById(int id)
         {
+            if(id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), id, "The identifier has to be greater than 0.");
+
+
             const string sql = 
                 "SELECT * FROM [Clauses] [cl]\n" +
                  "    LEFT JOIN [Translations] [tr] ON [tr].[ClauseId] = [cl].[Id]\n" +
@@ -214,9 +220,9 @@ namespace DDictionary.DAL
             }
             catch(Exception e) when(HandleError(e))
             { return Enumerable.Empty<JustWordDTO>(); }
-    }
+        }
 
-        public int AddOrUpdateClause(ClauseUpdateDTO clause)
+        public int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched)
         {
             if(clause is null)
                 throw new ArgumentNullException(nameof(clause));
@@ -228,8 +234,9 @@ namespace DDictionary.DAL
                 if(clause.Id == 0)
                 { //Insert a new record
                     const string sql =
-                        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Group]) " +
-                        "VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Group);\n" +
+                        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], " +
+                        " [Watched], [WatchedCount], [Group])\n" +
+                        "   VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group);\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
@@ -241,16 +248,23 @@ namespace DDictionary.DAL
                             Context = clause.Context,
                             Added = now,
                             Updated = now,
+                            Watched = now,
                             Group = clause.Group
                         })
                         .Single();
                 }
                 else
                 { //Update an existing record
-                    const string sql =
-                        "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
-                        " [Context] = @Context, [Updated] = @Updated, [Group] = @Group " +
-                        "WHERE Id = @Id; ";
+                    string sql = updateWatched
+                        ? 
+                            "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
+                            " [Context] = @Context, [Updated] = @Updated, [Watched] = @Watched," +
+                            " [WatchedCount] = [WatchedCount] + 1, [Group] = @Group\n" +
+                            "   WHERE [Id] = @Id; "
+                        : 
+                            "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
+                            " [Context] = @Context, [Updated] = @Updated, [Group] = @Group\n" +
+                            "   WHERE [Id] = @Id; ";
 
                     using(IDbConnection cnn = GetConnection())
                         cnn.Execute(sql, new
@@ -261,6 +275,7 @@ namespace DDictionary.DAL
                             Transcription = clause.Transcription,
                             Context = clause.Context,
                             Updated = now,
+                            Watched = now,
                             Group = clause.Group
                         });
 
@@ -271,18 +286,39 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
-        public void RemoveClauses(params int[] clauseIds)
+        public int UpdateClauseWatch(int id)
         {
-            if(clauseIds is null || clauseIds.Length == 0)
-                return;
+            if(id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), id, "The identifier has to be greater than 0.");
 
-            string nums = clauseIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
-                                   .ToString().Trim(' ', ',');
+
+            const string sql =
+                "UPDATE [Clauses] SET [Watched] = @Watched WHERE [Id] = @Id;\n" +
+                "UPDATE [Clauses] SET [WatchedCount] = [WatchedCount] + 1 WHERE [Id] = @Id;\n" +
+                "SELECT [WatchedCount] FROM [Clauses] WHERE [Id] = @Id; ";
 
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute($"DELETE FROM [Clauses] WHERE [Id] IN ({nums}); ");
+                    return cnn.ExecuteScalar<int>(sql, new { Id = id, Watched = DateTime.Now });
+            }
+            catch(Exception e) when(HandleError(e))
+            { return -1; }
+        }
+
+        public void RemoveClauses(params int[] clauseIds)
+        {
+            if(clauseIds?.Any(o => o <= 0) == true)
+                throw new ArgumentException("All identifiers have to be greater than 0.", nameof(clauseIds));
+
+
+            if(clauseIds is null || clauseIds.Length == 0)
+                return;
+
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                    cnn.Execute("DELETE FROM [Clauses] WHERE [Id] IN @Nums", new { Nums = clauseIds });
             }
             catch(Exception e) when(HandleError(e))
             { }
@@ -290,16 +326,18 @@ namespace DDictionary.DAL
 
         public void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds)
         {
+            if(clauseIds?.Any(o => o <= 0) == true)
+                throw new ArgumentException("All identifiers have to be greater than 0.", nameof(clauseIds));
+
+
             if(clauseIds is null || clauseIds.Length == 0)
                 return;
-
-            string nums = clauseIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
-                                   .ToString().Trim(' ', ',');
 
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute($"UPDATE [Clauses] SET [Group] = {(byte)toGroup} WHERE [Id] IN ({nums}); ");
+                    cnn.Execute("UPDATE [Clauses] SET [Group] = @ToGroup WHERE [Id] IN @Nums", 
+                        new { ToGroup = (byte)toGroup, Nums = clauseIds });
 
                 //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
             }
@@ -309,27 +347,54 @@ namespace DDictionary.DAL
 
         public int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
         {
+            if(relationId < 0)
+                throw new ArgumentOutOfRangeException(nameof(relationId), relationId, 
+                    "The identifier has to be equal or greater than 0.");
+
+            if(fromClauseId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(fromClauseId), fromClauseId, 
+                    "The identifier has to be greater than 0.");
+
+            if(toClauseId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(toClauseId), toClauseId,
+                    "The identifier has to be greater than 0.");
+
+
             try
             {
                 if(relationId == 0)
                 { //Insert a new record
                     const string sql =
                         "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description]) VALUES (@From, @To, @Descr);\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                        "   WHERE [Id] = @From;\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
-                        return cnn.Query<int>(sql, new { From = fromClauseId, To = toClauseId, Descr = relDescription })
-                                  .Single();
+                        return cnn.Query<int>(sql, new { 
+                            From = fromClauseId, 
+                            To = toClauseId, 
+                            Descr = relDescription, 
+                            Now = DateTime.Now 
+                        })
+                        .Single();
                 }
                 else
                 { //Update an existing record
                     const string sql =
-                        "UPDATE [Relations] SET [FromClauseId] = @From, [ToClauseId] = @To, [Description] = @Descr " +
-                        "WHERE [Id] = @Id; ";
+                        "UPDATE [Relations] SET [FromClauseId] = @From, [ToClauseId] = @To, [Description] = @Descr\n" +
+                        "   WHERE [Id] = @Id;\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                        "   WHERE [Id] = @From; ";
 
                     using(IDbConnection cnn = GetConnection())
-                        cnn.Execute(sql,
-                            new { Id = relationId, From = fromClauseId, To = toClauseId, Descr = relDescription });
+                        cnn.Execute(sql, new { 
+                            Id = relationId, 
+                            From = fromClauseId, 
+                            To = toClauseId, 
+                            Descr = relDescription, 
+                            Now = DateTime.Now 
+                        });
 
                     return relationId;
                 }
@@ -340,16 +405,22 @@ namespace DDictionary.DAL
 
         public void RemoveRelations(params int[] relationIds)
         {
+            if(relationIds?.Any(o => o <= 0) == true)
+                throw new ArgumentException("All identifiers have to be greater than 0.", nameof(relationIds));
+
+
             if(relationIds is null || relationIds.Length == 0)
                 return;
 
-            string nums = relationIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
-                                     .ToString().Trim(' ', ',');
+            const string sql =
+                "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                "   WHERE [Id] IN (SELECT [FromClauseId] FROM [Relations] WHERE [Id] IN @Nums);\n" + 
+                "DELETE FROM [Relations] WHERE [Id] IN @Nums; ";
 
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute($"DELETE FROM [Relations] WHERE [Id] IN ({nums}); ");
+                    cnn.Execute(sql, new { Now = DateTime.Now, Nums = relationIds });
             }
             catch(Exception e) when(HandleError(e))
             { }
@@ -360,29 +431,49 @@ namespace DDictionary.DAL
             if(translation is null)
                 throw new ArgumentNullException(nameof(translation));
 
+            if(toClauseId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(toClauseId), toClauseId,
+                    "The identifier has to be greater than 0.");
+
+
             try
             {
                 if(translation.Id == 0)
                 { //Insert a new record
                     const string sql =
-                        "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) " +
-                        "VALUES (@Index, @Text, @Part, @ClauseId);\n" +
+                        "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId])\n" +
+                        "   VALUES (@Index, @Text, @Part, @ClauseId);\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" + 
+                        "   WHERE [Id] = @ClauseId;\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
-                        return cnn.Query<int>(sql,
-                                              new { translation.Index, translation.Text, translation.Part, ClauseId = toClauseId })
-                                  .Single();
+                        return cnn.Query<int>(sql, new { 
+                            translation.Index, 
+                            translation.Text, 
+                            translation.Part, 
+                            ClauseId = toClauseId,
+                            Now = DateTime.Now
+                        })
+                        .Single();
                 }
                 else
                 { //Update an existing record
                     const string sql =
-                        "UPDATE [Translations] SET [Index] = @Index, [Text] = @Text, [Part] = @Part, [ClauseId] = @ClauseId " +
-                        "WHERE [Id] = @Id; ";
+                        "UPDATE [Translations] SET [Index] = @Index, [Text] = @Text, [Part] = @Part, [ClauseId] = @ClauseId\n" +
+                        "   WHERE [Id] = @Id;\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" + 
+                        "   WHERE [Id] = @ClauseId; ";
 
                     using(IDbConnection cnn = GetConnection())
-                        cnn.Execute(sql,
-                            new { translation.Id, translation.Index, translation.Text, translation.Part, ClauseId = toClauseId });
+                        cnn.Execute(sql, new { 
+                            translation.Id, 
+                            translation.Index, 
+                            translation.Text, 
+                            translation.Part, 
+                            ClauseId = toClauseId,
+                            Now = DateTime.Now
+                        });
 
                     return translation.Id;
                 }
@@ -393,16 +484,22 @@ namespace DDictionary.DAL
 
         public void RemoveTranslations(params int[] translationIds)
         {
+            if(translationIds?.Any(o => o <= 0) == true)
+                throw new ArgumentException("All identifiers have to be greater than 0.", nameof(translationIds));
+
+
             if(translationIds is null || translationIds.Length == 0)
                 return;
 
-            string nums = translationIds.Aggregate(new StringBuilder(), (s, n) => s.AppendFormat("{0}, ", n))
-                                        .ToString().Trim(' ', ',');
+            const string sql =
+                "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                "   WHERE [Id] IN (SELECT [ClauseId] FROM [Translations] WHERE [Id] IN @Nums);\n" +
+                "DELETE FROM [Translations] WHERE [Id] IN @Nums; ";
 
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute($"DELETE FROM [Translations] WHERE [Id] IN ({nums}); ");
+                    cnn.Execute(sql, new { Now = DateTime.Now, Nums = translationIds });
             }
             catch(Exception e) when(HandleError(e))
             { }

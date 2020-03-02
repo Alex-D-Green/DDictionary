@@ -14,6 +14,8 @@ namespace DDictionary.Domain.Entities
         public List<Relation> Relations { get; set; } = new List<Relation>();
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
+        public DateTime Watched { get; set; }
+        public int WatchedCount { get; set; }
         public WordGroup Group { get; set; }
     }
 }

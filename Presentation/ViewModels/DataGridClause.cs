@@ -17,6 +17,8 @@ namespace DDictionary.Presentation.ViewModels
         public bool HasRelations { get; set; }
         public DateTime Added { get; set; }
         public DateTime Updated { get; set; }
+        public DateTime Watched { get; set; }
+        public int WatchedCount { get; set; }
         public WordGroup Group { get; set; }
     }
 }

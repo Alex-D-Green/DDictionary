@@ -31,6 +31,8 @@ namespace DDictionary.Presentation.Converters
                 Relations = MakeRelationsString(cl.Relations),
                 Added = cl.Added,
                 Updated = cl.Updated,
+                Watched = cl.Watched,
+                WatchedCount = cl.WatchedCount,
                 Group = cl.Group.ToGradeStr()
             };
         }

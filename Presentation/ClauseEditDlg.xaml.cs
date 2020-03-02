@@ -42,6 +42,9 @@ namespace DDictionary.Presentation
         /// <summary>The list of "scrollable" clauses' ids.</summary>
         private readonly IList<int> clausesIdsLst;
 
+        /// <summary>The list of watched clauses during this "session".</summary>
+        private readonly List<int> watchedClauses = new List<int>();
+
 
         /// <summary>The editing clause (<c>null</c> for new one).</summary>
         private Clause clause;
@@ -108,11 +111,19 @@ namespace DDictionary.Presentation
         private void LoadClauseData(int clauseId)
         {
             Clause cl = dbFacade.GetClauseById(clauseId) ?? 
-                throw new InvalidOperationException($"The clause with id = {clauseId} is not found.");
+                throw new InvalidOperationException($"The clause with id = {clauseId} was not found.");
 
             clause = cl;
             relations.AddRange(clause.Relations.Select(o => o.MapToRelationDTO()));
             translations.AddRange(clause.Translations);
+
+            if(watchedClauses.Contains(clauseId))
+                return; //Update data only once for each clause per dialog showing
+
+            dbFacade.UpdateClauseWatch(clauseId);
+            //Do not call ClausesWereUpdated here cuz it's not such sufficient changes...
+
+            watchedClauses.Add(clauseId); //Remember updated clause's id
         }
 
         /// <summary>
@@ -228,10 +239,24 @@ namespace DDictionary.Presentation
 
             var newTranslationLbl = (TextBlock)copy.FindName(nameof(translationLbl));
             newTranslationLbl.Text = TranslationConverter.ConvertToString(tr);
+            newTranslationLbl.MouseUp += (s, e) =>
+            { //Edit the translation
+                var dlg = new TranslationsEditDlg(tr.Text, tr.Part) { Owner = this };
+
+                if(dlg.ShowDialog() == true)
+                {
+                    tr.Text = dlg.Translation.Value.translation;
+                    tr.Part = dlg.Translation.Value.partOfSpeech;
+
+                    newTranslationLbl.Text = TranslationConverter.ConvertToString(tr);
+
+                    ChangesHaveBeenMade();
+                }
+            };
 
             var newRemoveBtn = (Button)copy.FindName(nameof(trRemoveBtn));
             newRemoveBtn.Click += (s, e) =>
-            {
+            { //Remove the translation
                 LooseHeight();
 
                 translationsPanel.Children.Remove(copy);
@@ -521,7 +546,8 @@ namespace DDictionary.Presentation
                 Word = wordEdit.Text
             };
 
-            clause.Id = dbFacade.AddOrUpdateClause(clauseDTO);
+            clause.Id = dbFacade.AddOrUpdateClause(clauseDTO, 
+                !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data
 
             //Handle relations
             dbFacade.RemoveRelations(clause.Relations.Select(o => o.Id)

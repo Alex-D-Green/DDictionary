@@ -44,6 +44,7 @@ namespace DDictionary.DAL
                 Relations = new List<Relation>(),
                 Added = new DateTime(2019, 9, 1, 12, 0, 0, DateTimeKind.Local),
                 Updated = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
+                Watched = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.A_DefinitelyKnown
             };
 
@@ -65,6 +66,7 @@ namespace DDictionary.DAL
                 Relations = new List<Relation>(),
                 Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
                 Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
+                Watched = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.C_KindaKnown
             };
 
@@ -92,6 +94,7 @@ namespace DDictionary.DAL
                 Relations = new List<Relation>(),
                 Added = new DateTime(2019, 9, 12, 12, 0, 0, DateTimeKind.Local),
                 Updated = new DateTime(2019, 9, 13, 12, 0, 0, DateTimeKind.Local),
+                Watched = new DateTime(2019, 9, 13, 12, 0, 0, DateTimeKind.Local),
                 Group = WordGroup.E_TotallyUnknown
             };
 
@@ -124,6 +127,7 @@ namespace DDictionary.DAL
                     Relations = new List<Relation>(),
                     Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
                     Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
+                    Watched = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
                     Group = WordGroup.C_KindaKnown
                 };
 
@@ -301,7 +305,7 @@ namespace DDictionary.DAL
             cl.Updated = DateTime.Now;
         }
 
-        public int AddOrUpdateClause(ClauseUpdateDTO clause)
+        public int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched)
         {
             DateTime now = DateTime.Now;
 
@@ -314,11 +318,26 @@ namespace DDictionary.DAL
             cl.Transcription = clause.Transcription;
             cl.Word = clause.Word;
             cl.Updated = now;
+            
+            if(clause.Id == 0 || updateWatched)
+                cl.Watched = now;
 
             if(clause.Id == 0)
                 clauses.Add(cl);
+            else if(updateWatched)
+                cl.WatchedCount += 1;
 
             return cl.Id;
+        }
+
+        public int UpdateClauseWatch(int id)
+        {
+            Clause cl = clauses.Single(o => o.Id == id);
+            
+            cl.Watched = DateTime.Now;
+            cl.WatchedCount += 1;
+
+            return cl.WatchedCount;
         }
 
 #pragma warning restore CA1822 // Mark members as static

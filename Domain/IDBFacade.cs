@@ -46,8 +46,15 @@ namespace DDictionary.Domain
         /// clause will be created otherwise the existing one will be updated.
         /// </summary>
         /// <param name="clause">Clause data.</param>
+        /// <param name="updateWatched">Update the clause's watching data.</param>
         /// <returns>The id of the created/updated clause.</returns>
-        int AddOrUpdateClause(ClauseUpdateDTO clause);
+        int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched);
+
+        /// <summary>
+        /// Update the data when the clause was watched for the last time.
+        /// </summary>
+        /// <returns>The new value of the watch counter.</returns>
+        int UpdateClauseWatch(int id);
 
         /// <summary>
         /// Remove these clauses.

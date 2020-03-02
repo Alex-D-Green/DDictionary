@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:DDictionary="clr-namespace:DDictionary"
         mc:Ignorable="d"
-        Title="Clause editing" MinWidth="350" WindowStartupLocation="CenterOwner" 
+        Title="Clause editing" MinWidth="350" MaxWidth="800" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False">
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -20,13 +21,15 @@
             <StackPanel Margin="0,15">
                 <ComboBox x:Name="groupCBox" Width="150" Margin="5" TabIndex="20" SelectionChanged="OnSomeDataWasChanged"/>
                 <TextBox x:Name="wordEdit" Text="Word" HorizontalAlignment="Center" Margin="5" FontSize="16" FontWeight="Bold" 
-                         TextAlignment="Center" Padding="15,5" TabIndex="21" TextChanged="OnSomeDataWasChanged"/>
+                         TextAlignment="Center" Padding="15,5" TabIndex="21" TextChanged="OnSomeDataWasChanged" 
+                         MaxLength="{x:Static DDictionary:Constrains.MaxWordLength}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                     <Button Content="#" Padding="5,2" TabIndex="22" Click="OnSoundRefBtn_Click"/>
                     <Button x:Name="playBtn" Content="Play" Padding="10,2" Margin="0,0,5,0" TabIndex="23" 
                             Click="OnPlayBtn_Click"/>
                     <TextBox x:Name="transcriptionEdit" Text="Transcription" Padding="10,2" TabIndex="24" 
-                             TextChanged="OnSomeDataWasChanged"/>
+                             TextChanged="OnSomeDataWasChanged" 
+                             MaxLength="{x:Static DDictionary:Constrains.MaxTranscriptionLength}"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>
@@ -34,7 +37,8 @@
             <DockPanel x:Name="translationRow" Margin="5,0,5,5" HorizontalAlignment="Center">
                 <Button x:Name="trUpBtn" Content="↑" Padding="5,2" TabIndex="50"/>
                 <Button x:Name="trDownBtn" Content="↓" Padding="5,2" TabIndex="51"/>
-                <TextBlock x:Name="translationLbl" Text="Translation (part)" Margin="15,0" Padding="2"/>
+                <TextBlock x:Name="translationLbl" Text="Translation (part)" Margin="15,0" Padding="2" 
+                           Foreground="Blue" TextDecorations="Underline" Cursor="Hand" />
                 <Button x:Name="trRemoveBtn" Content="X" Padding="5,2" TabIndex="52"/>
             </DockPanel>
             <Button x:Name="addTranslationBtn" Content="Add translation" HorizontalAlignment="Center" Margin="5" Padding="15,2" 
@@ -42,7 +46,8 @@
         </StackPanel>
         <StackPanel Grid.Row="2" Margin="5">
             <TextBox x:Name="contextEdit" Text="Context" Margin="5" FontSize="10" TextAlignment="Center" Padding="5" 
-                     TabIndex="201" TextChanged="OnSomeDataWasChanged"/>
+                     TabIndex="201" TextChanged="OnSomeDataWasChanged"
+                     MaxLength="{x:Static DDictionary:Constrains.MaxContextLength}"/>
             <TextBlock x:Name="relationsLbl" Text="Relations" TextAlignment="Center" Margin="5" Padding="5" FontSize="10" 
                        Foreground="Blue" TextDecorations="Underline" Cursor="Hand" HorizontalAlignment="Center"
                        MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp" 
