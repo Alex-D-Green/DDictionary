@@ -122,43 +122,50 @@ namespace DDictionary.DAL
             if(String.IsNullOrEmpty(filter.TextFilter))
                 return GetClauses(sql.ToString());
 
+            //Adding the escape symbol to the percent symbol (single backslash is used as an escape symbol)
+            string escaped = filter.TextFilter.Replace("%", "\\%");
+
+            var parameters = new {
+                TextP  = $"{escaped}%", //Text Percent
+                PTextP = $"%{escaped}%" //Percent Text Percent
+            };
 
             //Primary search target (the word itself - the beginning is matched), in alphabet order
-            var tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE '{filter.TextFilter}%'\nORDER BY [cl].[Word]\n";
+            var tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @TextP ESCAPE '\\'\nORDER BY [cl].[Word]\n";
             
-            IEnumerable<Clause> ret = GetClauses(tmpSql);
+            IEnumerable<Clause> ret = GetClauses(tmpSql, parameters);
 
             //Secondary target (the word itself except primary target - matched but not the beginning)
-            tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE '%{filter.TextFilter}%' AND [cl].[Word] NOT LIKE '{filter.TextFilter}%'\n";
+            tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @PTextP ESCAPE '\\' AND [cl].[Word] NOT LIKE @TextP ESCAPE '\\'\n";
             
-            ret = ret.Concat(GetClauses(tmpSql));
+            ret = ret.Concat(GetClauses(tmpSql, parameters));
 
             //Tertiary target (relations, excluding the word itself)
             var sqlCopy = new StringBuilder(sql.ToString());
-            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE '%{1}%'\n", nextJoin, filter.TextFilter);
+            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
             sql.AppendFormat("    AND EXISTS( SELECT * FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
             sql.Append(      "                AND EXISTS( SELECT * FROM [Clauses] [cltf] ");
             sql.Append(                      "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
-            sql.AppendFormat(                "AND [cltf].[Word] LIKE '%{0}%' )\n", filter.TextFilter);
+            sql.Append(                      "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
-            ret = ret.Concat(GetClauses(sql.ToString()));
+            ret = ret.Concat(GetClauses(sql.ToString(), parameters));
 
             //Quaternary targets (excluding all previous targets)
             sql = sqlCopy;
-            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE '%{1}%'\n", nextJoin, filter.TextFilter);
+            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
             sql.Append(      "    AND NOT EXISTS( SELECT * FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
             sql.Append(      "                    AND EXISTS( SELECT * FROM [Clauses] [cltf] ");
             sql.Append(                                       "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
-            sql.AppendFormat(                                 "AND [cltf].[Word] LIKE '%{0}%' )\n", filter.TextFilter);
+            sql.Append(                                       "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
-            sql.AppendFormat("    AND ([cl].[Context] LIKE '%{0}%'\n", filter.TextFilter);
+            sql.Append(      "    AND ([cl].[Context] LIKE @PTextP ESCAPE '\\'\n");
             sql.Append(      "        OR EXISTS( SELECT * FROM [Translations] [trtf] ");
             sql.Append(                         "WHERE [trtf].[ClauseId] = [cl].[Id] ");
-            sql.AppendFormat(                   "AND [trtf].[Text] LIKE '%{0}%' )\n", filter.TextFilter);
+            sql.Append(                         "AND [trtf].[Text] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
-            return ret.Concat(GetClauses(sql.ToString())); //To get the words' matches in the beginning
+            return ret.Concat(GetClauses(sql.ToString(), parameters)); //To get the words' matches in the beginning
         }
 
         private IEnumerable<Clause> GetClauses(string sql, object parameters = null)
