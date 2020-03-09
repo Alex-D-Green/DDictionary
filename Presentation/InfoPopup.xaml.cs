@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
+using DDictionary.Domain;
+using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
 
@@ -13,7 +17,9 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class InfoPopup: Window
     {
-        //HACK: Show full information (in separate rows) about word's relations in InfoPopup?..
+        /// <summary>The object to work with data storage.</summary>
+        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
+
 
         public InfoPopup(DataGridClause clause)
         {
@@ -36,13 +42,29 @@ namespace DDictionary.Presentation
             else
                 transcriptionLbl.Content = $"[{clause.Transcription}]";
 
-            if(!clause.HasRelations)
+            if(clause.HasRelations)
+            {
+                var cl = dbFacade.GetClauseById(clause.Id);
+                Debug.Assert(cl != null);
+
+                var ret = new StringBuilder("");
+
+                int maxCount = 10;
+                foreach(Relation rl in cl.Relations)
+                {
+                    ret.AppendFormat("{0} - {1}\n", rl.ToClause?.Word, rl.Description);
+
+                    if(--maxCount == 0)
+                        break;
+                }
+
+                relationsLbl.Content = ret.ToString().TrimEnd('\n');
+            }
+            else
             {
                 relationsLbl.Visibility = Visibility.Hidden;
                 relationsLbl.Height = 0; //To correct row height
             }
-            else
-                relationsLbl.Content = clause.Relations;
         }
 
 
