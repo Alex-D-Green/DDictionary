@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Default document.ico</ApplicationIcon>
+    <ApplicationIcon>Icon\DDictionary.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper, Version=15.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
@@ -81,10 +81,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constrains.cs" />
     <Compile Include="DAL\SQLiteStorage.cs" />
     <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
     <Compile Include="Domain\Entities\RelationDTO.cs" />
+    <Compile Include="Presentation\AboutProgramDlg.xaml.cs">
+      <DependentUpon>AboutProgramDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\ClauseEditDlg.xaml.cs">
       <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
     </Compile>
@@ -104,6 +108,10 @@
     <Compile Include="Presentation\RelationsEditDlg.xaml.cs">
       <DependentUpon>RelationsEditDlg.xaml</DependentUpon>
     </Compile>
+    <Page Include="Presentation\AboutProgramDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Presentation\ClauseEditDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -122,6 +130,9 @@
     </Compile>
     <Compile Include="Domain\FiltrationCriteria.cs" />
     <Compile Include="Domain\IDBFacade.cs" />
+    <Compile Include="Presentation\SettingsDlg.xaml.cs">
+      <DependentUpon>SettingsDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\SoundManager.cs" />
     <Compile Include="Presentation\SoundRefEditDlg.xaml.cs">
       <DependentUpon>SoundRefEditDlg.xaml</DependentUpon>
@@ -129,6 +140,7 @@
     <Compile Include="Presentation\TranslationsEditDlg.xaml.cs">
       <DependentUpon>TranslationsEditDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\UICommands.cs" />
     <Compile Include="Presentation\ViewModels\CsvClause.cs" />
     <Compile Include="Presentation\ViewModels\DataGridClause.cs" />
     <Compile Include="DAL\InMemoryMockStorage.cs" />
@@ -143,6 +155,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Presentation\RelationsEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\SettingsDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -175,9 +191,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="DictionaryDB.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="DictionaryDB.db" />
+    <None Include="Icon\DDictionary.fla" />
+    <None Include="LICENSE" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -189,9 +205,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Default document.ico" />
+    <Resource Include="Icon\DDictionary.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icon\DDictionary.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

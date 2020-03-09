@@ -1,0 +1,31 @@
+﻿<Window x:Class="DDictionary.Presentation.SettingsDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Program settings" MinHeight="200" MinWidth="350" WindowStartupLocation="CenterOwner" 
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
+    <StackPanel Margin="10">
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <CheckBox x:Name="showPopupChk" Content="Show info popup" TabIndex="10" Click="OnShowPopupChk_Checked"
+                      ToolTip=
+"Show quick info popup while hover over the main table.&#x0A;
+The popup does not appear over the 'active' columns or when the filtration field has focus.&#x0A;
+To hide the popup just click on it or press Escape or hold Shift to prevent it from popping up."/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10, -5, 10, 10">
+            <CheckBox x:Name="autoPlayChk" Content="Autoplay sound" TabIndex="20" Margin="20,0,0,0" 
+                      ToolTip="Automatically play the word's sound when the info popup appears."/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <CheckBox x:Name="saveContextChk" Content="Save browser context" TabIndex="30"
+                      ToolTip="Save filter, sorting, scroll position etc. on exit."/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="10,25,10,0" HorizontalAlignment="Center">
+            <Button x:Name="saveBtn" Content="Save" MinWidth="75" Margin="5" IsDefault="True" TabIndex="100"
+                    Click="OnSaveBtn_Click"/>
+            <Button x:Name="cancelBtn" Content="Cancel" MinWidth="75" Margin="5" IsCancel="True" TabIndex="110"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -70,7 +70,7 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can not play sound: &quot;{0}&quot;
+        ///   Looks up a localized string similar to Cannot play the sound: &quot;{0}&quot;
         ///
         ///{1}.
         /// </summary>
@@ -81,7 +81,7 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can not refresh sound: &quot;{0}&quot;
+        ///   Looks up a localized string similar to Cannot refresh the sound: &quot;{0}&quot;
         ///
         ///{1}.
         /// </summary>
@@ -184,6 +184,168 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to adjective.
+        /// </summary>
+        internal static string POFFullAdjective {
+            get {
+                return ResourceManager.GetString("POFFullAdjective", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to adverb.
+        /// </summary>
+        internal static string POFFullAdverb {
+            get {
+                return ResourceManager.GetString("POFFullAdverb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to conjunction.
+        /// </summary>
+        internal static string POFFullConjunction {
+            get {
+                return ResourceManager.GetString("POFFullConjunction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to interjection.
+        /// </summary>
+        internal static string POFFullInterjection {
+            get {
+                return ResourceManager.GetString("POFFullInterjection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to noun.
+        /// </summary>
+        internal static string POFFullNoun {
+            get {
+                return ResourceManager.GetString("POFFullNoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to preposition.
+        /// </summary>
+        internal static string POFFullPreposition {
+            get {
+                return ResourceManager.GetString("POFFullPreposition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pronoun.
+        /// </summary>
+        internal static string POFFullPronoun {
+            get {
+                return ResourceManager.GetString("POFFullPronoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unknown.
+        /// </summary>
+        internal static string POFFullUnknown {
+            get {
+                return ResourceManager.GetString("POFFullUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to verb.
+        /// </summary>
+        internal static string POFFullVerb {
+            get {
+                return ResourceManager.GetString("POFFullVerb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to a.
+        /// </summary>
+        internal static string POFShortAdjective {
+            get {
+                return ResourceManager.GetString("POFShortAdjective", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to adv.
+        /// </summary>
+        internal static string POFShortAdverb {
+            get {
+                return ResourceManager.GetString("POFShortAdverb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to cj.
+        /// </summary>
+        internal static string POFShortConjunction {
+            get {
+                return ResourceManager.GetString("POFShortConjunction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to int.
+        /// </summary>
+        internal static string POFShortInterjection {
+            get {
+                return ResourceManager.GetString("POFShortInterjection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to n.
+        /// </summary>
+        internal static string POFShortNoun {
+            get {
+                return ResourceManager.GetString("POFShortNoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to prep.
+        /// </summary>
+        internal static string POFShortPreposition {
+            get {
+                return ResourceManager.GetString("POFShortPreposition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to pron.
+        /// </summary>
+        internal static string POFShortPronoun {
+            get {
+                return ResourceManager.GetString("POFShortPronoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -.
+        /// </summary>
+        internal static string POFShortUnknown {
+            get {
+                return ResourceManager.GetString("POFShortUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to v.
+        /// </summary>
+        internal static string POFShortVerb {
+            get {
+                return ResourceManager.GetString("POFShortVerb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attention please!.
         /// </summary>
         internal static string QuestionCaption {
@@ -220,20 +382,56 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This clause has no any related ones..
+        ///   Looks up a localized string similar to Watched: {0:yyyy-MM-dd} ({1}).
         /// </summary>
-        internal static string ThereAreNoRelations {
+        internal static string WatchedDateCount {
             get {
-                return ResourceManager.GetString("ThereAreNoRelations", resourceCulture);
+                return ResourceManager.GetString("WatchedDateCount", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Updated: {0:yyyy-MM-dd}.
+        ///   Looks up a localized string similar to Definitely known.
         /// </summary>
-        internal static string UpdateDate {
+        internal static string WGDefinitelyKnown {
             get {
-                return ResourceManager.GetString("UpdateDate", resourceCulture);
+                return ResourceManager.GetString("WGDefinitelyKnown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kind of known.
+        /// </summary>
+        internal static string WGKindOfKnown {
+            get {
+                return ResourceManager.GetString("WGKindOfKnown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Need to memorize.
+        /// </summary>
+        internal static string WGNeedToMemorize {
+            get {
+                return ResourceManager.GetString("WGNeedToMemorize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Totally unknown.
+        /// </summary>
+        internal static string WGTotallyUnknown {
+            get {
+                return ResourceManager.GetString("WGTotallyUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Well known.
+        /// </summary>
+        internal static string WGWellKnown {
+            get {
+                return ResourceManager.GetString("WGWellKnown", resourceCulture);
             }
         }
         

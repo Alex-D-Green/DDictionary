@@ -1,0 +1,20 @@
+﻿<Window x:Class="DDictionary.Presentation.AboutProgramDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="About DDictionary" Height="295.303" Width="402.775" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height">
+    <StackPanel Margin="20">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+            <Image Height="100" Width="100" Source="/DDictionary;component/Icon/DDictionary.png"/>
+            <StackPanel>
+                <Label Content="DDictionary" FontFamily="Segoe UI Black" FontSize="24" Margin="0"/>
+                <Label x:Name="versionLbl" Content="Version: "/>
+            </StackPanel>
+        </StackPanel>
+        <Label Content="Copyright ©  2019-2020  Alexander Dyachenko" HorizontalAlignment="Right"/>
+        <Label Content="License: Apache 2.0" HorizontalAlignment="Right"/>
+        <Button Content="Ok" Width="75" Height="25"  HorizontalAlignment="Center" Margin="0,30,0,0" IsDefault="True" IsCancel="True"/>
+    </StackPanel>
+</Window>

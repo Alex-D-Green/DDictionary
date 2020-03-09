@@ -3,14 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:DDictionary="clr-namespace:DDictionary"
         mc:Ignorable="d"
         Title="Translation editing" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
-    <StackPanel Margin="5" Orientation="Horizontal">
-        <TextBox x:Name="translationEdit" TextWrapping="NoWrap" Text="" Width="200" TabIndex="0" TextChanged="OnSomeDataWasChanged"/>
-        <ComboBox x:Name="partOfSpeechCBox" Width="100" Margin="15,0,0,0" TabIndex="10" MaxDropDownHeight="287" 
-                  IsReadOnly="True" SelectionChanged="OnSomeDataWasChanged"/>
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" MinWidth="420" MaxWidth="800">
+    <DockPanel Margin="5">
         <Button x:Name="acceptBtn" Content="Accept" Width="75" Margin="15,0,0,0" TabIndex="20" IsEnabled="False" 
-                IsDefault="True" Click="OnAcceptBtn_Click"/>
-    </StackPanel>
+            IsDefault="True" Click="OnAcceptBtn_Click" DockPanel.Dock="Right"/>            
+        <ComboBox x:Name="partOfSpeechCBox" Width="100" Margin="15,0,0,0" TabIndex="10" MaxDropDownHeight="287" 
+                IsReadOnly="True" SelectionChanged="OnSomeDataWasChanged" DockPanel.Dock="Right"/>
+        <TextBox x:Name="translationEdit" Text="" MinWidth="200" TabIndex="0" 
+                TextChanged="OnSomeDataWasChanged" MaxLength="{x:Static DDictionary:Constrains.MaxTranslationLength}"/>        
+    </DockPanel>
 </Window>

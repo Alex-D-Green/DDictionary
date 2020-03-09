@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDictionary.Presentation.Converters"
+        xmlns:DDictionary="clr-namespace:DDictionary" 
         mc:Ignorable="d"
         Title="Relations editing" WindowStartupLocation="CenterOwner" Width="450" SizeToContent="WidthAndHeight" 
-        WindowStyle="ToolWindow" ShowInTaskbar="False" MinWidth="450">
+        WindowStyle="ToolWindow" ShowInTaskbar="False" MinWidth="450" MaxWidth="800">
     <Window.Resources>
         <local:JustWordDTOConverter x:Key="JustWordDTOConverter" />
     </Window.Resources>
@@ -33,7 +34,8 @@
             <Button x:Name="addRelationBtn" Content="Add" Margin="5" Width="60" Height="22" DockPanel.Dock="Right" 
                     TabIndex="1003" IsEnabled="False" Click="OnAddRelationBtn_Click" />
             <TextBox x:Name="newRelationDescrTBox" Text="" Margin="5" Height="22" VerticalContentAlignment="Center" 
-                     TabIndex="1002" TextChanged="OnNewRelationDescrTBox_TextChanged"/>
+                     TabIndex="1002" TextChanged="OnNewRelationDescrTBox_TextChanged"
+                     MaxLength="{x:Static DDictionary:Constrains.MaxRelationDescLength}" />
         </DockPanel>
         <DockPanel Margin="5,25,5,5" LastChildFill="False">
             <Button Content="Cancel" DockPanel.Dock="Right" Margin="5" Width="100" Height="22" TabIndex="2002" 

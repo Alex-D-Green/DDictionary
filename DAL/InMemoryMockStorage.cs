@@ -157,6 +157,8 @@ namespace DDictionary.DAL
 
             if(!String.IsNullOrEmpty(filter.TextFilter))
             {
+                //HACK: InMemoryMockStorage does not handle placeholders for filtration!
+
                 const StringComparison sc = StringComparison.OrdinalIgnoreCase;
 
                 //Primary search target (the word itself - the beginning is matched), in alphabet order

@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -22,6 +24,7 @@ using DDictionary.Presentation.ViewModels;
 using Microsoft.Win32;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation
@@ -50,13 +53,36 @@ namespace DDictionary.Presentation
         private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
         /// <summary>The brush to highlight cells.</summary>
-        private Brush highlightBrush
-        { get => mainDataGrid.Resources["HighlightBrush"] as Brush ?? Brushes.Yellow; }
+        private Brush highlightBrush { get; }
 
 
         public MainWindow()
         {
+            #region Upgrade application settings if needed
+
+            if(Properties.Settings.Default.UpgradeRequired)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpgradeRequired = false;
+                Properties.Settings.Default.Save();
+            }
+
+            #endregion
+
+            dbFacade.OnErrorOccurs += (Exception e, ref bool handled) =>
+            { //The DAL errors handler for the whole GUI
+                if(handled)
+                    return;
+
+                Debug.WriteLine(e.ToString());
+
+                MessageBox.Show(this, e.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
+            };
+
             InitializeComponent();
+
+            highlightBrush = mainDataGrid.Resources["HighlightBrush"] as Brush ??
+                new SolidColorBrush(Color.FromRgb(0xFD, 0xC4, 0x4D));
 
             #region ComboBoxes with groups initialization
 
@@ -69,10 +95,123 @@ namespace DDictionary.Presentation
             UpdateGroupFilterText();
 
             #endregion
+        }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            //Restore window's state
+            if(PrgSettings.Default.Maximized)
+            {
+                ScreenInfo screen =
+                    ScreenInfo.AllScreens().SingleOrDefault(o => o.DeviceName == PrgSettings.Default.ScreenName);
+
+                if(screen != null)
+                { //Move the window on the right screen before maximize it
+                    Rect workArea = ScreenInfo.GetRectInDpi(this, screen.WorkingAreaPix);
+
+                    Left = workArea.Left;
+                    Top = workArea.Top;
+                }
+
+                WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                Left = PrgSettings.Default.Left;
+                Top = PrgSettings.Default.Top;
+                Width = PrgSettings.Default.Width;
+                Height = PrgSettings.Default.Height;
+            }
+
+            try
+            {
+                //Restore columns
+                int idx = 0;
+                foreach(string pair in PrgSettings.Default.Columns.Split(';'))
+                {
+                    string[] values = pair.Split(',');
+
+                    mainDataGrid.Columns[idx].DisplayIndex = Int32.Parse(values[0]);
+                    mainDataGrid.Columns[idx].Width = 
+                        new DataGridLength(Double.Parse(values[1]), DataGridLengthUnitType.Pixel);
+
+                    idx++;
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                PrgSettings.Default.Columns = ""; //To clear corrupted value
+            }
+
+
+            //Restore browser context's state
+            if(PrgSettings.Default.SaveContext)
+            { 
+                if(PrgSettings.Default.FilterRelatedFrom > 0)
+                { //Relation filtration
+                    try { currentFilter.RelatedFrom = dbFacade.GetClauseById(PrgSettings.Default.FilterRelatedFrom); }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine(ex.ToString());
+                        PrgSettings.Default.FilterRelatedFrom = 0; //To clear corrupted value
+                    }
+                }
+
+                //Text filtration
+                textFilterEdit.Text = currentFilter.TextFilter = PrgSettings.Default.FilterText;
+
+                textFilterEdit.Background = textFilterEdit.Text?.Length > 0 ? highlightBrush
+                                                                            : Brushes.Transparent;
+
+                //Groups filtration
+                if(!String.IsNullOrEmpty(PrgSettings.Default.FilterGroups))
+                {
+                    try
+                    {
+                        currentFilter.ShownGroups = PrgSettings.Default.FilterGroups.Split(',')
+                            .Select(o => WordGroupTranslator.FromGradeStr(o)).ToArray();
+
+                        foreach(var item in groupFilterCBox.Items.Cast<CheckBoxItem<WordGroup>>())
+                            item.IsSelected = currentFilter.ShownGroups.Contains(item.ItemValue);
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine(ex.ToString());
+                        PrgSettings.Default.FilterGroups = ""; //To clear corrupted value
+                    }
+                }
+
+                UpdateGroupFilterText();
+
+                if(!String.IsNullOrEmpty(PrgSettings.Default.Sorting))
+                { //Restore sorting
+                    try
+                    {
+                        string[] data = PrgSettings.Default.Sorting.Split(',');
+
+                        var sorting = new SortDescription(data[0], (ListSortDirection)Int32.Parse(data[1]));
+
+                        mainDataGrid.Items.SortDescriptions.Add(sorting);
+
+                        mainDataGrid.Columns.First(o => o.SortMemberPath == sorting.PropertyName)
+                                            .SortDirection = sorting.Direction; //Column header arrow
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine(ex.ToString());
+                        PrgSettings.Default.Sorting = ""; //To clear corrupted value
+                    }
+                }
+            }
+
+            //The first datagrid update
             UpdateDataGrid();
 
             textFilterEdit.Focus();
+            textFilterEdit.SelectAll();
         }
 
         /// <summary>
@@ -134,6 +273,8 @@ namespace DDictionary.Presentation
         /// </summary>
         private void HighlightCells(string substring)
         {
+            Regex regEx = null;
+
             foreach(DataGridClause item in mainDataGrid.Items.Cast<DataGridClause>())
             {
                 updateHighlight(item.Word, (TextBlock)mainDataGridWordColumn.GetCellContent(item));
@@ -148,7 +289,21 @@ namespace DDictionary.Presentation
                 if(tb is null) 
                     return;
 
-                if(substring?.Length > 0 && text?.Contains(substring) == true)
+                if(String.IsNullOrEmpty(text) || String.IsNullOrEmpty(substring))
+                {
+                    tb.Background = Brushes.Transparent;
+                    return;
+                }
+
+                if(regEx is null)
+                {
+                    regEx = new Regex(substring
+                                          .Replace(".", "\\.") //To handle dots as a regular symbol
+                                          .Replace("_", "."),  //To handle underscores as the placeholder
+                                      RegexOptions.IgnoreCase);
+                }
+
+                if(regEx.IsMatch(text))
                     tb.Background = highlightBrush;
                 else
                     tb.Background = Brushes.Transparent;
@@ -209,7 +364,6 @@ namespace DDictionary.Presentation
 
             UpdateDataGrid();
             UpdateGroupFilterText();
-            UpdateClearFilterButtonState();
         }
 
         /// <summary>
@@ -258,25 +412,32 @@ namespace DDictionary.Presentation
 
             UpdateDataGrid(clearSorting: true); //Cuz clauses in the special order after text filtration
             UpdateGroupFilterText();
-            UpdateClearFilterButtonState();
         }
 
         /// <summary>
-        /// Enable/disable "Clear filter" button depending on current filter state.
-        /// </summary>
-        private void UpdateClearFilterButtonState()
-        {
-            clearFilterBtn.IsEnabled = currentFilter.TextFilter?.Length > 0 ||
-                                       currentFilter.RelatedFrom != null ||
-                                       currentFilter.ShownGroups?.Any() == true;
-        }
-
-        /// <summary>
-        /// Clear the filter.
+        /// Clear the filter/sorting.
         /// </summary>
         private void OnClearFilterBtn_Click(object sender, RoutedEventArgs e)
         {
-            ClearFilter();
+            if(Keyboard.Modifiers == ModifierKeys.Alt)
+                ClearSorting();
+            else
+                ClearFilter();
+        }
+
+        /// <summary>
+        /// Clear the sorting.
+        /// </summary>
+        private void ClearSorting()
+        {
+            //Only one column could have sorting
+            Debug.Assert(mainDataGrid.Items.SortDescriptions.Count <= 1);
+
+            //Clear sorting
+            mainDataGrid.Items.SortDescriptions.Clear();
+
+            foreach(DataGridColumn col in mainDataGrid.Columns)
+                col.SortDirection = null;
         }
 
         /// <summary>
@@ -298,8 +459,6 @@ namespace DDictionary.Presentation
 
             if(updateGrid)
                 UpdateDataGrid();
-
-            UpdateClearFilterButtonState();
         }
 
         /// <summary>
@@ -374,7 +533,6 @@ namespace DDictionary.Presentation
             
             UpdateDataGrid();
             UpdateGroupFilterText();
-            UpdateClearFilterButtonState();
         }
 
         /// <summary>
@@ -471,14 +629,15 @@ namespace DDictionary.Presentation
             var dlg = new ClauseEditDlg(null, lst) { Owner = this };
             dlg.ClausesWereUpdated += () => UpdateDataGrid();
 
-            if(dlg.ShowDialog() == true)
-                UpdateDataGrid(); //Just in case
+            dlg.ShowDialog();
+            
+            UpdateDataGrid(); //Clause's last watch data can be changed...
         }
 
         /// <summary>
         /// Edit clause button handler.
         /// </summary>
-        private void OnDataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void OnDataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Debug.Assert(sender is DataGridRow row && row.DataContext is DataGridClause);
 
@@ -487,8 +646,11 @@ namespace DDictionary.Presentation
             var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id, lst) { Owner = this };
             dlg.ClausesWereUpdated += () => UpdateDataGrid();
 
-            if(dlg.ShowDialog() == true)
-                UpdateDataGrid(); //Just in case
+            await Task.Delay(150); //To prevent mouse event from catching in the just opened dialog
+
+            dlg.ShowDialog();
+            
+            UpdateDataGrid(); //Clause's last watch data can be changed...
         }
 
 
@@ -530,5 +692,78 @@ namespace DDictionary.Presentation
             finally
             { exportBtn.IsEnabled = mainDataGrid.Items.Count > 0; }
         }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            //Save window's state
+            bool max = PrgSettings.Default.Maximized = (WindowState == WindowState.Maximized);
+            PrgSettings.Default.Left = max ? 0 : Left;
+            PrgSettings.Default.Top = max ? 0 : Top;
+            PrgSettings.Default.Width = max ? 0 : ActualWidth;
+            PrgSettings.Default.Height = max ? 0 : ActualHeight;
+            PrgSettings.Default.ScreenName = ScreenInfo.GetScreenFrom(this).DeviceName;
+
+            PrgSettings.Default.Columns = 
+                mainDataGrid.Columns.Aggregate("", (s, o) => s += $"{o.DisplayIndex},{o.ActualWidth};");
+
+
+            //Save browser context's state
+            if(PrgSettings.Default.SaveContext)
+            {
+                PrgSettings.Default.FilterRelatedFrom = currentFilter.RelatedFrom?.Id ?? 0;
+                PrgSettings.Default.FilterText = currentFilter.TextFilter ?? "";
+                PrgSettings.Default.FilterGroups =
+                    currentFilter.ShownGroups?.Aggregate("", (s, o) => s += $"{o.ToGradeStr()},").TrimEnd(',') ?? "";
+
+                if(mainDataGrid.Items.SortDescriptions.Count > 0)
+                {
+                    SortDescription sorting = mainDataGrid.Items.SortDescriptions[0];
+
+                    PrgSettings.Default.Sorting = $"{sorting.PropertyName},{(int)sorting.Direction}";
+                }
+                else
+                    PrgSettings.Default.Sorting = "";
+            }
+            else
+            {
+                PrgSettings.Default.FilterRelatedFrom = 0;
+                PrgSettings.Default.FilterText = "";
+                PrgSettings.Default.FilterGroups = "";
+                PrgSettings.Default.Sorting = "";
+            }
+
+            PrgSettings.Default.Save();
+        }
+
+        #region Commands' handlers
+
+        private void OnExitCommand(object sender, ExecutedRoutedEventArgs e) 
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void OnSettingsCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            new SettingsDlg() { Owner = this }.ShowDialog();
+        }
+
+        private void OnGoToSiteCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            Process.Start("https://github.com/Alex-D-Green/DDictionary");
+        }
+
+        private void OnOnlineHelpCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            Process.Start("https://github.com/Alex-D-Green/DDictionary/wiki");
+        }
+
+        private void OnAboutCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            new AboutProgramDlg() { Owner = this }.ShowDialog();
+        }
+
+        #endregion
     }
 }

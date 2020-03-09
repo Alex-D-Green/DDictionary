@@ -76,7 +76,7 @@ namespace DDictionary.Presentation
         /// <param name="overwriteCache">Update file in the cache.</param>
         /// <exception cref="System.ArgumentNullException"/>
         /// <exception cref="System.IO.FileNotFoundException"/>
-        private static async Task<Uri> UpdateSoundCache(int clauseId, string soundUri, bool overwriteCache)
+        public static async Task<Uri> UpdateSoundCache(int clauseId, string soundUri, bool overwriteCache)
         {
             if(String.IsNullOrEmpty(soundUri))
                 throw new ArgumentNullException(nameof(soundUri));

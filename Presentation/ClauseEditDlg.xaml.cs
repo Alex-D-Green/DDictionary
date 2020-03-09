@@ -19,8 +19,6 @@ using PrgResources = DDictionary.Properties.Resources;
 
 namespace DDictionary.Presentation
 {
-    //TODO: Remake Clause Edit Dialog to see clause's relations right away without any clicks!
-
     //HACK: Implement the Clause Edit Dialog closing by click outside of the dialog?..
     //https://stackoverflow.com/a/10301550
 

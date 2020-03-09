@@ -1,4 +1,9 @@
-﻿using DDictionary.Domain.Entities;
+﻿using System;
+
+using DDictionary.Domain.Entities;
+
+using PrgResources = DDictionary.Properties.Resources;
+
 
 namespace DDictionary.Presentation.Converters
 {
@@ -23,15 +28,32 @@ namespace DDictionary.Presentation.Converters
         {
             switch(group)
             {
-                case WordGroup.A_DefinitelyKnown: return "(A) Definitely known";
-                case WordGroup.B_WellKnown: return "(B) Well known";
-                case WordGroup.C_KindaKnown: return "(C) Kinda known";
-                case WordGroup.D_NeedToMemorize: return "(D) Need to memorize";
-                case WordGroup.E_TotallyUnknown: return "(E) Totally unknown";
+                case WordGroup.A_DefinitelyKnown: return $"({group.ToGradeStr()}) {PrgResources.WGDefinitelyKnown}";
+                case WordGroup.B_WellKnown:       return $"({group.ToGradeStr()}) {PrgResources.WGWellKnown}";
+                case WordGroup.C_KindaKnown:      return $"({group.ToGradeStr()}) {PrgResources.WGKindOfKnown}";
+                case WordGroup.D_NeedToMemorize:  return $"({group.ToGradeStr()}) {PrgResources.WGNeedToMemorize}";
+                case WordGroup.E_TotallyUnknown:  return $"({group.ToGradeStr()}) {PrgResources.WGTotallyUnknown}";
 
                 default:
                     return group.ToString();
             }
+        }
+
+        /// <exception cref="System.ArgumentOutOfRangeException" />
+        public static WordGroup FromGradeStr(string grade)
+        {
+            if(String.Equals(grade, WordGroup.A_DefinitelyKnown.ToGradeStr(), StringComparison.OrdinalIgnoreCase))
+                return WordGroup.A_DefinitelyKnown;
+            else if(String.Equals(grade, WordGroup.B_WellKnown.ToGradeStr(), StringComparison.OrdinalIgnoreCase))
+                return WordGroup.B_WellKnown;
+            else if(String.Equals(grade, WordGroup.C_KindaKnown.ToGradeStr(), StringComparison.OrdinalIgnoreCase))
+                return WordGroup.C_KindaKnown;
+            else if(String.Equals(grade, WordGroup.D_NeedToMemorize.ToGradeStr(), StringComparison.OrdinalIgnoreCase))
+                return WordGroup.D_NeedToMemorize;
+            else if(String.Equals(grade, WordGroup.E_TotallyUnknown.ToGradeStr(), StringComparison.OrdinalIgnoreCase))
+                return WordGroup.E_TotallyUnknown;
+            else
+                throw new ArgumentOutOfRangeException(nameof(grade), grade, "Unknown value.");
         }
     }
 }

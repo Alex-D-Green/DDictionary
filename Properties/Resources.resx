@@ -121,12 +121,12 @@
     <value>add</value>
   </data>
   <data name="CannotPlaySound" xml:space="preserve">
-    <value>Can not play sound: "{0}"
+    <value>Cannot play the sound: "{0}"
 
 {1}</value>
   </data>
   <data name="CannotRefreshSound" xml:space="preserve">
-    <value>Can not refresh sound: "{0}"
+    <value>Cannot refresh the sound: "{0}"
 
 {1}</value>
   </data>
@@ -162,6 +162,78 @@ Continue and save only filtered clauses?</value>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>
   </data>
+  <data name="POFFullAdjective" xml:space="preserve">
+    <value>adjective</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullAdverb" xml:space="preserve">
+    <value>adverb</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullConjunction" xml:space="preserve">
+    <value>conjunction</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullInterjection" xml:space="preserve">
+    <value>interjection</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullNoun" xml:space="preserve">
+    <value>noun</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullPreposition" xml:space="preserve">
+    <value>preposition</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullPronoun" xml:space="preserve">
+    <value>pronoun</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullUnknown" xml:space="preserve">
+    <value>unknown</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFFullVerb" xml:space="preserve">
+    <value>verb</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortAdjective" xml:space="preserve">
+    <value>a</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortAdverb" xml:space="preserve">
+    <value>adv</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortConjunction" xml:space="preserve">
+    <value>cj</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortInterjection" xml:space="preserve">
+    <value>int</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortNoun" xml:space="preserve">
+    <value>n</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortPreposition" xml:space="preserve">
+    <value>prep</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortPronoun" xml:space="preserve">
+    <value>pron</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortUnknown" xml:space="preserve">
+    <value>-</value>
+    <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortVerb" xml:space="preserve">
+    <value>v</value>
+    <comment>PartOfSpeech</comment>
+  </data>
   <data name="QuestionCaption" xml:space="preserve">
     <value>Attention please!</value>
   </data>
@@ -174,12 +246,28 @@ Continue and save only filtered clauses?</value>
   <data name="TheClauseDeletionConfirmation" xml:space="preserve">
     <value>Delete "{0}" clause?</value>
   </data>
-  <data name="ThereAreNoRelations" xml:space="preserve">
-    <value>This clause has no any related ones.</value>
-    <comment>Not used</comment>
+  <data name="WatchedDateCount" xml:space="preserve">
+    <value>Watched: {0:yyyy-MM-dd} ({1})</value>
   </data>
-  <data name="UpdateDate" xml:space="preserve">
-    <value>Updated: {0:yyyy-MM-dd}</value>
+  <data name="WGDefinitelyKnown" xml:space="preserve">
+    <value>Definitely known</value>
+    <comment>WordGroup</comment>
+  </data>
+  <data name="WGKindOfKnown" xml:space="preserve">
+    <value>Kind of known</value>
+    <comment>WordGroup</comment>
+  </data>
+  <data name="WGNeedToMemorize" xml:space="preserve">
+    <value>Need to memorize</value>
+    <comment>WordGroup</comment>
+  </data>
+  <data name="WGTotallyUnknown" xml:space="preserve">
+    <value>Totally unknown</value>
+    <comment>WordGroup</comment>
+  </data>
+  <data name="WGWellKnown" xml:space="preserve">
+    <value>Well known</value>
+    <comment>WordGroup</comment>
   </data>
   <data name="WordRelationTo" xml:space="preserve">
     <value>"{0}" relation to:</value>

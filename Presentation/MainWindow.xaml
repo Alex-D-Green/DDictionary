@@ -9,7 +9,14 @@
         Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200" MouseMove="OnMainWindow_MouseMove">
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
-    </Window.Resources>    
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:UICommands.ExitCommand}" Executed="OnExitCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.SettingsCommand}" Executed="OnSettingsCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.GoToSiteCommand}" Executed="OnGoToSiteCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.OnlineHelpCommand}" Executed="OnOnlineHelpCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.AboutCommand}" Executed="OnAboutCommand" />
+    </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -22,7 +29,9 @@
                     TabIndex="1" ToolTip="Select all rows or clear selection" Click="OnSelectAllBtn_Clicked" 
                     BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
             <TextBox x:Name="textFilterEdit" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
-                     Height="22" TabIndex="2" ToolTip="Enter substring for filtration" TextChanged="OnTextFilter_TextChanged"/>
+                     Height="22" TabIndex="2" 
+                     ToolTip="Enter substring for filtration (use the underscore as a symbol placeholder)" 
+                     TextChanged="OnTextFilter_TextChanged"/>
             <ComboBox x:Name="groupFilterCBox" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" 
                       IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" 
                       ToolTip="Select in the dropdown list groups that should be shown" KeyUp="OnGroupFilterCBox_KeyUp">
@@ -37,7 +46,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
-                    TabIndex="4" ToolTip="Clear filter" Click="OnClearFilterBtn_Click" IsEnabled="False"/>
+                    TabIndex="4" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click"/>
             <Button x:Name="exportBtn" Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
                     Margin="5,5,10,5" DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False" 
                     Click="OnExportBtn_Click" ToolTip="Export the dictionary into a CSV file"/>
@@ -59,7 +68,7 @@
                 <Style x:Key="ColumnElementStyle" TargetType="TextBlock">
                     <Setter Property="Padding" Value="7,2,7,2" />
                 </Style>
-                <SolidColorBrush x:Key="HighlightBrush" Color="Yellow" />
+                <SolidColorBrush x:Key="HighlightBrush" Color="#FDC44D" />
             </DataGrid.Resources>
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
@@ -151,9 +160,15 @@
                 <DataGridTextColumn Binding="{Binding Updated, StringFormat={}{0:yyyy-MM-dd}}" Header="Updated" 
                                     ElementStyle="{StaticResource ColumnElementStyle}" 
                                     MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
-                <DataGridTextColumn Binding="{Binding Group, Converter={StaticResource WordGroupConverter}}" Header="Group" 
+                <DataGridTextColumn Binding="{Binding Watched, StringFormat={}{0:yyyy-MM-dd}}" Header="Watched" 
                                     ElementStyle="{StaticResource ColumnElementStyle}" 
                                     MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding WatchedCount}" Header="WatchedCount" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding Group, Converter={StaticResource WordGroupConverter}}" Header="Group" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>                
             </DataGrid.Columns>
         </DataGrid>
         <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" 
@@ -171,8 +186,21 @@
             <Label VerticalAlignment="Center"/>
         </StatusBar>
         <Menu Margin="0">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
             <MenuItem Header="_File">
-                <MenuItem Header="E_xit"/>
+                <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
+            </MenuItem>
+            <MenuItem Header="_Help" HorizontalAlignment="Right">
+                <MenuItem Header="_Program site"  Command="local:UICommands.GoToSiteCommand"/>
+                <MenuItem Header="Online _help" Command="local:UICommands.OnlineHelpCommand"/>
+                <Separator/>
+                <MenuItem Header="_About DDictionary..." Command="local:UICommands.AboutCommand"/>
             </MenuItem>
         </Menu>
     </Grid>

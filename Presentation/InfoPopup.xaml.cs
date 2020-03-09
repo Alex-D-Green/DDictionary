@@ -13,9 +13,6 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class InfoPopup: Window
     {
-        //TODO: Add info about using InfoPopup, as a tooltip to "show popup" option.
-        //Tell how to hover over the main data grid without showing popup (Shift key, click, some columns)...
-
         //HACK: Show full information (in separate rows) about word's relations in InfoPopup?..
 
         public InfoPopup(DataGridClause clause)
@@ -29,7 +26,7 @@ namespace DDictionary.Presentation
             groupLbl.Content = clause.Group.ToFullStr();
             wordLbl.Content = clause.Word;
             translationsLbl.Content = clause.Translations;
-            dateLbl.Content = String.Format(Properties.Resources.UpdateDate, clause.Updated);
+            dateLbl.Content = String.Format(Properties.Resources.WatchedDateCount, clause.Watched, clause.WatchedCount);
 
             if(String.IsNullOrEmpty(clause.Transcription))
             {

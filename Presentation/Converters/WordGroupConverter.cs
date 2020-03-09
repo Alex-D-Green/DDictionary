@@ -22,6 +22,7 @@ namespace DDictionary.Presentation.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            //WordGroupTranslator.FromGradeStr() ?..
             throw new NotSupportedException();
         }
     }

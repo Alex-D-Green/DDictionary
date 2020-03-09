@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:DDictionary="clr-namespace:DDictionary" 
         mc:Ignorable="d"
-        Title="Sound reference editing" MinWidth="500" ShowInTaskbar="False" 
+        Title="Sound reference editing" MinWidth="500" MaxWidth="800" ShowInTaskbar="False" 
         WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight">
     <StackPanel Margin="5">
         <DockPanel Margin="10">
@@ -16,7 +17,8 @@
                     Click="OnLocalBtn_Click"/>
             <Button x:Name="clearBtn" DockPanel.Dock="Right" Content="X" TabIndex="13" Padding="5,2" Margin="0,0,5,0"
                     Click="OnClearBtn_Click"/>
-            <TextBox x:Name="refEdit" Text="Ref" TabIndex="12" VerticalAlignment="Center" Padding="5,2" Margin="0,0,5,0"/>
+            <TextBox x:Name="refEdit" Text="Ref" TabIndex="12" VerticalAlignment="Center" Padding="5,2" Margin="0,0,5,0"
+                     MaxLength="{x:Static DDictionary:Constrains.MaxSoundUriLength}"/>
         </DockPanel>
         <DockPanel LastChildFill="False" Margin="10,15,10,10">
             <Button DockPanel.Dock="Right" Content="Cancel" TabIndex="21" IsCancel="True" Padding="15,2"/>

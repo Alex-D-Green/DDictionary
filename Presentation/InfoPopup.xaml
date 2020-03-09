@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="InfoPopup" Height="100" Width="200" MinWidth="200" ShowInTaskbar="False" WindowStyle="None" 
+        Title="InfoPopup" Height="100" Width="250" MinWidth="250" MaxWidth="800" ShowInTaskbar="False" WindowStyle="None" 
         ResizeMode="NoResize" Background="{DynamicResource {x:Static SystemColors.InfoBrushKey}}" 
         PreviewMouseDown="OnWindow_PreviewMouseDown" PreviewKeyDown="OnWindow_PreviewKeyDown" 
         BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" 
@@ -13,7 +13,7 @@
         <DockPanel Margin="0,-5,0,-5">
             <Label x:Name="groupLbl" Content="Group" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" 
                FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
-            <Label x:Name="dateLbl" Content="Updated: 2019-01-18" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Center" 
+            <Label x:Name="dateLbl" Content="Watched: 2019-01-18 (999)" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Center" 
                FontSize="8" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" DockPanel.Dock="Right"/>
         </DockPanel>
         <StackPanel Margin="0" Orientation="Horizontal">

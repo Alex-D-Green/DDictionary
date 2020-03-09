@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -6,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using DDictionary.Presentation.ViewModels;
+
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation
@@ -35,7 +38,9 @@ namespace DDictionary.Presentation
             bool shouldNotAppear = newPivotCell.Column == mainDataGridRelationsColumn ||
                                    newPivotCell.Column == mainDataGridShowRelationsColumn ||
                                    newPivotCell.Column == mainDataGridPlayColumn ||
-                                   Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+                                   Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ||
+                                   PrgSettings.Default.ShowInfoPopup == false ||
+                                   textFilterEdit.IsFocused;
 
             if(shouldNotAppear || 
                infoPopupWindow != null) //The mark that pop-up PROBABLY was closed by itself
@@ -96,7 +101,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Show info pop-up and position it.
         /// </summary>
-        private void ShowInfoPopup(DataGridClause clause)
+        private async void ShowInfoPopup(DataGridClause clause)
         {
             Rect workArea = ScreenInfo.GetRectInDpi(this, ScreenInfo.GetScreenFrom(this).WorkingAreaPix);
 
@@ -140,7 +145,9 @@ namespace DDictionary.Presentation
 
             infoPopupWindow = popup; //To make it thread safe
 
-            //HACK: Auto play sound?..
+
+            if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
+                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound);
         }
 
         /// <summary>

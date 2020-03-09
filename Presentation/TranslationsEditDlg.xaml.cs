@@ -19,7 +19,7 @@ namespace DDictionary.Presentation
         public (string translation, PartOfSpeech partOfSpeech)? Translation { get; private set; }
 
 
-        public TranslationsEditDlg()
+        public TranslationsEditDlg(string translation = null, PartOfSpeech part = PartOfSpeech.Unknown)
         {
             InitializeComponent();
 
@@ -30,14 +30,20 @@ namespace DDictionary.Presentation
             };
 
             //ComboBox with parts of the speech initialization
-            foreach(PartOfSpeech part in Enum.GetValues(typeof(PartOfSpeech)).Cast<PartOfSpeech>())
-                partOfSpeechCBox.Items.Add(new CheckBoxItem<PartOfSpeech> { Text = part.ToFullString(), ItemValue = part });
+            foreach(PartOfSpeech pt in Enum.GetValues(typeof(PartOfSpeech)).Cast<PartOfSpeech>())
+                partOfSpeechCBox.Items.Add(new CheckBoxItem<PartOfSpeech> { Text = pt.ToFullString(), ItemValue = pt });
 
-            partOfSpeechCBox.SelectedIndex = 0;
+            partOfSpeechCBox.SelectedItem = 
+                partOfSpeechCBox.Items.Cast<CheckBoxItem<PartOfSpeech>>().Single(o => o.ItemValue == part);
+
+            translationEdit.Text = translation;
+            translationEdit.Focus();
+
             acceptBtn.IsEnabled = false;
 
-            translationEdit.Focus();
+            Activated += OnDialog_Activated; //To do initial actions when form will be shown
         }
+
 
         /// <summary>
         /// Any data was changed.
@@ -65,6 +71,31 @@ namespace DDictionary.Presentation
 
             DialogResult = true;
             Close();
+        }
+
+        /// <summary>
+        /// Initial actions.
+        /// </summary>
+        private void OnDialog_Activated(object sender, EventArgs e)
+        {
+            Activated -= OnDialog_Activated; //Not need to replay
+
+            FixHeight();
+        }
+
+        /// <summary>
+        /// Fix current dialog height and prohibit it from changing.
+        /// </summary>
+        private void FixHeight()
+        {
+            //https://stackoverflow.com/questions/1256916/how-to-force-actualwidth-and-actualheight-to-update-silverlight
+
+            //To fit dialog's size, especially its height
+            SizeToContent = SizeToContent.Manual;
+            SizeToContent = SizeToContent.WidthAndHeight;
+
+            //To prevent height changing
+            MinHeight = MaxHeight = ActualHeight; //ActualHeight should be updated by this time
         }
     }
 }
