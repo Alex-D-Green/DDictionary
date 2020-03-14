@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,6 +50,13 @@ namespace DDictionary.Presentation
         private readonly FiltrationCriteria currentFilter = new FiltrationCriteria();
 
 
+        /// <summary>
+        /// Cancellation token source to cancel an update fallowed by changes of the text filter.
+        /// </summary>
+        /// <seealso cref="DDictionary.Presentation.MainWindow.OnTextFilter_TextChanged"/>
+        private CancellationTokenSource textFilterUpdateCancellation;
+
+
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
@@ -76,7 +84,8 @@ namespace DDictionary.Presentation
 
                 Debug.WriteLine(e.ToString());
 
-                MessageBox.Show(this, e.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
+                Dispatcher.Invoke(() => //In case if it's not the GUI thread
+                    MessageBox.Show(this, e.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error));
             };
 
             InitializeComponent();
@@ -152,7 +161,10 @@ namespace DDictionary.Presentation
             { 
                 if(PrgSettings.Default.FilterRelatedFrom > 0)
                 { //Relation filtration
-                    try { currentFilter.RelatedFrom = dbFacade.GetClauseById(PrgSettings.Default.FilterRelatedFrom); }
+                    try 
+                    { 
+                        currentFilter.RelatedFrom = dbFacade.GetClauseByIdAsync(PrgSettings.Default.FilterRelatedFrom).Result; 
+                    }
                     catch(Exception ex)
                     {
                         Debug.WriteLine(ex.ToString());
@@ -208,7 +220,7 @@ namespace DDictionary.Presentation
             }
 
             //The first datagrid update
-            UpdateDataGrid();
+            UpdateDataGridAsync().Wait();
 
             textFilterEdit.Focus();
             textFilterEdit.SelectAll();
@@ -225,47 +237,60 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Get all clauses that satisfy current filter (see <see cref="DDictionary.MainWindow.currentFilter"/>).
         /// </summary>
-        private IEnumerable<DataGridClause> LoadData()
+        private async Task<IEnumerable<DataGridClause>> LoadDataAsync(CancellationToken cancellationToken = default)
         {
-            return dbFacade.GetClauses(currentFilter).Select(o => o.MapToDataGridClause());
+            return (await dbFacade.GetClausesAsync(currentFilter, cancellationToken)).Select(o => o.MapToDataGridClause());
         }
 
         /// <summary>
         /// Refill main data grid with accordance to current filter.
         /// </summary>
-        /// <param name="clearSorting">Set clauses in the default order.</param>
-        private void UpdateDataGrid(bool clearSorting = false)
+        /// <remarks>The method use GUI Dispatcher inside so it could be called from outside of the GUI thread.
+        /// </remarks>
+        /// <param name="clearSorting">Set the clauses in the default order.</param>
+        private async Task UpdateDataGridAsync(bool clearSorting = false, CancellationToken cancellationToken = default)
         {
-            //Only one column could have sorting
-            Debug.Assert(mainDataGrid.Items.SortDescriptions.Count <= 1);
+            SortDescription? sorting = null;
 
-            //Remember sorting if any
-            SortDescription? sorting = mainDataGrid.Items.SortDescriptions.Count > 0
-                ? mainDataGrid.Items.SortDescriptions[0]
-                : (SortDescription?)null;
+            Dispatcher.Invoke(() =>
+            {
+                //Only one column could have sorting
+                Debug.Assert(mainDataGrid.Items.SortDescriptions.Count <= 1);
 
-            //Clear sorting
-            mainDataGrid.Items.SortDescriptions.Clear();
+                //Remember sorting if any
+                sorting = mainDataGrid.Items.SortDescriptions.Count > 0
+                    ? mainDataGrid.Items.SortDescriptions[0]
+                    : (SortDescription?)null;
 
-            foreach(DataGridColumn col in mainDataGrid.Columns)
-                col.SortDirection = null;
+                //Clear sorting
+                mainDataGrid.Items.SortDescriptions.Clear();
 
-            //Update items
-            mainDataGrid.ItemsSource = LoadData();
+                foreach(DataGridColumn col in mainDataGrid.Columns)
+                    col.SortDirection = null;
+            });
 
-            if(!clearSorting && sorting.HasValue)
-            { //Restore sorting
-                mainDataGrid.Items.SortDescriptions.Add(sorting.Value); //Sorting itself
+            //Data loading is accomplished outside of the GUI thread (if the whole method was called from outside)
+            IEnumerable<DataGridClause> data = await LoadDataAsync(cancellationToken);
 
-                mainDataGrid.Columns.First(o => o.SortMemberPath == sorting.Value.PropertyName)
-                                    .SortDirection = sorting.Value.Direction; //Column header arrow
+            Dispatcher.Invoke(() =>
+            {
+                //Update items
+                mainDataGrid.ItemsSource = data;
 
-                mainDataGrid.Items.Refresh();
-            }
+                if(!clearSorting && sorting.HasValue)
+                { //Restore sorting
+                    mainDataGrid.Items.SortDescriptions.Add(sorting.Value); //Sorting itself
 
-            exportBtn.IsEnabled = mainDataGrid.Items.Count > 0;
+                    mainDataGrid.Columns.First(o => o.SortMemberPath == sorting.Value.PropertyName)
+                                        .SortDirection = sorting.Value.Direction; //Column header arrow
 
-            UpdateStatusBar();
+                    mainDataGrid.Items.Refresh();
+                }
+
+                exportBtn.IsEnabled = mainDataGrid.Items.Count > 0;
+
+                UpdateStatusBar();
+            });
         }
 
         /// <summary>
@@ -312,7 +337,7 @@ namespace DDictionary.Presentation
 
         private void UpdateStatusBar()
         {
-            totalWordsLbl.Content = dbFacade.GetTotalClauses();
+            totalWordsLbl.Content = dbFacade.GetTotalClausesAsync().Result;
             shownWordsLbl.Content = mainDataGrid.Items.Count;
             selectedWordsLbl.Content = mainDataGrid.SelectedItems.Count;
         }
@@ -330,7 +355,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Move selected words to the selected group and clear combo box selection.
         /// </summary>
-        private void OnToGroupCBox_DropDownClosed(object sender, EventArgs e)
+        private async void OnToGroupCBox_DropDownClosed(object sender, EventArgs e)
         {
             if(toGroupCBox.SelectedItem is null)
                 return;
@@ -344,11 +369,11 @@ namespace DDictionary.Presentation
                     PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
                     return;
 
-                dbFacade.MoveClausesToGroup(toGroup.ItemValue, mainDataGrid.SelectedItems.Cast<DataGridClause>()
-                                                                                         .Select(o => o.Id)
-                                                                                         .ToArray());
+                await dbFacade.MoveClausesToGroupAsync(toGroup.ItemValue, mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                                                                    .Select(o => o.Id)
+                                                                                                    .ToArray());
 
-                UpdateDataGrid();
+                await UpdateDataGridAsync();
             }
             finally { toGroupCBox.SelectedItem = null; }
         }
@@ -357,12 +382,12 @@ namespace DDictionary.Presentation
         /// Show all checked groups (in short form) separated by comma in group filter combo box.
         /// And update main data grid.
         /// </summary>
-        private void OnGroupFilter_DropDownClosed(object sender, EventArgs e)
+        private async void OnGroupFilter_DropDownClosed(object sender, EventArgs e)
         {
             currentFilter.RelatedFrom = null;
             currentFilter.ShownGroups = GetFilterGroups();
 
-            UpdateDataGrid();
+            await UpdateDataGridAsync();
             UpdateGroupFilterText();
         }
 
@@ -399,6 +424,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Apply the filter.
         /// </summary>
+        /// <seealso cref="DDictionary.Presentation.MainWindow.textFilterUpdateCancellation"/>
         private void OnTextFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             textFilterEdit.Background = textFilterEdit.Text?.Length > 0 ? highlightBrush 
@@ -410,8 +436,31 @@ namespace DDictionary.Presentation
             currentFilter.RelatedFrom = null;
             currentFilter.TextFilter = textFilterEdit.Text;
 
-            UpdateDataGrid(clearSorting: true); //Cuz clauses in the special order after text filtration
-            UpdateGroupFilterText();
+            textFilterUpdateCancellation?.Cancel(); //Cancel the previous task if any
+            textFilterUpdateCancellation = new CancellationTokenSource(); //To get a token for a new task
+
+            //Cuz clauses in the special order after text filtration
+
+            //Start a separate task to free the GUI thread as soon as possible
+            new Task(async () =>
+            {
+                try
+                {
+                    CancellationToken token = textFilterUpdateCancellation.Token;
+
+                    //Start a delay task which could be canceled to reduce impact on the DB and GUI.
+                    //If a new input will be done in 500 ms then the whole task will be canceled without
+                    //bothering DB & GUI at all.
+                    await Task.Delay(500, token);
+
+                    await UpdateDataGridAsync(clearSorting: true, token); //Can be canceled on this stage as well
+                    
+                    Dispatcher.Invoke(() => UpdateGroupFilterText());
+                }
+                catch(TaskCanceledException) //The task was canceled, there is nothing to do about it
+                { }
+            }, TaskCreationOptions.LongRunning) //To encourage the using of a separate thread
+            .Start(); 
         }
 
         /// <summary>
@@ -444,7 +493,7 @@ namespace DDictionary.Presentation
         /// Clear the current filter and related to filtration controls.
         /// </summary>
         /// <param name="updateGrid">Refill the main data grid.</param>
-        private void ClearFilter(bool updateGrid = true)
+        private async void ClearFilter(bool updateGrid = true)
         {
             foreach(CheckBoxItem<WordGroup> item in groupFilterCBox.Items.Cast<CheckBoxItem<WordGroup>>())
                 item.IsSelected = false; //Uncheck all groups in dropdown
@@ -458,7 +507,7 @@ namespace DDictionary.Presentation
             UpdateGroupFilterText();
 
             if(updateGrid)
-                UpdateDataGrid();
+                await UpdateDataGridAsync();
         }
 
         /// <summary>
@@ -518,7 +567,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Handle "Show relations" column button click.
         /// </summary>
-        private void ShowRelationsButton_Click(object sender, RoutedEventArgs e)
+        private async void ShowRelationsButton_Click(object sender, RoutedEventArgs e)
         {
             var clauseDTO = (DataGridClause)((FrameworkElement)sender).DataContext;
 
@@ -529,9 +578,9 @@ namespace DDictionary.Presentation
             }
 
             ClearFilter(false);
-            currentFilter.RelatedFrom = dbFacade.GetClauseById(clauseDTO.Id);
+            currentFilter.RelatedFrom = await dbFacade.GetClauseByIdAsync(clauseDTO.Id);
             
-            UpdateDataGrid();
+            await UpdateDataGridAsync();
             UpdateGroupFilterText();
         }
 
@@ -571,67 +620,67 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Main data grid's hyperlinks handler.
         /// </summary>
-        private void OnMainDataGrid_HyperlinkClick(object sender, RoutedEventArgs e)
+        private async void OnMainDataGrid_HyperlinkClick(object sender, RoutedEventArgs e)
         {
             if(!(e.OriginalSource is Hyperlink hyperlink))
                 return;
 
-            Clause cl = dbFacade.GetClauseById(((DataGridClause)hyperlink.DataContext).Id);
+            Clause cl = await dbFacade.GetClauseByIdAsync(((DataGridClause)hyperlink.DataContext).Id);
             RelationDTO[] relLst = cl.Relations.Select(o => o.MapToRelationDTO()).ToArray();
 
             var dlg = new RelationsEditDlg(cl.Id, cl.Word, relLst) { Owner = this };
 
             if(dlg.ShowDialog() == true)
             {
-                dbFacade.RemoveRelations(cl.Relations.Select(o => o.Id)
-                                                     .Except(dlg.Relations.Select(o => o.Id))
-                                                     .ToArray());
+                await dbFacade.RemoveRelationsAsync(cl.Relations.Select(o => o.Id)
+                                                                .Except(dlg.Relations.Select(o => o.Id))
+                                                                .ToArray());
 
                 foreach(RelationDTO rel in dlg.Relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
                 {
-                    dbFacade.AddOrUpdateRelation(rel.Id, cl.Id, rel.ToWordId, rel.Description);
+                    await dbFacade.AddOrUpdateRelationAsync(rel.Id, cl.Id, rel.ToWordId, rel.Description);
 
                     if(rel.MakeInterconnected)
                     { //Add relation to the other side
                         Debug.Assert(rel.Id == 0);
 
-                        dbFacade.AddOrUpdateRelation(0, rel.ToWordId, cl.Id, rel.Description);
+                        await dbFacade.AddOrUpdateRelationAsync(0, rel.ToWordId, cl.Id, rel.Description);
                     }
                 }
 
-                UpdateDataGrid();
+                await UpdateDataGridAsync();
             }
         }
 
         /// <summary>
         /// Delete selected clauses button handler.
         /// </summary>
-        private void OnDeleteBtn_Click(object sender, RoutedEventArgs e)
+        private async void OnDeleteBtn_Click(object sender, RoutedEventArgs e)
         {
             if(MessageBox.Show(this, String.Format(PrgResources.ClausesDeletionConfirmation, mainDataGrid.SelectedItems.Count), 
                 PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
                 return;
 
-            dbFacade.RemoveClauses(mainDataGrid.SelectedItems.Cast<DataGridClause>()
-                                                             .Select(o => o.Id)
-                                                             .ToArray());
+            await dbFacade.RemoveClausesAsync(mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                                        .Select(o => o.Id)
+                                                                        .ToArray());
 
-            UpdateDataGrid();
+            await UpdateDataGridAsync();
         }
 
         /// <summary>
         /// Add new clause button handler.
         /// </summary>
-        private void OnAddWordButton_Click(object sender, RoutedEventArgs e)
+        private async void OnAddWordButton_Click(object sender, RoutedEventArgs e)
         {
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
 
             var dlg = new ClauseEditDlg(null, lst) { Owner = this };
-            dlg.ClausesWereUpdated += () => UpdateDataGrid();
+            dlg.ClausesWereUpdated += async () => await UpdateDataGridAsync();
 
             dlg.ShowDialog();
             
-            UpdateDataGrid(); //Clause's last watch data can be changed...
+            await UpdateDataGridAsync(); //Clause's last watch data can be changed...
         }
 
         /// <summary>
@@ -644,13 +693,13 @@ namespace DDictionary.Presentation
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
 
             var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id, lst) { Owner = this };
-            dlg.ClausesWereUpdated += () => UpdateDataGrid();
+            dlg.ClausesWereUpdated += async () => await UpdateDataGridAsync();
 
             await Task.Delay(150); //To prevent mouse event from catching in the just opened dialog
 
             dlg.ShowDialog();
             
-            UpdateDataGrid(); //Clause's last watch data can be changed...
+            await UpdateDataGridAsync(); //Clause's last watch data can be changed...
         }
 
 
@@ -682,7 +731,8 @@ namespace DDictionary.Presentation
 
                 using(var writer = new StreamWriter(dlg.FileName))
                 using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                    await csv.WriteRecordsAsync(dbFacade.GetClauses(currentFilter).Select(o => o.MapToCsvClause()));
+                    await csv.WriteRecordsAsync(
+                        (await dbFacade.GetClausesAsync(currentFilter)).Select(o => o.MapToCsvClause()) );
 
                 MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
                     MessageBoxButton.OK, MessageBoxImage.Information);

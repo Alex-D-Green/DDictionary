@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Dapper;
 
@@ -64,7 +66,7 @@ namespace DDictionary.DAL
 
         public event ErrorHandler OnErrorOccurs;
 
-        public Clause GetClauseById(int id)
+        public async Task<Clause> GetClauseByIdAsync(int id)
         {
             if(id <= 0)
                 throw new ArgumentOutOfRangeException(nameof(id), id, "The identifier has to be greater than 0.");
@@ -79,13 +81,14 @@ namespace DDictionary.DAL
 
             try
             {
-                return GetClauses(sql, new { ClauseId = id }).SingleOrDefault();
+                return (await GetClauses(sql, new { ClauseId = id })).SingleOrDefault();
             }
             catch(Exception e) when(HandleError(e))
             { return null; }
         }
 
-        public IEnumerable<Clause> GetClauses(FiltrationCriteria filter = null)
+        public async Task<IEnumerable<Clause>> GetClausesAsync(FiltrationCriteria filter = null, 
+            CancellationToken cancellationToken = default)
         {
             if(filter is null)
                 filter = new FiltrationCriteria(); //Empty filter - without filtration
@@ -120,7 +123,7 @@ namespace DDictionary.DAL
             }
 
             if(String.IsNullOrEmpty(filter.TextFilter))
-                return GetClauses(sql.ToString());
+                return await GetClauses(sql.ToString(), cancellationToken: cancellationToken);
 
             //Adding the escape symbol to the percent symbol (single backslash is used as an escape symbol)
             string escaped = filter.TextFilter.Replace("%", "\\%");
@@ -133,12 +136,12 @@ namespace DDictionary.DAL
             //Primary search target (the word itself - the beginning is matched), in alphabet order
             var tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @TextP ESCAPE '\\'\nORDER BY [cl].[Word]\n";
             
-            IEnumerable<Clause> ret = GetClauses(tmpSql, parameters);
+            IEnumerable<Clause> ret = await GetClauses(tmpSql, parameters, cancellationToken);
 
             //Secondary target (the word itself except primary target - matched but not the beginning)
             tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @PTextP ESCAPE '\\' AND [cl].[Word] NOT LIKE @TextP ESCAPE '\\'\n";
             
-            ret = ret.Concat(GetClauses(tmpSql, parameters));
+            ret = ret.Concat(await GetClauses(tmpSql, parameters, cancellationToken));
 
             //Tertiary target (relations, excluding the word itself)
             var sqlCopy = new StringBuilder(sql.ToString());
@@ -149,7 +152,7 @@ namespace DDictionary.DAL
             sql.Append(                      "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
-            ret = ret.Concat(GetClauses(sql.ToString(), parameters));
+            ret = ret.Concat(await GetClauses(sql.ToString(), parameters, cancellationToken));
 
             //Quaternary targets (excluding all previous targets)
             sql = sqlCopy;
@@ -165,71 +168,84 @@ namespace DDictionary.DAL
             sql.Append(                         "AND [trtf].[Text] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
-            return ret.Concat(GetClauses(sql.ToString(), parameters)); //To get the words' matches in the beginning
+            //To get the words' matches in the beginning
+            return ret.Concat(await GetClauses(sql.ToString(), parameters, cancellationToken));
         }
 
-        private IEnumerable<Clause> GetClauses(string sql, object parameters = null)
+        private async Task<IEnumerable<Clause>> GetClauses(string sql, object parameters = null, 
+            CancellationToken cancellationToken = default)
         {
             try
             {
                 using(IDbConnection cnn = GetConnection())
                 {
+                    //https://dapper-tutorial.net/result-multi-mapping#example-query-multi-mapping-one-to-many
+
                     var clauseDictionary = new Dictionary<int, Clause>();
 
-                    IEnumerable<Clause> clauses =
-                        cnn.Query<Clause, Translation, Relation, Clause, Clause>(sql,
-                            (clause, translation, relation, clauseTo) =>
-                            {
-                                if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
+                    //https://dapper-tutorial.net/knowledge-base/25540793/cancellation-token-on-dapper
+                    var cmd = new CommandDefinition(sql, parameters, cancellationToken: cancellationToken);
+
+                    try
+                    {
+                        IEnumerable<Clause> clauses =
+                            await cnn.QueryAsync<Clause, Translation, Relation, Clause, Clause>(cmd,
+                                (clause, translation, relation, clauseTo) =>
                                 {
-                                    clauseEntry = clause;
-                                    clauseDictionary.Add(clauseEntry.Id, clauseEntry);
-                                }
 
-                                if(translation != null && !clauseEntry.Translations.Any(o => o.Id == translation.Id))
-                                    clauseEntry.Translations.Add(translation);
+                                    if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
+                                    {
+                                        clauseEntry = clause;
+                                        clauseDictionary.Add(clauseEntry.Id, clauseEntry);
+                                    }
 
-                                if(relation != null && !clauseEntry.Relations.Any(o => o.Id == relation.Id))
-                                {
-                                    relation.ToClause = clauseTo;
-                                    clauseEntry.Relations.Add(relation);
-                                }
+                                    if(translation != null && !clauseEntry.Translations.Any(o => o.Id == translation.Id))
+                                        clauseEntry.Translations.Add(translation);
 
-                                return clauseEntry;
-                            },
-                            parameters)
-                        .Distinct();
+                                    if(relation != null && !clauseEntry.Relations.Any(o => o.Id == relation.Id))
+                                    {
+                                        relation.ToClause = clauseTo;
+                                        clauseEntry.Relations.Add(relation);
+                                    }
 
-                    return clauses;
+                                    return clauseEntry;
+                                });
+
+                        return clauses.Distinct();
+                    }
+                    catch(DataException ex) when(cancellationToken.IsCancellationRequested)
+                    { throw new TaskCanceledException(ex.Message, ex); } //Sometime occurs during cancellation
+                    catch(SQLiteException ex) when(cancellationToken.IsCancellationRequested)
+                    { throw new TaskCanceledException(ex.Message, ex); } //Sometime occurs during cancellation
                 }
             }
-            catch(Exception e) when(HandleError(e))
-            { return Enumerable.Empty<Clause>(); }
+            catch(Exception e) when(!(e is TaskCanceledException) && HandleError(e)) //Skip TaskCanceledException
+            { return Enumerable.Empty<Clause>(); } //If the exception was handled
         }
 
-        public int GetTotalClauses()
+        public async Task<int> GetTotalClausesAsync()
         {
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    return cnn.ExecuteScalar<int>("SELECT Count(*) FROM [Clauses]");
+                    return await cnn.ExecuteScalarAsync<int>("SELECT Count(*) FROM [Clauses]");
             }
             catch(Exception e) when(HandleError(e))
             { return 0; }
         }
 
-        public IEnumerable<JustWordDTO> GetJustWords()
+        public async Task<IEnumerable<JustWordDTO>> GetJustWordsAsync()
         {
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    return cnn.Query<JustWordDTO>("SELECT [Id], [Word] FROM [Clauses]");
+                    return await cnn.QueryAsync<JustWordDTO>("SELECT [Id], [Word] FROM [Clauses]");
             }
             catch(Exception e) when(HandleError(e))
             { return Enumerable.Empty<JustWordDTO>(); }
         }
 
-        public int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched)
+        public async Task<int> AddOrUpdateClauseAsync(ClauseUpdateDTO clause, bool updateWatched)
         {
             if(clause is null)
                 throw new ArgumentNullException(nameof(clause));
@@ -247,7 +263,7 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
-                        return cnn.Query<int>(sql, new
+                        return (await cnn.QueryAsync<int>(sql, new
                         {
                             Sound = clause.Sound,
                             Word = clause.Word,
@@ -257,7 +273,7 @@ namespace DDictionary.DAL
                             Updated = now,
                             Watched = now,
                             Group = clause.Group
-                        })
+                        }))
                         .Single();
                 }
                 else
@@ -274,7 +290,7 @@ namespace DDictionary.DAL
                             "   WHERE [Id] = @Id; ";
 
                     using(IDbConnection cnn = GetConnection())
-                        cnn.Execute(sql, new
+                        await cnn.ExecuteAsync(sql, new
                         {
                             Id = clause.Id,
                             Sound = clause.Sound,
@@ -293,7 +309,7 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
-        public int UpdateClauseWatch(int id)
+        public async Task<int> UpdateClauseWatchAsync(int id)
         {
             if(id <= 0)
                 throw new ArgumentOutOfRangeException(nameof(id), id, "The identifier has to be greater than 0.");
@@ -307,13 +323,13 @@ namespace DDictionary.DAL
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    return cnn.ExecuteScalar<int>(sql, new { Id = id, Watched = DateTime.Now });
+                    return await cnn.ExecuteScalarAsync<int>(sql, new { Id = id, Watched = DateTime.Now });
             }
             catch(Exception e) when(HandleError(e))
             { return -1; }
         }
 
-        public void RemoveClauses(params int[] clauseIds)
+        public async Task RemoveClausesAsync(params int[] clauseIds)
         {
             if(clauseIds?.Any(o => o <= 0) == true)
                 throw new ArgumentException("All identifiers have to be greater than 0.", nameof(clauseIds));
@@ -325,13 +341,13 @@ namespace DDictionary.DAL
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute("DELETE FROM [Clauses] WHERE [Id] IN @Nums", new { Nums = clauseIds });
+                    await cnn.ExecuteAsync("DELETE FROM [Clauses] WHERE [Id] IN @Nums", new { Nums = clauseIds });
             }
             catch(Exception e) when(HandleError(e))
             { }
         }
 
-        public void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds)
+        public async Task MoveClausesToGroupAsync(WordGroup toGroup, params int[] clauseIds)
         {
             if(clauseIds?.Any(o => o <= 0) == true)
                 throw new ArgumentException("All identifiers have to be greater than 0.", nameof(clauseIds));
@@ -343,7 +359,7 @@ namespace DDictionary.DAL
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute("UPDATE [Clauses] SET [Group] = @ToGroup WHERE [Id] IN @Nums", 
+                    await cnn.ExecuteAsync("UPDATE [Clauses] SET [Group] = @ToGroup WHERE [Id] IN @Nums", 
                         new { ToGroup = (byte)toGroup, Nums = clauseIds });
 
                 //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
@@ -352,7 +368,8 @@ namespace DDictionary.DAL
             { }
         }
 
-        public int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
+        public async Task<int> AddOrUpdateRelationAsync(int relationId, int fromClauseId, int toClauseId, 
+            string relDescription)
         {
             if(relationId < 0)
                 throw new ArgumentOutOfRangeException(nameof(relationId), relationId, 
@@ -378,12 +395,12 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
-                        return cnn.Query<int>(sql, new { 
+                        return (await cnn.QueryAsync<int>(sql, new { 
                             From = fromClauseId, 
                             To = toClauseId, 
                             Descr = relDescription, 
                             Now = DateTime.Now 
-                        })
+                        }))
                         .Single();
                 }
                 else
@@ -395,7 +412,7 @@ namespace DDictionary.DAL
                         "   WHERE [Id] = @From; ";
 
                     using(IDbConnection cnn = GetConnection())
-                        cnn.Execute(sql, new { 
+                        await cnn.ExecuteAsync(sql, new { 
                             Id = relationId, 
                             From = fromClauseId, 
                             To = toClauseId, 
@@ -410,7 +427,7 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
-        public void RemoveRelations(params int[] relationIds)
+        public async Task RemoveRelationsAsync(params int[] relationIds)
         {
             if(relationIds?.Any(o => o <= 0) == true)
                 throw new ArgumentException("All identifiers have to be greater than 0.", nameof(relationIds));
@@ -427,13 +444,13 @@ namespace DDictionary.DAL
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute(sql, new { Now = DateTime.Now, Nums = relationIds });
+                    await cnn.ExecuteAsync(sql, new { Now = DateTime.Now, Nums = relationIds });
             }
             catch(Exception e) when(HandleError(e))
             { }
         }
 
-        public int AddOrUpdateTranslation(Translation translation, int toClauseId)
+        public async Task<int> AddOrUpdateTranslationAsync(Translation translation, int toClauseId)
         {
             if(translation is null)
                 throw new ArgumentNullException(nameof(translation));
@@ -455,13 +472,13 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
-                        return cnn.Query<int>(sql, new { 
+                        return (await cnn.QueryAsync<int>(sql, new { 
                             translation.Index, 
                             translation.Text, 
                             translation.Part, 
                             ClauseId = toClauseId,
                             Now = DateTime.Now
-                        })
+                        }))
                         .Single();
                 }
                 else
@@ -473,7 +490,7 @@ namespace DDictionary.DAL
                         "   WHERE [Id] = @ClauseId; ";
 
                     using(IDbConnection cnn = GetConnection())
-                        cnn.Execute(sql, new { 
+                        await cnn.ExecuteAsync(sql, new { 
                             translation.Id, 
                             translation.Index, 
                             translation.Text, 
@@ -489,7 +506,7 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
-        public void RemoveTranslations(params int[] translationIds)
+        public async Task RemoveTranslationsAsync(params int[] translationIds)
         {
             if(translationIds?.Any(o => o <= 0) == true)
                 throw new ArgumentException("All identifiers have to be greater than 0.", nameof(translationIds));
@@ -506,7 +523,7 @@ namespace DDictionary.DAL
             try
             {
                 using(IDbConnection cnn = GetConnection())
-                    cnn.Execute(sql, new { Now = DateTime.Now, Nums = translationIds });
+                    await cnn.ExecuteAsync(sql, new { Now = DateTime.Now, Nums = translationIds });
             }
             catch(Exception e) when(HandleError(e))
             { }

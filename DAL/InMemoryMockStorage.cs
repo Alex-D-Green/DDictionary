@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
@@ -137,12 +139,13 @@ namespace DDictionary.DAL
 
         public event ErrorHandler OnErrorOccurs;
 
-        public Clause GetClauseById(int id)
+        public Task<Clause> GetClauseByIdAsync(int id)
         {
-            return clauses.SingleOrDefault(o => o.Id == id);
+            return Task.FromResult(clauses.SingleOrDefault(o => o.Id == id));
         }
 
-        public IEnumerable<Clause> GetClauses(FiltrationCriteria filter = null)
+        public Task<IEnumerable<Clause>> GetClausesAsync(FiltrationCriteria filter = null, 
+            CancellationToken cancellationToken = default)
         {
             if(filter is null)
                 filter = new FiltrationCriteria(); //Empty filter - without filtration
@@ -182,20 +185,20 @@ namespace DDictionary.DAL
                 ret = ret1.Concat(ret2).Concat(ret3).Concat(ret4);
             }
 
-            return ret;
+            return Task.FromResult(ret);
         }
 
-        public int GetTotalClauses()
+        public Task<int> GetTotalClausesAsync()
         {
-            return clauses.Count;
+            return Task.FromResult(clauses.Count);
         }
 
-        public IEnumerable<JustWordDTO> GetJustWords()
+        public Task<IEnumerable<JustWordDTO>> GetJustWordsAsync()
         {
-            return clauses.Select(o => new JustWordDTO { Id = o.Id, Word = o.Word });
+            return Task.FromResult(clauses.Select(o => new JustWordDTO { Id = o.Id, Word = o.Word }));
         }
 
-        public int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription)
+        public Task<int> AddOrUpdateRelationAsync(int relationId, int fromClauseId, int toClauseId, string relDescription)
         {
             Clause from = clauses.Single(o => o.Id == fromClauseId);
             Clause to = clauses.Single(o => o.Id == toClauseId);
@@ -220,31 +223,37 @@ namespace DDictionary.DAL
 
             from.Updated = DateTime.Now;
 
-            return ret.Id;
+            return Task.FromResult(ret.Id);
         }
 
-        public void RemoveRelations(params int[] relationIds)
+        public Task RemoveRelationsAsync(params int[] relationIds)
         {
             foreach(var relation in relationIds)
                 RemoveRelation(relation);
+
+            return Task.CompletedTask;
         }
 
-        private void RemoveRelation(int relationId)
+        private Task RemoveRelation(int relationId)
         {
             Clause cl = clauses.Single(o => o.Relations.Any(r => r.Id == relationId));
             
             cl.Relations.Remove(cl.Relations.Single(r => r.Id == relationId));
 
             cl.Updated = DateTime.Now;
+
+            return Task.CompletedTask;
         }
 
-        public void RemoveClauses(params int[] clauseIds)
+        public Task RemoveClausesAsync(params int[] clauseIds)
         {
             foreach(var clause in clauseIds)
                 RemoveClause(clause);
+
+            return Task.CompletedTask;
         }
 
-        private void RemoveClause(int id)
+        private Task RemoveClause(int id)
         {
             Clause clauseToRemove = clauses.Single(o => o.Id == id);
 
@@ -252,17 +261,21 @@ namespace DDictionary.DAL
                 RemoveRelation(relation.Id);
 
             clauses.Remove(clauseToRemove);
+
+            return Task.CompletedTask;
         }
 
-        public void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds)
+        public Task MoveClausesToGroupAsync(WordGroup toGroup, params int[] clauseIds)
         {
             foreach(var id in clauseIds)
                 clauses.Single(o => o.Id == id).Group = toGroup;
 
+            return Task.CompletedTask;
+
             //The group changing isn't counted as clause's modification so the last update date shouldn't be changed
         }
 
-        public int AddOrUpdateTranslation(Translation translation, int toClauseId)
+        public Task<int> AddOrUpdateTranslationAsync(Translation translation, int toClauseId)
         {
             Clause cl = clauses.Single(o => o.Id == toClauseId);
             Translation ret = null;
@@ -289,25 +302,29 @@ namespace DDictionary.DAL
 
             cl.Updated = DateTime.Now;
 
-            return ret.Id;
+            return Task.FromResult(ret.Id);
         }
 
-        public void RemoveTranslations(params int[] translationIds)
+        public Task RemoveTranslationsAsync(params int[] translationIds)
         {
             foreach(var translation in translationIds)
                 RemoveTranslation(translation);
+
+            return Task.CompletedTask;
         }
 
-        private void RemoveTranslation(int translationId)
+        private Task RemoveTranslation(int translationId)
         {
             Clause cl = clauses.Single(o => o.Translations.Any(tr => tr.Id == translationId));
 
             cl.Translations.Remove(cl.Translations.Single(tr => tr.Id == translationId));
 
             cl.Updated = DateTime.Now;
+
+            return Task.CompletedTask;
         }
 
-        public int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched)
+        public Task<int> AddOrUpdateClauseAsync(ClauseUpdateDTO clause, bool updateWatched)
         {
             DateTime now = DateTime.Now;
 
@@ -329,17 +346,17 @@ namespace DDictionary.DAL
             else if(updateWatched)
                 cl.WatchedCount += 1;
 
-            return cl.Id;
+            return Task.FromResult(cl.Id);
         }
 
-        public int UpdateClauseWatch(int id)
+        public Task<int> UpdateClauseWatchAsync(int id)
         {
             Clause cl = clauses.Single(o => o.Id == id);
             
             cl.Watched = DateTime.Now;
             cl.WatchedCount += 1;
 
-            return cl.WatchedCount;
+            return Task.FromResult(cl.WatchedCount);
         }
 
 #pragma warning restore CA1822 // Mark members as static

@@ -56,7 +56,7 @@ namespace DDictionary.Presentation
             wordLbl.Content = String.Format(PrgResources.WordRelationTo, word);
 
             //Initialize the list of all words in the dictionary except this clause's word itself
-            listOfWordsCBox.ItemsSource = dbFacade.GetJustWords()
+            listOfWordsCBox.ItemsSource = dbFacade.GetJustWordsAsync().Result
                                                   .Where(o => o.Id != clauseId)
                                                   .OrderBy(o => o.Word);
 

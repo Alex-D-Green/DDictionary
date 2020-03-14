@@ -44,7 +44,7 @@ namespace DDictionary.Presentation
 
             if(clause.HasRelations)
             {
-                var cl = dbFacade.GetClauseById(clause.Id);
+                Clause cl = dbFacade.GetClauseByIdAsync(clause.Id).Result;
                 Debug.Assert(cl != null);
 
                 var ret = new StringBuilder("");

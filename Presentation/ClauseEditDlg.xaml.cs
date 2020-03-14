@@ -106,9 +106,9 @@ namespace DDictionary.Presentation
         /// Load a clause with the given id and put it into <see cref="DDictionary.Presentation.ClauseEditDlg.clause"/>.
         /// </summary>
         /// <exception cref="System.InvalidOperationException" />
-        private void LoadClauseData(int clauseId)
+        private async void LoadClauseData(int clauseId)
         {
-            Clause cl = dbFacade.GetClauseById(clauseId) ?? 
+            Clause cl = await dbFacade.GetClauseByIdAsync(clauseId) ?? 
                 throw new InvalidOperationException($"The clause with id = {clauseId} was not found.");
 
             clause = cl;
@@ -118,7 +118,7 @@ namespace DDictionary.Presentation
             if(watchedClauses.Contains(clauseId))
                 return; //Update data only once for each clause per dialog showing
 
-            dbFacade.UpdateClauseWatch(clauseId);
+            await dbFacade.UpdateClauseWatchAsync(clauseId);
             //Do not call ClausesWereUpdated here cuz it's not such sufficient changes...
 
             watchedClauses.Add(clauseId); //Remember updated clause's id
@@ -531,7 +531,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Handle Save button click.
         /// </summary>
-        private void OnSaveClauseBtn_Click(object sender, RoutedEventArgs e)
+        private async void OnSaveClauseBtn_Click(object sender, RoutedEventArgs e)
         {
             saveClauseBtn.IsEnabled = false;
 
@@ -544,31 +544,31 @@ namespace DDictionary.Presentation
                 Word = wordEdit.Text
             };
 
-            clause.Id = dbFacade.AddOrUpdateClause(clauseDTO, 
+            clause.Id = await dbFacade.AddOrUpdateClauseAsync(clauseDTO, 
                 !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data
 
             //Handle relations
-            dbFacade.RemoveRelations(clause.Relations.Select(o => o.Id)
-                                                     .Except(relations.Select(o => o.Id))
-                                                     .ToArray());
+            await dbFacade.RemoveRelationsAsync(clause.Relations.Select(o => o.Id)
+                                                                .Except(relations.Select(o => o.Id))
+                                                                .ToArray());
 
             foreach(RelationDTO rel in relations.Where(o => o.Id == 0 || o.DescriptionWasChanged))
             {
-                rel.Id = dbFacade.AddOrUpdateRelation(rel.Id, clause.Id, rel.ToWordId, rel.Description);
+                rel.Id = await dbFacade.AddOrUpdateRelationAsync(rel.Id, clause.Id, rel.ToWordId, rel.Description);
 
                 if(rel.MakeInterconnected) //Add relation to the other side
-                    dbFacade.AddOrUpdateRelation(0, rel.ToWordId, clause.Id, rel.Description);
+                    await dbFacade.AddOrUpdateRelationAsync(0, rel.ToWordId, clause.Id, rel.Description);
             }
 
             //Handle translations
-            dbFacade.RemoveTranslations(clause.Translations.Select(o => o.Id)
-                                                           .Except(translations.Select(o => o.Id))
-                                                           .ToArray());
+            await dbFacade.RemoveTranslationsAsync(clause.Translations.Select(o => o.Id)
+                                                                      .Except(translations.Select(o => o.Id))
+                                                                      .ToArray());
 
             for(int i=0; i<translations.Count; i++)
             {
                 translations[i].Index = i; //Correcting items indices according to collection
-                translations[i].Id = dbFacade.AddOrUpdateTranslation(translations[i], clause.Id);
+                translations[i].Id = await dbFacade.AddOrUpdateTranslationAsync(translations[i], clause.Id);
             }
 
             dataWasUpdated = true; //Data was changed
@@ -616,7 +616,7 @@ namespace DDictionary.Presentation
 
             int id = clause.Id;
 
-            dbFacade.RemoveClauses(id);
+            dbFacade.RemoveClausesAsync(id);
             dataWasUpdated = true; //Data was changed
 
             int idx = clausesIdsLst.IndexOf(id);

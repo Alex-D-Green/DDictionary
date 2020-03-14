@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 using DDictionary.Domain.Entities;
+
 
 namespace DDictionary.Domain
 {
@@ -28,18 +31,19 @@ namespace DDictionary.Domain
         /// Get dictionary clause by id.
         /// </summary>
         /// <returns>The clause with the given id or <c>null</c>, if there is no such one.</returns>
-        Clause GetClauseById(int id);
+        Task<Clause> GetClauseByIdAsync(int id);
 
         /// <summary>
         /// Get all clauses that match to the filtration criteria.
         /// </summary>
         /// <param name="filter">The filtration criteria, <c>null</c> - without filtration.</param>
-        IEnumerable<Clause> GetClauses(FiltrationCriteria filter = null);
+        Task<IEnumerable<Clause>> GetClausesAsync(FiltrationCriteria filter = null, 
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get the total amount of clauses.
         /// </summary>
-        int GetTotalClauses();
+        Task<int> GetTotalClausesAsync();
 
         /// <summary>
         /// Add or update clause data. If the id of the <paramref name="clause"/> equals 0 then a new 
@@ -48,31 +52,31 @@ namespace DDictionary.Domain
         /// <param name="clause">Clause data.</param>
         /// <param name="updateWatched">Update the clause's watching data.</param>
         /// <returns>The id of the created/updated clause.</returns>
-        int AddOrUpdateClause(ClauseUpdateDTO clause, bool updateWatched);
+        Task<int> AddOrUpdateClauseAsync(ClauseUpdateDTO clause, bool updateWatched);
 
         /// <summary>
         /// Update the data when the clause was watched for the last time.
         /// </summary>
         /// <returns>The new value of the watch counter.</returns>
-        int UpdateClauseWatch(int id);
+        Task<int> UpdateClauseWatchAsync(int id);
 
         /// <summary>
         /// Remove these clauses.
         /// </summary>
         /// <param name="clauseIds">Ids of the clauses that should be deleted.</param>
-        void RemoveClauses(params int[] clauseIds);
+        Task RemoveClausesAsync(params int[] clauseIds);
 
         /// <summary>
         /// "Move" these clauses to the destination group.
         /// </summary>
         /// <param name="toGroup">The destination group.</param>
         /// <param name="clauseIds">Ids of the clauses that should be moved.</param>
-        void MoveClausesToGroup(WordGroup toGroup, params int[] clauseIds);
+        Task MoveClausesToGroupAsync(WordGroup toGroup, params int[] clauseIds);
 
         /// <summary>
         /// Get all words with their ids.
         /// </summary>
-        IEnumerable<JustWordDTO> GetJustWords();
+        Task<IEnumerable<JustWordDTO>> GetJustWordsAsync();
 
         /// <summary>
         /// Add or update relation data. If <paramref name="relationId"/> equals 0 then a new relation will be created 
@@ -83,13 +87,13 @@ namespace DDictionary.Domain
         /// <param name="toClauseId">To clause id.</param>
         /// <param name="relDescription">Relation's description.</param>
         /// <returns>The id of the created/updated relation.</returns>
-        int AddOrUpdateRelation(int relationId, int fromClauseId, int toClauseId, string relDescription);
+        Task<int> AddOrUpdateRelationAsync(int relationId, int fromClauseId, int toClauseId, string relDescription);
 
         /// <summary>
         /// Remove given relations.
         /// </summary>
         /// <param name="relationIds">Relations ids.</param>
-        void RemoveRelations(params int[] relationIds);
+        Task RemoveRelationsAsync(params int[] relationIds);
 
         /// <summary>
         /// Add or update translation data. If the id of the <paramref name="translation"/> equals 0 then a new 
@@ -98,12 +102,12 @@ namespace DDictionary.Domain
         /// <param name="translation">Translation data.</param>
         /// <param name="toClauseId">Id of the clause that the translation belongs to.</param>
         /// <returns>The id of the created/updated translation.</returns>
-        int AddOrUpdateTranslation(Translation translation, int toClauseId);
+        Task<int> AddOrUpdateTranslationAsync(Translation translation, int toClauseId);
 
         /// <summary>
         /// Remove given translations.
         /// </summary>
         /// <param name="translationIds">Translations ids.</param>
-        void RemoveTranslations(params int[] translationIds);
+        Task RemoveTranslationsAsync(params int[] translationIds);
     }
 }
