@@ -115,13 +115,20 @@ namespace DDictionary.Presentation
             relations.AddRange(clause.Relations.Select(o => o.MapToRelationDTO()));
             translations.AddRange(clause.Translations);
 
-            if(watchedClauses.Contains(clauseId))
-                return; //Update data only once for each clause per dialog showing
+            if(clause.Watched.Date == DateTime.Now.Date)
+                watchedClauses.Add(clauseId); //Already was incremented today
 
-            await dbFacade.UpdateClauseWatchAsync(clauseId);
-            //Do not call ClausesWereUpdated here cuz it's not such sufficient changes...
+            if(!watchedClauses.Contains(clauseId))
+            { //Update data only once for each clause per dialog showing and only once a day
+                await dbFacade.UpdateClauseWatchAsync(clauseId);
 
-            watchedClauses.Add(clauseId); //Remember updated clause's id
+                //Do not call ClausesWereUpdated here cuz it's not such sufficient changes...
+
+                watchedClauses.Add(clauseId); //Remember updated clause's id
+            }
+
+            if(Properties.Settings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
+                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound);
         }
 
         /// <summary>

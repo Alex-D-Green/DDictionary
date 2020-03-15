@@ -15,8 +15,6 @@ namespace DDictionary.Presentation
             showPopupChk.IsChecked = Properties.Settings.Default.ShowInfoPopup;
             autoPlayChk.IsChecked = Properties.Settings.Default.AutoplaySound;
             saveContextChk.IsChecked = Properties.Settings.Default.SaveContext;
-
-            OnShowPopupChk_Checked(null, new RoutedEventArgs());
         }
 
 
@@ -29,11 +27,6 @@ namespace DDictionary.Presentation
             Properties.Settings.Default.Save();
 
             Close();
-        }
-
-        private void OnShowPopupChk_Checked(object sender, RoutedEventArgs e)
-        {
-            autoPlayChk.IsEnabled = showPopupChk.IsChecked == true;
         }
     }
 }

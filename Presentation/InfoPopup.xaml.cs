@@ -17,6 +17,10 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class InfoPopup: Window
     {
+        /// <summary>Shown clause.</summary>
+        private readonly DataGridClause clause;
+
+
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
@@ -28,6 +32,8 @@ namespace DDictionary.Presentation
 
 
             InitializeComponent();
+
+            this.clause = clause;
 
             groupLbl.Content = clause.Group.ToFullStr();
             wordLbl.Content = clause.Word;
@@ -73,10 +79,19 @@ namespace DDictionary.Presentation
             Close(); //Close the window if any mouse button was pressed
         }
 
-        private void OnWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void OnWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Escape && Keyboard.Modifiers == ModifierKeys.None)
+            if(Keyboard.Modifiers == ModifierKeys.None && (e.Key == Key.Escape || (e.Key >= Key.A && e.Key <= Key.Z) ||
+               (e.Key >= Key.D0 && e.Key <= Key.D9) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)))
+            { 
                 Close();
+
+                //HACK: Somehow resend this input to the parent window...
+            }
+            else if(!String.IsNullOrEmpty(clause.Sound) && e.Key == Key.Space)
+            { 
+                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound); 
+            }
         }
     }
 }

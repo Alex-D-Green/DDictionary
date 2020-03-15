@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
+using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
 
 using PrgSettings = DDictionary.Properties.Settings;
@@ -148,6 +149,19 @@ namespace DDictionary.Presentation
 
             if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
                 await SoundManager.PlaySoundAsync(clause.Id, clause.Sound);
+
+            //Update clause's watch data
+            if(clause.Watched.Date == DateTime.Now.Date)
+                return; //Increment only once a day
+            
+            await dbFacade.UpdateClauseWatchAsync(clause.Id);
+
+            DataGridClause updated = (await dbFacade.GetClauseByIdAsync(clause.Id)).MapToDataGridClause();
+
+            clause.Watched = updated.Watched;
+            clause.WatchedCount = updated.WatchedCount;
+            
+            mainDataGrid.Items.Refresh();
         }
 
         /// <summary>

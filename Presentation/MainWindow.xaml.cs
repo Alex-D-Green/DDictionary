@@ -136,21 +136,32 @@ namespace DDictionary.Presentation
 
             try
             {
-                //Restore columns
-                int idx = 0;
-                foreach(string pair in PrgSettings.Default.Columns.Split(';'))
+                //Restore the columns, there is an issue with that see 
+                //https://www.telerik.com/forums/reordering-columns-issue-once-again#A-r5p46x-k-Je0JMRTCYeA
+
+                var columnsData = PrgSettings.Default.Columns.Split(';').Select((s, i) =>
                 {
-                    string[] values = pair.Split(',');
+                    string[] values = s.Split(',');
 
-                    mainDataGrid.Columns[idx].DisplayIndex = Int32.Parse(values[0]);
-                    mainDataGrid.Columns[idx].Width = 
-                        new DataGridLength(Double.Parse(values[1]), DataGridLengthUnitType.Pixel);
+                    return new {
+                        Index = i,
+                        DisplayIndex = Int32.Parse(values[0]),
+                        Width = Double.Parse(values[1])
+                    };
+                });
 
-                    idx++;
+                foreach(var data in columnsData.OrderBy(o => o.DisplayIndex))
+                {
+                    mainDataGrid.Columns[data.Index].DisplayIndex = data.DisplayIndex;
+                    mainDataGrid.Columns[data.Index].Width = 
+                        new DataGridLength(data.Width, DataGridLengthUnitType.Pixel);
                 }
             }
             catch(Exception ex)
             {
+#if DEBUG
+                throw;
+#endif
                 Debug.WriteLine(ex.ToString());
                 PrgSettings.Default.Columns = ""; //To clear corrupted value
             }
@@ -167,6 +178,9 @@ namespace DDictionary.Presentation
                     }
                     catch(Exception ex)
                     {
+#if DEBUG
+                        throw;
+#endif
                         Debug.WriteLine(ex.ToString());
                         PrgSettings.Default.FilterRelatedFrom = 0; //To clear corrupted value
                     }
@@ -191,6 +205,9 @@ namespace DDictionary.Presentation
                     }
                     catch(Exception ex)
                     {
+#if DEBUG
+                        throw;
+#endif
                         Debug.WriteLine(ex.ToString());
                         PrgSettings.Default.FilterGroups = ""; //To clear corrupted value
                     }
@@ -213,6 +230,9 @@ namespace DDictionary.Presentation
                     }
                     catch(Exception ex)
                     {
+#if DEBUG
+                        throw;
+#endif
                         Debug.WriteLine(ex.ToString());
                         PrgSettings.Default.Sorting = ""; //To clear corrupted value
                     }
@@ -221,9 +241,6 @@ namespace DDictionary.Presentation
 
             //The first datagrid update
             UpdateDataGridAsync().Wait();
-
-            textFilterEdit.Focus();
-            textFilterEdit.SelectAll();
         }
 
         /// <summary>
@@ -756,8 +773,7 @@ namespace DDictionary.Presentation
             PrgSettings.Default.ScreenName = ScreenInfo.GetScreenFrom(this).DeviceName;
 
             PrgSettings.Default.Columns = 
-                mainDataGrid.Columns.Aggregate("", (s, o) => s += $"{o.DisplayIndex},{o.ActualWidth};");
-
+                mainDataGrid.Columns.Aggregate("", (s, o) => s += $"{o.DisplayIndex},{o.ActualWidth};").TrimEnd(';');
 
             //Save browser context's state
             if(PrgSettings.Default.SaveContext)
@@ -785,6 +801,17 @@ namespace DDictionary.Presentation
             }
 
             PrgSettings.Default.Save();
+        }
+
+        private void OnWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if( !textFilterEdit.IsFocused && Keyboard.Modifiers == ModifierKeys.None && 
+                ( (e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) || 
+                  (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) ) )
+            {
+                textFilterEdit.Focus();
+                textFilterEdit.SelectAll();
+            }
         }
 
         #region Commands' handlers

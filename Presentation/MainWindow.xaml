@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:DDictionary.Presentation"
         xmlns:converters="clr-namespace:DDictionary.Presentation.Converters"
         mc:Ignorable="d"
-        Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200" MouseMove="OnMainWindow_MouseMove">
+        Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200" MouseMove="OnMainWindow_MouseMove"
+        PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
     </Window.Resources>
