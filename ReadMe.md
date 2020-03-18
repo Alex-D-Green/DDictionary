@@ -13,8 +13,8 @@ Todo list for the first version:
 - [x] Implement export functionality;
 - [x] Implement main menu and finish GUI;
 - [x] Try to make async DB & GUI interface to exclude delays on text filtration;
+- [x] Remake the relations dialog, "relate to word" should be an edit with autocompletion (and visible translations);
 - [ ] Add ability to make relations with the same description among all selected words;
-- [ ] Remake the relations dialog, "relate to word" should be an edit with autocompletion (and visible translations);
 - [ ] Relations in the clause edit dialog should be seen with their descriptions.
 
 ## License

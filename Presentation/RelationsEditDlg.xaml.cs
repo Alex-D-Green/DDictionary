@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Markup;
-
-using DDictionary.DAL;
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
+using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
 
@@ -36,10 +38,12 @@ namespace DDictionary.Presentation
         /// <summary>All clause's relations.</summary>
         private List<RelationDTO> relations { get; } = new List<RelationDTO>();
 
-
         /// <summary>All clause's relations.</summary>
         /// <value><see cref="DDictionary.Presentation.RelationsEditDlg.relations"/></value>
         public IReadOnlyCollection<RelationDTO> Relations { get => relations; }
+
+        /// <summary>The brush to mark errors text.</summary>
+        private Brush errorTextBrush { get; }
 
 
         public RelationsEditDlg(int clauseId, string word, IEnumerable<RelationDTO> relations)
@@ -53,16 +57,15 @@ namespace DDictionary.Presentation
 
             InitializeComponent();
 
+            errorTextBrush = Resources["TextErrorBrush"] as Brush ??
+                new SolidColorBrush(Color.FromRgb(0xFF, 0x80, 0x80));
+
             wordLbl.Content = String.Format(PrgResources.WordRelationTo, word);
 
             //Initialize the list of all words in the dictionary except this clause's word itself
             listOfWordsCBox.ItemsSource = dbFacade.GetJustWordsAsync().Result
                                                   .Where(o => o.Id != clauseId)
                                                   .OrderBy(o => o.Word);
-
-            //TODO: Fix the first slow opening of the words list in the RelationsEditDlg!
-            //Probably the dropdown should be replaced with the textbox + autocompletion & dynamic search 
-            //from the data source or something like that.
 
             //Show rows of relations
             foreach(RelationDTO rel in Relations)
@@ -92,6 +95,8 @@ namespace DDictionary.Presentation
             Activated -= OnRelationsEditDlg_Activated; //Not need to replay
 
             FixHeight();
+
+            listOfWordsCBox.Focus();
         }
 
         /// <summary>
@@ -194,14 +199,17 @@ namespace DDictionary.Presentation
             UpdateAddButtonState();
         }
 
-        private void OnListOfWordsCBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void OnListOfWordsCBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateAddButtonState();
+
+            await UpdateTranslationHint(((JustWordDTO)listOfWordsCBox.SelectedItem)?.Id);
         }
 
-        private void UpdateAddButtonState()
+        private void UpdateAddButtonState(bool forceDisable = false)
         {
-            addRelationBtn.IsEnabled = countOfRelations < MaxCountOfRelations &&
+            addRelationBtn.IsEnabled = !forceDisable &&
+                                       countOfRelations < MaxCountOfRelations &&
                                        listOfWordsCBox.SelectedItem != null &&
                                        !String.IsNullOrEmpty(newRelationDescrTBox.Text);
         }
@@ -218,7 +226,6 @@ namespace DDictionary.Presentation
             AddRelationRow(0, word.Word, word.Id, newRelationDescrTBox.Text, interconnectedCheck.IsChecked == true);
 
             newRelationDescrTBox.Text = ""; //To prevent duplication
-            interconnectedCheck.IsChecked = false;
             ChangesHaveBeenMade();
         }
 
@@ -263,6 +270,41 @@ namespace DDictionary.Presentation
                 var relationDTO = (RelationDTO)rowPanel.Tag;
 
                 relations.Insert(idx, relationDTO); //To save order in case if the collection exceed "editable" range
+            }
+        }
+
+        /// <summary>
+        /// Put the clause translations into the translation hint, 
+        /// or clear it if <paramref name="clauseId"/> is <c>null</c>.
+        /// </summary>
+        private async Task UpdateTranslationHint(int? clauseId)
+        {
+            if(clauseId != null)
+            {
+                translationLbl.Content = ClauseToDataGridClauseMapper.MakeTranslationsString(
+                    (await dbFacade.GetClauseByIdAsync(clauseId.Value)).Translations);
+            }
+            else
+                translationLbl.Content = "";
+        }
+
+        private async void OnListOfWordsCBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            var word = (JustWordDTO)listOfWordsCBox.SelectedItem;
+
+            if(word is null || listOfWordsCBox.Text != word.Word)
+            {
+                await UpdateTranslationHint(null);
+                UpdateAddButtonState(forceDisable: true);
+
+                listOfWordsCBox.Foreground = errorTextBrush;
+            }
+            else
+            {
+                await UpdateTranslationHint(word.Id);
+                UpdateAddButtonState();
+
+                listOfWordsCBox.Foreground = SystemColors.WindowTextBrush;
             }
         }
     }

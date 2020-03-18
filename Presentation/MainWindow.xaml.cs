@@ -134,36 +134,39 @@ namespace DDictionary.Presentation
                 Height = PrgSettings.Default.Height;
             }
 
-            try
+            if(!String.IsNullOrEmpty(PrgSettings.Default.Columns))
             {
-                //Restore the columns, there is an issue with that see 
-                //https://www.telerik.com/forums/reordering-columns-issue-once-again#A-r5p46x-k-Je0JMRTCYeA
-
-                var columnsData = PrgSettings.Default.Columns.Split(';').Select((s, i) =>
+                try
                 {
-                    string[] values = s.Split(',');
+                    //Restore the columns, there is an issue with that see 
+                    //https://www.telerik.com/forums/reordering-columns-issue-once-again#A-r5p46x-k-Je0JMRTCYeA
 
-                    return new {
-                        Index = i,
-                        DisplayIndex = Int32.Parse(values[0]),
-                        Width = Double.Parse(values[1])
-                    };
-                });
+                    var columnsData = PrgSettings.Default.Columns.Split(';').Select((s, i) =>
+                    {
+                        string[] values = s.Split(',');
 
-                foreach(var data in columnsData.OrderBy(o => o.DisplayIndex))
-                {
-                    mainDataGrid.Columns[data.Index].DisplayIndex = data.DisplayIndex;
-                    mainDataGrid.Columns[data.Index].Width = 
-                        new DataGridLength(data.Width, DataGridLengthUnitType.Pixel);
+                        return new {
+                            Index = i,
+                            DisplayIndex = Int32.Parse(values[0]),
+                            Width = Double.Parse(values[1])
+                        };
+                    });
+
+                    foreach(var data in columnsData.OrderBy(o => o.DisplayIndex))
+                    {
+                        mainDataGrid.Columns[data.Index].DisplayIndex = data.DisplayIndex;
+                        mainDataGrid.Columns[data.Index].Width =
+                            new DataGridLength(data.Width, DataGridLengthUnitType.Pixel);
+                    }
                 }
-            }
-            catch(Exception ex)
-            {
+                catch(Exception ex)
+                {
 #if DEBUG
-                throw;
+                    throw;
 #endif
-                Debug.WriteLine(ex.ToString());
-                PrgSettings.Default.Columns = ""; //To clear corrupted value
+                    Debug.WriteLine(ex.ToString());
+                    PrgSettings.Default.Columns = ""; //To clear corrupted value
+                }
             }
 
 

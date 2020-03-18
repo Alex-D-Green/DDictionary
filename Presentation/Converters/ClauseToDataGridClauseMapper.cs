@@ -23,9 +23,7 @@ namespace DDictionary.Presentation.Converters
                 Sound = cl.Sound,
                 Word = cl.Word,
                 Transcription = cl.Transcription,
-                Translations = cl.Translations.OrderBy(o => o.Index)
-                                              .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
-                                              .TrimEnd(' ', ';'),
+                Translations = MakeTranslationsString(cl.Translations),
                 Context = cl.Context,
                 Relations = MakeRelationsString(cl.Relations.Select(o => o.ToClause.Word)),
                 HasRelations = (cl.Relations.Count > 0),
@@ -35,6 +33,19 @@ namespace DDictionary.Presentation.Converters
                 WatchedCount = cl.WatchedCount,
                 Group = cl.Group
             };
+        }
+
+        /// <summary>
+        /// Get a string representation of the translations.
+        /// </summary>
+        public static string MakeTranslationsString(IEnumerable<Translation> translations)
+        {
+            if(translations?.Any() != true)
+                return "";
+
+            return translations.OrderBy(o => o.Index)
+                               .Aggregate("", (s, o) => s += $"{TranslationConverter.ConvertToString(o)}; ")
+                               .TrimEnd(' ', ';');
         }
 
         /// <summary>
