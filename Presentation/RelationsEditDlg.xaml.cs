@@ -104,7 +104,7 @@ namespace DDictionary.Presentation
         /// </summary>
         /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.AddRelationRow(int, string, int, string, bool)"/>
         /// <seealso cref="DDictionary.Presentation.RelationsEditDlg.newRelationRowTabIdx"/>
-        private void AddRelationRow(RelationDTO relationDTO)
+        private async void AddRelationRow(RelationDTO relationDTO)
         {
             var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relationRow));
             int addPanelIdx = mainStackPanel.Children.IndexOf(addNewRelationPanel);
@@ -114,6 +114,8 @@ namespace DDictionary.Presentation
 
             var newToWordLbl = (Label)copy.FindName(nameof(toWordLbl));
             newToWordLbl.Content = relationDTO.ToWord;
+            newToWordLbl.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
+                (await dbFacade.GetClauseByIdAsync(relationDTO.ToWordId)).Translations);
 
             var newDescrTBox = (TextBox)copy.FindName(nameof(descrTBox));
             newDescrTBox.Text = relationDTO.Description;
