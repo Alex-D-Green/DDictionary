@@ -844,6 +844,20 @@ namespace DDictionary.Presentation
             new AboutProgramDlg() { Owner = this }.ShowDialog();
         }
 
+        private async void OnCreateMultirelationCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            DataGridClause[] selectedClauses = mainDataGrid.SelectedItems.Cast<DataGridClause>().ToArray();
+
+            if(new MultirelationCreateDlg(selectedClauses) { Owner = this }.ShowDialog() == true)
+                await UpdateDataGridAsync();
+        }
+
+        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if(e.Command == UICommands.CreateMultirelationCommand)
+                e.CanExecute = (mainDataGrid.SelectedItems.Count >= 2 && mainDataGrid.SelectedItems.Count <= 7);
+        }
+
         #endregion
     }
 }

@@ -17,6 +17,9 @@
         <CommandBinding Command="{x:Static local:UICommands.GoToSiteCommand}" Executed="OnGoToSiteCommand" />
         <CommandBinding Command="{x:Static local:UICommands.OnlineHelpCommand}" Executed="OnOnlineHelpCommand" />
         <CommandBinding Command="{x:Static local:UICommands.AboutCommand}" Executed="OnAboutCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.CreateMultirelationCommand}" 
+                        Executed="OnCreateMultirelationCommand"
+                        CanExecute="CommandBinding_CanExecute"/>
     </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -196,6 +199,9 @@
                 <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
+            </MenuItem>
+            <MenuItem Header="_Actions">
+                <MenuItem Header="_Create multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
             </MenuItem>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
                 <MenuItem Header="_Program site"  Command="local:UICommands.GoToSiteCommand"/>

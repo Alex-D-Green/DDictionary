@@ -26,5 +26,9 @@ namespace DDictionary.Presentation
 
         public static readonly RoutedUICommand AboutCommand = new RoutedUICommand(
             "About program", "About program", typeof(UICommands));
+
+        public static readonly RoutedUICommand CreateMultirelationCommand = new RoutedUICommand(
+            "Create multirelation", "Create multirelation", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.M, ModifierKeys.Control) });
     }
 }

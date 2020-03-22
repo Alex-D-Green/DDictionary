@@ -170,9 +170,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Presentation\MultirelationCreateDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Presentation\ScreenInfo.cs" />
+    <Compile Include="Presentation\MultirelationCreateDlg.xaml.cs">
+      <DependentUpon>MultirelationCreateDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
