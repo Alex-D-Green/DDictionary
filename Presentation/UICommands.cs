@@ -30,5 +30,52 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand CreateMultirelationCommand = new RoutedUICommand(
             "Create multirelation", "Create multirelation", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.M, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand SelectAllCommand = new RoutedUICommand(
+            "Select all", "Select all", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.A, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand ClearFilterCommand = new RoutedUICommand(
+            "Clear filter", "Clear filter", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.C, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand ClearSortingCommand = new RoutedUICommand(
+            "Clear sorting", "Clear sorting", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.C, ModifierKeys.Alt|ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand AddWordCommand = new RoutedUICommand(
+            "Add word", "Add word", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.W, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand DeleteWordsCommand = new RoutedUICommand(
+            "Delete selected words", "Delete selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.Delete) });
+
+        public static readonly RoutedUICommand EditRelationsCommand = new RoutedUICommand(
+            "Edit word relations", "Edit word relations", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand ExportToCSVCommand = new RoutedUICommand(
+            "Export to CSV", "Export to CSV", typeof(UICommands));
+
+        public static readonly RoutedUICommand MoveWordsToAGroupCommand = new RoutedUICommand(
+            "Move selected words to A group", "Move selected words to A group", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand MoveWordsToBGroupCommand = new RoutedUICommand(
+            "Move selected words to B group", "Move selected words to B group", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.B, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand MoveWordsToCGroupCommand = new RoutedUICommand(
+            "Move selected words to C group", "Move selected words to C group", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.C, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand MoveWordsToDGroupCommand = new RoutedUICommand(
+            "Move selected words to D group", "Move selected words to D group", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.D, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand MoveWordsToEGroupCommand = new RoutedUICommand(
+            "Move selected words to E group", "Move selected words to E group", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.E, ModifierKeys.Control | ModifierKeys.Shift) });
     }
 }

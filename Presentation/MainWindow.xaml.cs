@@ -307,8 +307,6 @@ namespace DDictionary.Presentation
                     mainDataGrid.Items.Refresh();
                 }
 
-                exportBtn.IsEnabled = mainDataGrid.Items.Count > 0;
-
                 UpdateStatusBar();
             });
         }
@@ -369,7 +367,7 @@ namespace DDictionary.Presentation
         {
             selectedWordsLbl.Content = mainDataGrid.SelectedItems.Count;
 
-            toGroupCBox.IsEnabled = deleteBtn.IsEnabled = mainDataGrid.SelectedItems.Count > 0;
+            toGroupCBox.IsEnabled = mainDataGrid.SelectedItems.Count > 0;
         }
 
         /// <summary>
@@ -380,22 +378,22 @@ namespace DDictionary.Presentation
             if(toGroupCBox.SelectedItem is null)
                 return;
 
-            try
-            {
-                var toGroup = (CheckBoxItem<WordGroup>)toGroupCBox.SelectedItem;
-
-                if(MessageBox.Show(this,
-                    String.Format(PrgResources.GroupChangeConfirmation, toGroup, mainDataGrid.SelectedItems.Count),
-                    PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
-                    return;
-
-                await dbFacade.MoveClausesToGroupAsync(toGroup.ItemValue, mainDataGrid.SelectedItems.Cast<DataGridClause>()
-                                                                                                    .Select(o => o.Id)
-                                                                                                    .ToArray());
-
-                await UpdateDataGridAsync();
-            }
+            try { await MoveSelectedWordsToGroup(((CheckBoxItem<WordGroup>)toGroupCBox.SelectedItem).ItemValue); }
             finally { toGroupCBox.SelectedItem = null; }
+        }
+
+        private async Task MoveSelectedWordsToGroup(WordGroup toGroup)
+        {
+            if(MessageBox.Show(this,
+                String.Format(PrgResources.GroupChangeConfirmation, toGroup.ToFullStr(), mainDataGrid.SelectedItems.Count),
+                PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                return;
+
+            await dbFacade.MoveClausesToGroupAsync(toGroup, mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                                                      .Select(o => o.Id)
+                                                                                      .ToArray());
+
+            await UpdateDataGridAsync();
         }
 
         /// <summary>
@@ -428,17 +426,6 @@ namespace DDictionary.Presentation
                 groupFilterCBox.Text = selected.Aggregate("", (s, o) => s += $"{o.ToGradeStr()}, ").TrimEnd(' ', ',');
             else
                 groupFilterCBox.Text = "";
-        }
-
-        /// <summary>
-        /// Select all rows or clear selection.
-        /// </summary>
-        private void OnSelectAllBtn_Clicked(object sender, RoutedEventArgs e)
-        {
-            if(!Equals(shownWordsLbl.Content, selectedWordsLbl.Content))
-                mainDataGrid.SelectAll();
-            else
-                mainDataGrid.UnselectAll();
         }
 
         /// <summary>
@@ -489,9 +476,9 @@ namespace DDictionary.Presentation
         private void OnClearFilterBtn_Click(object sender, RoutedEventArgs e)
         {
             if(Keyboard.Modifiers == ModifierKeys.Alt)
-                ClearSorting();
+                UICommands.ClearSortingCommand.Execute(null, null);
             else
-                ClearFilter();
+                UICommands.ClearFilterCommand.Execute(null, null);
         }
 
         /// <summary>
@@ -645,7 +632,12 @@ namespace DDictionary.Presentation
             if(!(e.OriginalSource is Hyperlink hyperlink))
                 return;
 
-            Clause cl = await dbFacade.GetClauseByIdAsync(((DataGridClause)hyperlink.DataContext).Id);
+            await EditWordRelations(((DataGridClause)hyperlink.DataContext).Id);
+        }
+
+        private async Task EditWordRelations(int clauseId)
+        {
+            Clause cl = await dbFacade.GetClauseByIdAsync(clauseId);
             RelationDTO[] relLst = cl.Relations.Select(o => o.MapToRelationDTO()).ToArray();
 
             var dlg = new RelationsEditDlg(cl.Id, cl.Word, relLst) { Owner = this };
@@ -673,94 +665,33 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
-        /// Delete selected clauses button handler.
-        /// </summary>
-        private async void OnDeleteBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if(MessageBox.Show(this, String.Format(PrgResources.ClausesDeletionConfirmation, mainDataGrid.SelectedItems.Count), 
-                PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
-                return;
-
-            await dbFacade.RemoveClausesAsync(mainDataGrid.SelectedItems.Cast<DataGridClause>()
-                                                                        .Select(o => o.Id)
-                                                                        .ToArray());
-
-            await UpdateDataGridAsync();
-        }
-
-        /// <summary>
-        /// Add new clause button handler.
-        /// </summary>
-        private async void OnAddWordButton_Click(object sender, RoutedEventArgs e)
-        {
-            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
-
-            var dlg = new ClauseEditDlg(null, lst) { Owner = this };
-            dlg.ClausesWereUpdated += async () => await UpdateDataGridAsync();
-
-            dlg.ShowDialog();
-            
-            await UpdateDataGridAsync(); //Clause's last watch data can be changed...
-        }
-
-        /// <summary>
         /// Edit clause button handler.
         /// </summary>
         private async void OnDataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             Debug.Assert(sender is DataGridRow row && row.DataContext is DataGridClause);
 
+            await EditClause(((sender as DataGridRow).DataContext as DataGridClause).Id);
+        }
+
+        private async Task EditClause(int clauseId)
+        {
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
 
-            var dlg = new ClauseEditDlg(((sender as DataGridRow).DataContext as DataGridClause).Id, lst) { Owner = this };
+            var dlg = new ClauseEditDlg(clauseId, lst) { Owner = this };
             dlg.ClausesWereUpdated += async () => await UpdateDataGridAsync();
 
             await Task.Delay(150); //To prevent mouse event from catching in the just opened dialog
 
             dlg.ShowDialog();
-            
+
             await UpdateDataGridAsync(); //Clause's last watch data can be changed...
         }
 
-
-        /// <summary>
-        /// Export button handler.
-        /// </summary>
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-        private async void OnExportBtn_Click(object sender, RoutedEventArgs e)
+        private async void DataGridRow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if(!currentFilter.Empty &&
-               MessageBox.Show(this, PrgResources.FilterIsActivated, PrgResources.QuestionCaption,
-                   MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.Cancel)
-                return;
-
-            var dlg = new SaveFileDialog
-            {
-                OverwritePrompt = true,
-                DefaultExt = "csv",
-                Filter = "Csv files (*.csv)|*.csv|All files (*.*)|*.*",
-                FileName = $"{DateTime.Now.ToString("yyyy-MM-dd")}.csv"
-            };
-
-            if(dlg.ShowDialog() != true)
-                return;
-
-            try
-            {
-                exportBtn.IsEnabled = false; //To prevent simultaneous saving
-
-                using(var writer = new StreamWriter(dlg.FileName))
-                using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                    await csv.WriteRecordsAsync(
-                        (await dbFacade.GetClausesAsync(currentFilter)).Select(o => o.MapToCsvClause()) );
-
-                MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch(Exception ex)
-            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
-            finally
-            { exportBtn.IsEnabled = mainDataGrid.Items.Count > 0; }
+            if(e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.None && mainDataGrid.SelectedItems?.Count == 1)
+                await EditClause(((DataGridClause)mainDataGrid.SelectedItem).Id);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -808,9 +739,9 @@ namespace DDictionary.Presentation
 
         private void OnWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if( !textFilterEdit.IsFocused && Keyboard.Modifiers == ModifierKeys.None && 
-                ( (e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) || 
-                  (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) ) )
+            if(!textFilterEdit.IsFocused && Keyboard.Modifiers == ModifierKeys.None &&
+                ((e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.D0 && e.Key <= Key.D9) ||
+                  (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)))
             {
                 textFilterEdit.Focus();
                 textFilterEdit.SelectAll();
@@ -852,10 +783,126 @@ namespace DDictionary.Presentation
                 await UpdateDataGridAsync();
         }
 
+        private void OnSelectAllCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(!Equals(shownWordsLbl.Content, selectedWordsLbl.Content))
+                mainDataGrid.SelectAll();
+            else
+                mainDataGrid.UnselectAll();
+        }
+
+        private void OnClearFilterCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            ClearFilter();
+        }
+
+        private void OnClearSortingCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            ClearSorting();
+        }
+
+        private async void OnAddWordCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
+
+            var dlg = new ClauseEditDlg(null, lst) { Owner = this };
+            dlg.ClausesWereUpdated += async () => await UpdateDataGridAsync();
+
+            dlg.ShowDialog();
+
+            await UpdateDataGridAsync(); //Clause's last watch data can be changed...
+        }
+
+        private async void OnDeleteWordsCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(MessageBox.Show(this, String.Format(PrgResources.ClausesDeletionConfirmation, mainDataGrid.SelectedItems.Count),
+                PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                return;
+
+            await dbFacade.RemoveClausesAsync(mainDataGrid.SelectedItems.Cast<DataGridClause>()
+                                                                        .Select(o => o.Id)
+                                                                        .ToArray());
+
+            await UpdateDataGridAsync();
+        }
+
+        private async void OnEditRelationsCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var selected = (DataGridClause)mainDataGrid.SelectedItem;
+
+            Debug.Assert(selected is DataGridClause);
+
+            await EditWordRelations(selected.Id);
+        }
+
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
+        private async void OnExportToCSVCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(!currentFilter.Empty &&
+               MessageBox.Show(this, PrgResources.FilterIsActivated, PrgResources.QuestionCaption,
+                   MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.Cancel)
+                return;
+
+            var dlg = new SaveFileDialog {
+                OverwritePrompt = true,
+                DefaultExt = "csv",
+                Filter = "Csv files (*.csv)|*.csv|All files (*.*)|*.*",
+                FileName = $"{DateTime.Now:yyyy-MM-dd}.csv"
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            try
+            {
+                using(var writer = new StreamWriter(dlg.FileName))
+                using(var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                    await csv.WriteRecordsAsync(
+                        (await dbFacade.GetClausesAsync(currentFilter)).Select(o => o.MapToCsvClause()));
+
+                MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+        }
+
+        private async void OnMoveWordsToAGroup(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(e.Command == UICommands.MoveWordsToAGroupCommand)
+                await MoveSelectedWordsToGroup(WordGroup.A_DefinitelyKnown);
+            else if(e.Command == UICommands.MoveWordsToBGroupCommand)
+                await MoveSelectedWordsToGroup(WordGroup.B_WellKnown);
+            else if(e.Command == UICommands.MoveWordsToCGroupCommand)
+                await MoveSelectedWordsToGroup(WordGroup.C_KindaKnown);
+            else if(e.Command == UICommands.MoveWordsToDGroupCommand)
+                await MoveSelectedWordsToGroup(WordGroup.D_NeedToMemorize);
+            else if(e.Command == UICommands.MoveWordsToEGroupCommand)
+                await MoveSelectedWordsToGroup(WordGroup.E_TotallyUnknown);
+            else
+                Debug.Assert(false);
+        }
+
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             if(e.Command == UICommands.CreateMultirelationCommand)
-                e.CanExecute = (mainDataGrid.SelectedItems.Count >= 2 && mainDataGrid.SelectedItems.Count <= 7);
+                e.CanExecute = (mainDataGrid?.SelectedItems?.Count >= 2 && mainDataGrid?.SelectedItems?.Count <= 7);
+
+            if(e.Command == UICommands.EditRelationsCommand)
+                e.CanExecute = (mainDataGrid?.SelectedItems?.Count == 1);
+
+            if(e.Command == UICommands.DeleteWordsCommand)
+                e.CanExecute = (mainDataGrid?.SelectedItems?.Count > 0);
+
+            if(e.Command == UICommands.ExportToCSVCommand)
+                e.CanExecute = (mainDataGrid?.Items?.Count > 0);
+
+            if(e.Command == UICommands.MoveWordsToAGroupCommand || e.Command == UICommands.MoveWordsToBGroupCommand ||
+               e.Command == UICommands.MoveWordsToCGroupCommand || e.Command == UICommands.MoveWordsToDGroupCommand ||
+               e.Command == UICommands.MoveWordsToEGroupCommand)
+            { 
+                e.CanExecute = (mainDataGrid?.SelectedItems?.Count > 0); 
+            }
         }
 
         #endregion

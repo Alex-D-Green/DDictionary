@@ -20,6 +20,26 @@
         <CommandBinding Command="{x:Static local:UICommands.CreateMultirelationCommand}" 
                         Executed="OnCreateMultirelationCommand"
                         CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.SelectAllCommand}" Executed="OnSelectAllCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.ClearFilterCommand}" Executed="OnClearFilterCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.ClearSortingCommand}" Executed="OnClearSortingCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.AddWordCommand}" Executed="OnAddWordCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.DeleteWordsCommand}" Executed="OnDeleteWordsCommand" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.EditRelationsCommand}" Executed="OnEditRelationsCommand" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.ExportToCSVCommand}" Executed="OnExportToCSVCommand"
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToAGroupCommand}" Executed="OnMoveWordsToAGroup"
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToBGroupCommand}" Executed="OnMoveWordsToAGroup"
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToCGroupCommand}" Executed="OnMoveWordsToAGroup"
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToDGroupCommand}" Executed="OnMoveWordsToAGroup"
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToEGroupCommand}" Executed="OnMoveWordsToAGroup"
+                        CanExecute="CommandBinding_CanExecute"/>        
     </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -30,7 +50,7 @@
         </Grid.RowDefinitions>
         <DockPanel Margin="0" LastChildFill="False" Grid.Row="1">
             <Button x:Name="selectAllBtn" Content="" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
-                    TabIndex="1" ToolTip="Select all rows or clear selection" Click="OnSelectAllBtn_Clicked" 
+                    TabIndex="1" ToolTip="Select all rows or clear selection" Command="local:UICommands.SelectAllCommand"
                     BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
             <TextBox x:Name="textFilterEdit" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                      Height="22" TabIndex="2" 
@@ -51,17 +71,14 @@
             </ComboBox>
             <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
                     TabIndex="4" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click"/>
-            <Button x:Name="exportBtn" Content="Export" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Margin="5,5,10,5" DockPanel.Dock="Right" Height="22" TabIndex="8" IsEnabled="False" 
-                    Click="OnExportBtn_Click" ToolTip="Export the dictionary into a CSV file"/>
             <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                       DockPanel.Dock="Right" Height="22" TabIndex="7" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
                       DropDownClosed="OnToGroupCBox_DropDownClosed" ToolTip="Move selected words to the group"/>
             <Button x:Name="deleteBtn" Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6" IsEnabled="False" 
-                    ToolTip="Delete selected clauses" Click="OnDeleteBtn_Click"/>
+                    Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6"  
+                    ToolTip="Delete selected clauses" Command="local:UICommands.DeleteWordsCommand"/>
             <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
-                    DockPanel.Dock="Right" Height="22" TabIndex="5" Click="OnAddWordButton_Click"
+                    DockPanel.Dock="Right" Height="22" TabIndex="5" Command="local:UICommands.AddWordCommand"
                     ToolTip="Add new clause to the dictionary"/>
         </DockPanel>
         <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 
@@ -99,6 +116,7 @@
                     </Style.Triggers>
                     <EventSetter Event="PreviewMouseDown" Handler="OnDataGridRow_PreviewMouseDown"/>
                     <EventSetter Event="MouseDoubleClick" Handler="OnDataGridRow_MouseDoubleClick"/>
+                    <EventSetter Event="PreviewKeyDown" Handler="DataGridRow_PreviewKeyDown"/>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
@@ -196,15 +214,33 @@
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
             <MenuItem Header="_File">
+                <MenuItem Header="_Export shown words into CSV..." Command="local:UICommands.ExportToCSVCommand"/>
+                <Separator/>
                 <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
             </MenuItem>
             <MenuItem Header="_Actions">
+                <MenuItem Header="Select _all/Clear selection" Command="local:UICommands.SelectAllCommand"/>
+                <Separator/>
+                <MenuItem Header="Clear _filter" Command="local:UICommands.ClearFilterCommand"/>
+                <MenuItem Header="Clear _sorting" Command="local:UICommands.ClearSortingCommand"/>
+                <Separator/>
+                <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand"/>
+                <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand"/>
+                <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand"/>
+                <MenuItem Header="_Move selected words to">
+                    <MenuItem Header="Move words to group _A" Command="local:UICommands.MoveWordsToAGroupCommand"/>
+                    <MenuItem Header="Move words to group _B" Command="local:UICommands.MoveWordsToBGroupCommand"/>
+                    <MenuItem Header="Move words to group _C" Command="local:UICommands.MoveWordsToCGroupCommand"/>
+                    <MenuItem Header="Move words to group _D" Command="local:UICommands.MoveWordsToDGroupCommand"/>
+                    <MenuItem Header="Move words to group _E" Command="local:UICommands.MoveWordsToEGroupCommand"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="_Create multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
             </MenuItem>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
-                <MenuItem Header="_Program site"  Command="local:UICommands.GoToSiteCommand"/>
+                <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand"/>
                 <MenuItem Header="Online _help" Command="local:UICommands.OnlineHelpCommand"/>
                 <Separator/>
                 <MenuItem Header="_About DDictionary..." Command="local:UICommands.AboutCommand"/>

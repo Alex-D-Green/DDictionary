@@ -166,7 +166,7 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move these {1} selected clause[s] to group &quot;{0}&quot;?.
+        ///   Looks up a localized string similar to Move these {1} selected clause[s] to the group &quot;{0}&quot;?.
         /// </summary>
         internal static string GroupChangeConfirmation {
             get {

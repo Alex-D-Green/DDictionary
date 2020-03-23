@@ -157,7 +157,7 @@
 Continue and save only filtered clauses?</value>
   </data>
   <data name="GroupChangeConfirmation" xml:space="preserve">
-    <value>Move these {1} selected clause[s] to group "{0}"?</value>
+    <value>Move these {1} selected clause[s] to the group "{0}"?</value>
   </data>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>
