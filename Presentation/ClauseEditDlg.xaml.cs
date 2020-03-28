@@ -30,6 +30,9 @@ namespace DDictionary.Presentation
         /// <summary>The maximal count of handling translations.</summary>
         public const int MaxCountOfTranslations = 10;
 
+        /// <summary>The maximal count of handling relations.</summary>
+        public const int MaxCountOfRelations = 15;
+
 
         /// <summary>All clause's relations.</summary>
         private readonly List<RelationDTO> relations = new List<RelationDTO>();
@@ -185,7 +188,28 @@ namespace DDictionary.Presentation
 
         private void UpdateRelations()
         {
-            relationsLbl.Text = ClauseToDataGridClauseMapper.MakeRelationsString(relations.Select(o => o.ToWord));
+            LooseHeight();
+
+            ClearRelationsArea();
+
+            int countOfShownRelations = 0;
+            foreach(RelationDTO rel in relations)
+            {
+                var copy = (Label)XamlReader.Parse(XamlWriter.Save(relTemplateLbl));
+
+                copy.Name = null; //To show that it's a new item
+                copy.Visibility = Visibility.Visible;
+                copy.Content = $"{rel.ToWord} - {rel.Description}";
+                copy.MouseLeftButtonUp += OnRelationsLbl_MouseLeftButtonUp;
+
+                relationsPanel.Children.Insert(relationsPanel.Children.IndexOf(relTemplateLbl), copy);
+
+                if(countOfShownRelations == MaxCountOfRelations)
+                    break;
+            }
+
+            if(Visibility == Visibility.Visible) //Only if form is already shown and knows its size
+                FixHeight();
         }
 
         private void UpdateDeleteButtonState()
@@ -516,12 +540,26 @@ namespace DDictionary.Presentation
             FrameworkElement[] toRemove = translationsPanel.Children.OfType<FrameworkElement>()
                                                                     .Where(o => o.Name == null) //The item that was added
                                                                     .ToArray();
+
             LooseHeight();
 
             foreach(FrameworkElement item in toRemove)
                 translationsPanel.Children.Remove(item);
 
+            ClearRelationsArea();
+
             FixHeight();
+        }
+
+        private void ClearRelationsArea()
+        {
+            //Remove all old added relations
+            FrameworkElement[] toRemove = relationsPanel.Children.OfType<FrameworkElement>()
+                                                                  .Where(o => o.Name == null) //The item that was added
+                                                                  .ToArray();
+
+            foreach(FrameworkElement item in toRemove)
+                relationsPanel.Children.Remove(item);
         }
 
         /// <summary>

@@ -228,7 +228,9 @@
                 <Separator/>
                 <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand"/>
                 <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand"/>
+                <MenuItem Header="_Create multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
                 <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand"/>
+                <Separator/>
                 <MenuItem Header="_Move selected words to">
                     <MenuItem Header="Move words to group _A" Command="local:UICommands.MoveWordsToAGroupCommand"/>
                     <MenuItem Header="Move words to group _B" Command="local:UICommands.MoveWordsToBGroupCommand"/>
@@ -236,8 +238,6 @@
                     <MenuItem Header="Move words to group _D" Command="local:UICommands.MoveWordsToDGroupCommand"/>
                     <MenuItem Header="Move words to group _E" Command="local:UICommands.MoveWordsToEGroupCommand"/>
                 </MenuItem>
-                <Separator/>
-                <MenuItem Header="_Create multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
             </MenuItem>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
                 <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand"/>

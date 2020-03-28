@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:DDictionary="clr-namespace:DDictionary"
         mc:Ignorable="d"
-        Title="Clause editing" MinWidth="350" MaxWidth="800" WindowStartupLocation="CenterOwner" 
+        Title="Clause editing" MinWidth="380" MaxWidth="800" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False">
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -13,6 +13,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="300"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
         <DockPanel Grid.Row="0">
             <Button x:Name="scrollLeftBtn" Content="←" Width="30" Height="30" VerticalAlignment="Top" FontSize="16" 
                     Margin="5" TabIndex="10" Click="OnScrollBtn_Click"/>
@@ -33,7 +37,7 @@
                 </StackPanel>
             </StackPanel>
         </DockPanel>
-        <StackPanel x:Name="translationsPanel" Grid.Row="1" Margin="0,10">
+        <StackPanel x:Name="translationsPanel" Grid.Row="1" Margin="0,10" VerticalAlignment="Center">
             <DockPanel x:Name="translationRow" Margin="5,0,5,5" HorizontalAlignment="Center">
                 <Button x:Name="trUpBtn" Content="↑" Padding="5,2" TabIndex="50"/>
                 <Button x:Name="trDownBtn" Content="↓" Padding="5,2" TabIndex="51"/>
@@ -44,14 +48,10 @@
             <Button x:Name="addTranslationBtn" Content="Add translation" HorizontalAlignment="Center" Margin="5" Padding="15,2" 
                     TabIndex="200" Click="OnAddTranslationBtn_Click"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Margin="5">
-            <TextBox x:Name="contextEdit" Text="Context" Margin="5" FontSize="10" TextAlignment="Center" Padding="5" 
+        <StackPanel Grid.Row="2" Margin="5" VerticalAlignment="Bottom">
+            <TextBox x:Name="contextEdit" Text="Context" Margin="5,5,5,10" FontSize="10" TextAlignment="Center" Padding="5" 
                      TabIndex="201" TextChanged="OnSomeDataWasChanged"
                      MaxLength="{x:Static DDictionary:Constrains.MaxContextLength}"/>
-            <TextBlock x:Name="relationsLbl" Text="Relations" TextAlignment="Center" Margin="5" Padding="5" FontSize="10" 
-                       Foreground="Blue" TextDecorations="Underline" Cursor="Hand" HorizontalAlignment="Center"
-                       MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp" 
-                       Focusable="True" KeyboardNavigation.TabIndex="202" KeyUp="OnRelationsLbl_KeyUp"/>
             <DockPanel Margin="0,15,0,0">
                 <Button x:Name="deleteClauseBtn" Content="Delete" Width="60" Padding="2" TabIndex="300" 
                         Click="OnDeleteClauseBtn_Click" ToolTip="Hold Ctrl to suppress confirmation"/>
@@ -60,6 +60,14 @@
                 <Button x:Name="newClauseBtn" Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="301"
                         Click="OnNewClauseBtn_Click"/>
             </DockPanel>
+        </StackPanel>
+        <StackPanel x:Name="relationsPanel" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <Label x:Name="relTitleLbl" Margin="10,10,10,0" FontWeight="Bold" Content="Relations:"/>
+            <Label x:Name="relTemplateLbl" FontSize="9" Margin="10,0" Visibility="Hidden" Cursor="Hand"/>
+            <TextBlock x:Name="editRelsLbl" Margin="10" Padding="5" Text="[Add/Edit]" Focusable="True" 
+                       KeyboardNavigation.TabIndex="400" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" 
+                       MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp" KeyUp="OnRelationsLbl_KeyUp" />            
         </StackPanel>
     </Grid>
 </Window>
