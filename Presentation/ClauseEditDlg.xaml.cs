@@ -186,7 +186,7 @@ namespace DDictionary.Presentation
             saveClauseBtn.IsEnabled = false;
         }
 
-        private void UpdateRelations()
+        private async void UpdateRelations()
         {
             LooseHeight();
 
@@ -195,14 +195,20 @@ namespace DDictionary.Presentation
             int countOfShownRelations = 0;
             foreach(RelationDTO rel in relations)
             {
-                var copy = (Label)XamlReader.Parse(XamlWriter.Save(relTemplateLbl));
-
+                var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relTemplatePanel));
                 copy.Name = null; //To show that it's a new item
                 copy.Visibility = Visibility.Visible;
-                copy.Content = $"{rel.ToWord} - {rel.Description}";
                 copy.MouseLeftButtonUp += OnRelationsLbl_MouseLeftButtonUp;
+                copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
+                    (await dbFacade.GetClauseByIdAsync(rel.ToWordId)).Translations);
 
-                relationsPanel.Children.Insert(relationsPanel.Children.IndexOf(relTemplateLbl), copy);
+                var newWordLbl = (Label)copy.FindName(nameof(wordLbl));
+                newWordLbl.Content = rel.ToWord;
+
+                var newDescriptionLbl = (Label)copy.FindName(nameof(descriptionLbl));
+                newDescriptionLbl.Content = $" - {rel.Description}";
+
+                relationsPanel.Children.Insert(relationsPanel.Children.IndexOf(relTemplatePanel), copy);
 
                 if(countOfShownRelations == MaxCountOfRelations)
                     break;
@@ -555,8 +561,8 @@ namespace DDictionary.Presentation
         {
             //Remove all old added relations
             FrameworkElement[] toRemove = relationsPanel.Children.OfType<FrameworkElement>()
-                                                                  .Where(o => o.Name == null) //The item that was added
-                                                                  .ToArray();
+                                                                 .Where(o => o.Name == null) //The item that was added
+                                                                 .ToArray();
 
             foreach(FrameworkElement item in toRemove)
                 relationsPanel.Children.Remove(item);

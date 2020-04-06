@@ -64,7 +64,10 @@
         <StackPanel x:Name="relationsPanel" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
             <Label x:Name="relTitleLbl" Margin="10,10,10,0" FontWeight="Bold" Content="Relations:"/>
-            <Label x:Name="relTemplateLbl" FontSize="9" Margin="10,0" Visibility="Hidden" Cursor="Hand"/>
+            <StackPanel x:Name="relTemplatePanel" Visibility="Hidden" Cursor="Hand" Orientation="Horizontal" Margin="10,0">
+                <Label x:Name="wordLbl" FontSize="9" FontWeight="Bold"/>
+                <Label x:Name="descriptionLbl" FontSize="9" Margin="-10,0,0,0"/>
+            </StackPanel>
             <TextBlock x:Name="editRelsLbl" Margin="10" Padding="5" Text="[Add/Edit]" Focusable="True" 
                        KeyboardNavigation.TabIndex="400" Foreground="Blue" TextDecorations="Underline" Cursor="Hand" 
                        MouseLeftButtonUp="OnRelationsLbl_MouseLeftButtonUp" KeyUp="OnRelationsLbl_KeyUp" />            
