@@ -21,6 +21,7 @@ namespace DDictionary.Presentation.Converters
             throw new NotSupportedException();
         }
 
+        /// <seealso cref="DDictionary.Presentation.Converters.TranslationConverter.Parse"/>
         public static string ConvertToString(Translation val)
         {
             if(val is null)
@@ -33,6 +34,30 @@ namespace DDictionary.Presentation.Converters
                 ret = String.Format("{0} ({1})", ret, val.Part.ToShortString());
 
             return ret;
+        }
+
+        /// <summary>
+        /// Parses the string trying to find out the part of the speech as if it was written by
+        /// <see cref="DDictionary.Presentation.Converters.TranslationConverter.ConvertToString"/> method.
+        /// </summary>
+        public static Translation Parse(string translation)
+        {
+            if(translation is null)
+                throw new ArgumentNullException(nameof(translation));
+
+
+            foreach(PartOfSpeech p in Enum.GetValues(typeof(PartOfSpeech)))
+            {
+                if(translation.EndsWith($" ({p.ToShortString()})"))
+                {
+                    return new Translation {
+                        Text = translation.Substring(0, translation.LastIndexOf('(')).TrimEnd(),
+                        Part = p
+                    };
+                }
+            }
+
+            return new Translation { Text = translation, Part = PartOfSpeech.Unknown };
         }
     }
 }

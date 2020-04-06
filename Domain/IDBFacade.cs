@@ -46,6 +46,11 @@ namespace DDictionary.Domain
         Task<int> GetTotalClausesAsync();
 
         /// <summary>
+        /// Check if the word exists in the dictionary, if so returns its Id otherwise returns <c>0</c>.
+        /// </summary>
+        Task<int> GetClauseIdByWord(string word);
+
+        /// <summary>
         /// Add or update clause data. If the id of the <paramref name="clause"/> equals 0 then a new 
         /// clause will be created otherwise the existing one will be updated.
         /// </summary>
@@ -109,5 +114,13 @@ namespace DDictionary.Domain
         /// </summary>
         /// <param name="translationIds">Translations ids.</param>
         Task RemoveTranslationsAsync(params int[] translationIds);
+
+        /// <summary>
+        /// Add a set of clauses in one sitting.
+        /// </summary>
+        /// <remarks>This method should work by principle all or nothing.</remarks>
+        /// <returns>All founded errors in data. If the list is empty then the operation is successful.</returns>
+        /// <seealso cref="DDictionary.Presentation.Converters.ClauseToCsvClauseMapper.MapFromCsvClause"/>
+        Task<List<string>> BulkAddClausesAsync(IEnumerable<Clause> clauses);
     }
 }

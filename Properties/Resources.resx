@@ -136,6 +136,9 @@
   <data name="ClausesDeletionConfirmation" xml:space="preserve">
     <value>Delete {0} selected clause[s]?</value>
   </data>
+  <data name="CSVImportReportTitle" xml:space="preserve">
+    <value>Some errors occurred during import</value>
+  </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>An error occured!</value>
   </data>
@@ -145,8 +148,14 @@
   <data name="ExceedMaxCountOfTranslations" xml:space="preserve">
     <value>Only {0} (the maximal count) out of {1} translations have been shown.</value>
   </data>
+  <data name="ExportToCSVTitle" xml:space="preserve">
+    <value>Export shown words to a CSV file</value>
+  </data>
   <data name="FileNotFoundError" xml:space="preserve">
     <value>File "{0}" not found!</value>
+  </data>
+  <data name="FileWasSuccessivelyLoaded" xml:space="preserve">
+    <value>The data was successively imported</value>
   </data>
   <data name="FileWasSuccessivelySaved" xml:space="preserve">
     <value>The file was successively saved</value>
@@ -158,6 +167,12 @@ Continue and save only filtered clauses?</value>
   </data>
   <data name="GroupChangeConfirmation" xml:space="preserve">
     <value>Move these {1} selected clause[s] to the group "{0}"?</value>
+  </data>
+  <data name="ImportErrorsMsg" xml:space="preserve">
+    <value>No changes were made because of errors. Please rectify errors that shown below and retry import again.</value>
+  </data>
+  <data name="ImportFromCSVTitle" xml:space="preserve">
+    <value>Import words from a CSV file</value>
   </data>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>

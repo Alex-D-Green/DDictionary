@@ -1,0 +1,21 @@
+﻿<Window x:Class="DDictionary.Presentation.ReportDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Report" MinHeight="200" MinWidth="300" MaxHeight="600" WindowStartupLocation="CenterOwner" 
+        SizeToContent="WidthAndHeight" ResizeMode="CanResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" x:Name="textEdit" TextWrapping="NoWrap" Text="" AcceptsReturn="True" IsReadOnly="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+
+        <Button Grid.Row="1" Margin="0,10,0,0" Width="60" HorizontalAlignment="Right" IsCancel="True" IsDefault="True" 
+                Content="Close"/>
+    </Grid>
+</Window>

@@ -13,7 +13,6 @@ using Dapper;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 
-
 namespace DDictionary.DAL
 {
     //https://www.youtube.com/watch?v=ayp3tHEkRc0
@@ -65,6 +64,7 @@ namespace DDictionary.DAL
         }
 
         public event ErrorHandler OnErrorOccurs;
+
 
         public async Task<Clause> GetClauseByIdAsync(int id)
         {
@@ -234,6 +234,25 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
+        public async Task<int> GetClauseIdByWord(string word)
+        {
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                {
+                    IEnumerable<int> ids = 
+                        await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE [Word] = @Word", new { Word = word });
+
+                    if(ids.Count() > 1)
+                        throw new DataException($"There are more than one clause \"{word}\" in the DB.");
+
+                    return ids.SingleOrDefault();
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { return -1; }
+        }
+
         public async Task<IEnumerable<JustWordDTO>> GetJustWordsAsync()
         {
             try
@@ -257,9 +276,9 @@ namespace DDictionary.DAL
                 if(clause.Id == 0)
                 { //Insert a new record
                     const string sql =
-                        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], " +
+                        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated]," +
                         " [Watched], [WatchedCount], [Group])\n" +
-                        "   VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group);\n" +
+                        "    VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group);\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
@@ -283,11 +302,11 @@ namespace DDictionary.DAL
                             "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
                             " [Context] = @Context, [Updated] = @Updated, [Watched] = @Watched," +
                             " [WatchedCount] = [WatchedCount] + 1, [Group] = @Group\n" +
-                            "   WHERE [Id] = @Id; "
+                            "    WHERE [Id] = @Id; "
                         : 
                             "UPDATE [Clauses] SET [Sound] = @Sound, [Word] = @Word, [Transcription] = @Transcription," +
                             " [Context] = @Context, [Updated] = @Updated, [Group] = @Group\n" +
-                            "   WHERE [Id] = @Id; ";
+                            "    WHERE [Id] = @Id; ";
 
                     using(IDbConnection cnn = GetConnection())
                         await cnn.ExecuteAsync(sql, new
@@ -391,7 +410,7 @@ namespace DDictionary.DAL
                     const string sql =
                         "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description]) VALUES (@From, @To, @Descr);\n" +
                         "UPDATE [Clauses] SET [Updated] = @Now\n" +
-                        "   WHERE [Id] = @From;\n" +
+                        "    WHERE [Id] = @From;\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
@@ -407,9 +426,9 @@ namespace DDictionary.DAL
                 { //Update an existing record
                     const string sql =
                         "UPDATE [Relations] SET [FromClauseId] = @From, [ToClauseId] = @To, [Description] = @Descr\n" +
-                        "   WHERE [Id] = @Id;\n" +
+                        "    WHERE [Id] = @Id;\n" +
                         "UPDATE [Clauses] SET [Updated] = @Now\n" +
-                        "   WHERE [Id] = @From; ";
+                        "    WHERE [Id] = @From; ";
 
                     using(IDbConnection cnn = GetConnection())
                         await cnn.ExecuteAsync(sql, new { 
@@ -438,7 +457,7 @@ namespace DDictionary.DAL
 
             const string sql =
                 "UPDATE [Clauses] SET [Updated] = @Now\n" +
-                "   WHERE [Id] IN (SELECT [FromClauseId] FROM [Relations] WHERE [Id] IN @Nums);\n" + 
+                "    WHERE [Id] IN (SELECT [FromClauseId] FROM [Relations] WHERE [Id] IN @Nums);\n" + 
                 "DELETE FROM [Relations] WHERE [Id] IN @Nums; ";
 
             try
@@ -466,9 +485,9 @@ namespace DDictionary.DAL
                 { //Insert a new record
                     const string sql =
                         "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId])\n" +
-                        "   VALUES (@Index, @Text, @Part, @ClauseId);\n" +
-                        "UPDATE [Clauses] SET [Updated] = @Now\n" + 
-                        "   WHERE [Id] = @ClauseId;\n" +
+                        "    VALUES (@Index, @Text, @Part, @ClauseId);\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                        "    WHERE [Id] = @ClauseId;\n" +
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = GetConnection())
@@ -485,9 +504,9 @@ namespace DDictionary.DAL
                 { //Update an existing record
                     const string sql =
                         "UPDATE [Translations] SET [Index] = @Index, [Text] = @Text, [Part] = @Part, [ClauseId] = @ClauseId\n" +
-                        "   WHERE [Id] = @Id;\n" +
-                        "UPDATE [Clauses] SET [Updated] = @Now\n" + 
-                        "   WHERE [Id] = @ClauseId; ";
+                        "    WHERE [Id] = @Id;\n" +
+                        "UPDATE [Clauses] SET [Updated] = @Now\n" +
+                        "    WHERE [Id] = @ClauseId; ";
 
                     using(IDbConnection cnn = GetConnection())
                         await cnn.ExecuteAsync(sql, new { 
@@ -517,7 +536,7 @@ namespace DDictionary.DAL
 
             const string sql =
                 "UPDATE [Clauses] SET [Updated] = @Now\n" +
-                "   WHERE [Id] IN (SELECT [ClauseId] FROM [Translations] WHERE [Id] IN @Nums);\n" +
+                "    WHERE [Id] IN (SELECT [ClauseId] FROM [Translations] WHERE [Id] IN @Nums);\n" +
                 "DELETE FROM [Translations] WHERE [Id] IN @Nums; ";
 
             try
@@ -527,6 +546,151 @@ namespace DDictionary.DAL
             }
             catch(Exception e) when(HandleError(e))
             { }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", 
+            Justification = "<Pending>")]
+        public async Task<List<string>> BulkAddClausesAsync(IEnumerable<Clause> clauses)
+        {
+            if(clauses is null)
+                throw new ArgumentNullException(nameof(clauses));
+
+
+            const string insertClauseSql =
+                "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated]," +
+                " [Watched], [WatchedCount], [Group])\n" +
+                "    VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group);\n" +
+                "SELECT last_insert_rowid(); ";
+
+            const string insertTranslationSql =
+                "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) VALUES (@Index, @Text, @Part, @ClauseId); ";
+
+            const string insertRelationSql =
+                "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description])\n" +
+                "    VALUES (@From, (SELECT [Id] FROM [Clauses] WHERE [Word] = @Word), @Descr); ";
+
+            const string isWordExistSql = "SELECT 1 FROM [Clauses] WHERE [Word] = @Word; ";
+
+            DateTime now = DateTime.Now;
+
+            var errors = new List<string>();
+
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                {
+                    //Inner function to quick check if the word already exists
+                    async Task<bool> isWordExist(string word) =>
+                        (await cnn.QueryAsync(isWordExistSql, new { Word = word })).Any();
+
+
+                    cnn.Open();
+                    using(IDbTransaction transaction = cnn.BeginTransaction())
+                    {
+                        var tmpLst = new List<Clause>();
+                        int idx = 0;
+
+                        //This formation is used instead of foreach cycle to have ability to catch an exception 
+                        //and still keep moving forward.
+                        using(IEnumerator<Clause> enumerator = clauses.GetEnumerator())
+                        {
+                            while(true)
+                            { //The "first" run
+                                idx++;
+
+                                try 
+                                { 
+                                    if(!enumerator.MoveNext()) 
+                                        break; //The sequence is finished
+                                }
+                                catch(Exception e)
+                                { //An error occurs during the fetching this clause
+                                    errors.Add($"The clause #{idx}: {e.Message};");
+                                    
+                                    continue; //Keep fetching, move to the next clause
+                                }
+
+                                Clause clause = enumerator.Current; //Get next clause
+
+                                if(String.IsNullOrWhiteSpace(clause.Word))
+                                {
+                                    errors.Add($"The clause #{idx}: an empty word;");
+                                    continue;
+                                }
+
+                                if(clause.Translations.Count < 1)
+                                {
+                                    errors.Add($"The clause #{idx} ({clause.Word}): contains no translations;");
+                                    continue;
+                                }
+
+                                if(await isWordExist(clause.Word))
+                                {
+                                    errors.Add(
+                                        $"The clause #{idx} ({clause.Word}): this word already exists in the dictionary;");
+                                    continue;
+                                }
+
+                                try
+                                {
+                                    //Adding the clause itself
+                                    clause.Id = (await cnn.QueryAsync<int>(insertClauseSql, new {
+                                        Sound = clause.Sound,
+                                        Word = clause.Word,
+                                        Transcription = clause.Transcription,
+                                        Context = clause.Context,
+                                        Added = now,
+                                        Updated = now,
+                                        Watched = now,
+                                        Group = clause.Group
+                                    }))
+                                    .Single();
+
+                                    //Adding all clause's translations
+                                    await cnn.ExecuteAsync(insertTranslationSql, clause.Translations.Select(tr =>
+                                        new { ClauseId = clause.Id, Index = tr.Index, Text = tr.Text, Part = tr.Part }));
+
+                                    //Preparations for the "second" run below
+                                    tmpLst.Add(
+                                        new Clause { Id = clause.Id, Word = clause.Word, Relations = clause.Relations });
+                                }
+                                catch(Exception e)
+                                { errors.Add($"The clause #{idx} ({clause.Word}): {e.Message};"); }
+                            }
+                        }
+
+                        foreach(Clause clause in tmpLst)
+                        { //The "second" run
+                            try
+                            {
+                                //Adding all correct clause's relations
+                                await cnn.ExecuteAsync(insertRelationSql, clause.Relations.Select(o =>
+                                {
+                                    if(!isWordExist(o.ToClause.Word).Result)
+                                    {
+                                        errors.Add($"The relations of the clause ({clause.Word}): there is no word \"{o.ToClause.Word}\" in the dictionary;");
+                                        return null; //To skip this relation and move forward
+                                    }
+                                    else
+                                        return new { From = clause.Id, Word = o.ToClause.Word, Descr = o.Description };
+                                })
+                                .Where(o => o != null));
+                            }
+                            catch(Exception e)
+                            { errors.Add($"The relations of the clause ({clause.Word}): {e.Message};"); }
+                        }
+
+                        if(errors.Count == 0)
+                            transaction.Commit();
+                        else
+                            transaction.Rollback(); //All or nothing
+                    }
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { errors.Add(e.Message); }
+
+            return errors;
         }
 
         /// <summary>

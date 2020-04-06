@@ -110,6 +110,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some errors occurred during import.
+        /// </summary>
+        internal static string CSVImportReportTitle {
+            get {
+                return ResourceManager.GetString("CSVImportReportTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured!.
         /// </summary>
         internal static string ErrorCaption {
@@ -137,11 +146,29 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export shown words to a CSV file.
+        /// </summary>
+        internal static string ExportToCSVTitle {
+            get {
+                return ResourceManager.GetString("ExportToCSVTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File &quot;{0}&quot; not found!.
         /// </summary>
         internal static string FileNotFoundError {
             get {
                 return ResourceManager.GetString("FileNotFoundError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The data was successively imported.
+        /// </summary>
+        internal static string FileWasSuccessivelyLoaded {
+            get {
+                return ResourceManager.GetString("FileWasSuccessivelyLoaded", resourceCulture);
             }
         }
         
@@ -171,6 +198,24 @@ namespace DDictionary.Properties {
         internal static string GroupChangeConfirmation {
             get {
                 return ResourceManager.GetString("GroupChangeConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No changes were made because of errors. Please rectify errors that shown below and retry import again..
+        /// </summary>
+        internal static string ImportErrorsMsg {
+            get {
+                return ResourceManager.GetString("ImportErrorsMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import words from a CSV file.
+        /// </summary>
+        internal static string ImportFromCSVTitle {
+            get {
+                return ResourceManager.GetString("ImportFromCSVTitle", resourceCulture);
             }
         }
         

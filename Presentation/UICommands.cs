@@ -58,6 +58,9 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand ExportToCSVCommand = new RoutedUICommand(
             "Export to CSV", "Export to CSV", typeof(UICommands));
 
+        public static readonly RoutedUICommand ImportFromCSVCommand = new RoutedUICommand(
+            "Import from CSV", "Import from CSV", typeof(UICommands));
+
         public static readonly RoutedUICommand MoveWordsToAGroupCommand = new RoutedUICommand(
             "Move selected words to A group", "Move selected words to A group", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Shift) });

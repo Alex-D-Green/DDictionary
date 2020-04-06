@@ -847,7 +847,8 @@ namespace DDictionary.Presentation
                 OverwritePrompt = true,
                 DefaultExt = "csv",
                 Filter = "Csv files (*.csv)|*.csv|All files (*.*)|*.*",
-                FileName = $"{DateTime.Now:yyyy-MM-dd}.csv"
+                FileName = $"{DateTime.Now:yyyy-MM-dd}.csv",
+                Title = PrgResources.ExportToCSVTitle
             };
 
             if(dlg.ShowDialog() != true)
@@ -862,6 +863,50 @@ namespace DDictionary.Presentation
 
                 MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
                     MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+        }
+
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
+        private async void OnImportFromCSVCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog {
+                Multiselect = false,
+                CheckFileExists = true,
+                DefaultExt = "csv",
+                Filter = "Csv files (*.csv)|*.csv|All files (*.*)|*.*",
+                Title = PrgResources.ImportFromCSVTitle
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            try
+            {
+                CsvClause[] records = null;
+
+                using(var reader = new StreamReader(dlg.FileName))
+                using(var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                    records = await csv.GetRecordsAsync<CsvClause>().ToArrayAsync();
+
+                List<string> errors = await dbFacade.BulkAddClausesAsync(records.Select(o => o.MapFromCsvClause()));
+
+                if(errors.Count > 0)
+                { //Show the errors report
+                    var reportDlg = new ReportDlg(PrgResources.CSVImportReportTitle, 
+                        (new[] { PrgResources.ImportErrorsMsg, "" }).Concat(errors)) 
+                            { Owner = this };
+                    
+                    reportDlg.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelyLoaded,
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    await UpdateDataGridAsync();
+                }
             }
             catch(Exception ex)
             { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }

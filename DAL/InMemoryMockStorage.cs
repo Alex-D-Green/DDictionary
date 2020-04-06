@@ -12,6 +12,8 @@ namespace DDictionary.DAL
 {
     public sealed class InMemoryMockStorage: IDBFacade
     {
+        private const StringComparison sc = StringComparison.OrdinalIgnoreCase; //Strings comparison rules
+
 #pragma warning disable CA1822 // Mark members as static
 
         private static readonly List<Clause> clauses = new List<Clause>();
@@ -162,8 +164,6 @@ namespace DDictionary.DAL
             {
                 //HACK: InMemoryMockStorage does not handle placeholders for filtration!
 
-                const StringComparison sc = StringComparison.OrdinalIgnoreCase;
-
                 //Primary search target (the word itself - the beginning is matched), in alphabet order
                 var ret1 = ret.Where(o => o.Word.IndexOf(filter.TextFilter, sc) == 0)
                               .OrderBy(o => o.Word);
@@ -191,6 +191,11 @@ namespace DDictionary.DAL
         public Task<int> GetTotalClausesAsync()
         {
             return Task.FromResult(clauses.Count);
+        }
+
+        public Task<int> GetClauseIdByWord(string word)
+        {
+            return Task.FromResult(clauses.SingleOrDefault(o => String.Equals(o.Word, word, sc))?.Id ?? 0);
         }
 
         public Task<IEnumerable<JustWordDTO>> GetJustWordsAsync()
@@ -357,6 +362,11 @@ namespace DDictionary.DAL
             cl.WatchedCount += 1;
 
             return Task.FromResult(cl.WatchedCount);
+        }
+
+        public Task<List<string>> BulkAddClausesAsync(IEnumerable<Clause> clauses)
+        {
+            throw new NotImplementedException();
         }
 
 #pragma warning restore CA1822 // Mark members as static

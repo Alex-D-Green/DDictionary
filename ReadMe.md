@@ -16,7 +16,7 @@ Todo list for the first version:
 - [x] Remake the relations dialog, "relate to word" should be an edit with autocompletion (and visible translations);
 - [x] Add ability to make relations with the same description among all selected words;
 - [x] Relations in the clause edit dialog should be seen with their descriptions;
-- [ ] Implement CSV import feature;
+- [x] Implement CSV import feature;
 - [ ] Add icons + final strokes on GUI.
 
 ## License
