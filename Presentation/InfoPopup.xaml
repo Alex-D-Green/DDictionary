@@ -9,7 +9,7 @@
         PreviewMouseDown="OnWindow_PreviewMouseDown" PreviewKeyDown="OnWindow_PreviewKeyDown" 
         BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" 
         SizeToContent="WidthAndHeight" >
-    <StackPanel Margin="5">
+    <StackPanel Margin="5" x:Name="mainPanel">
         <DockPanel Margin="0,-5,0,-5">
             <Label x:Name="groupLbl" Content="Group" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Center" 
                FontSize="9" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
@@ -24,7 +24,11 @@
         </StackPanel>
         <Label x:Name="translationsLbl" Content="Translations" HorizontalAlignment="Left" Margin="0,-5,0,0" 
                VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
-        <Label x:Name="relationsLbl" Content="Relations" HorizontalAlignment="Left" Margin="0,-5,0,0" VerticalAlignment="Center" 
-               FontSize="9" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+        <StackPanel x:Name="relTemplatePanel" Orientation="Horizontal" Margin="0,-5,0,0">
+            <Label x:Name="relationLbl" FontSize="9" FontWeight="Bold" Content="relation" 
+                   Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+            <Label x:Name="descriptionLbl" FontSize="9" Margin="-10,0,0,0" Content=" - description" 
+                   Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+        </StackPanel>
     </StackPanel>
 </Window>

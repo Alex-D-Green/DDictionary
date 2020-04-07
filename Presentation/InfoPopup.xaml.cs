@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Markup;
 
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
@@ -41,10 +42,7 @@ namespace DDictionary.Presentation
             dateLbl.Content = String.Format(Properties.Resources.WatchedDateCount, clause.Watched, clause.WatchedCount);
 
             if(String.IsNullOrEmpty(clause.Transcription))
-            {
                 transcriptionLbl.Visibility = Visibility.Hidden;
-                relationsLbl.Height = 0; //To correct row height
-            }
             else
                 transcriptionLbl.Content = $"[{clause.Transcription}]";
 
@@ -53,24 +51,30 @@ namespace DDictionary.Presentation
                 Clause cl = dbFacade.GetClauseByIdAsync(clause.Id).Result;
                 Debug.Assert(cl != null);
 
-                var ret = new StringBuilder("");
-
                 int maxCount = 10;
                 foreach(Relation rl in cl.Relations)
                 {
-                    ret.AppendFormat("{0} - {1}\n", rl.ToClause?.Word, rl.Description);
+                    var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(relTemplatePanel));
+                    copy.Name = null; //To show that it's a new item
+                    copy.Visibility = Visibility.Visible;
+                    copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
+                        dbFacade.GetClauseByIdAsync(rl.ToClause.Id).Result.Translations);
+
+                    var newWordLbl = (Label)copy.FindName(nameof(relationLbl));
+                    newWordLbl.Content = rl.ToClause.Word;
+
+                    var newDescriptionLbl = (Label)copy.FindName(nameof(descriptionLbl));
+                    newDescriptionLbl.Content = $" - {rl.Description}";
+
+                    mainPanel.Children.Insert(mainPanel.Children.IndexOf(relTemplatePanel), copy);
 
                     if(--maxCount == 0)
                         break;
                 }
+            }
 
-                relationsLbl.Content = ret.ToString().TrimEnd('\n');
-            }
-            else
-            {
-                relationsLbl.Visibility = Visibility.Hidden;
-                relationsLbl.Height = 0; //To correct row height
-            }
+            relTemplatePanel.Visibility = Visibility.Hidden;
+            relTemplatePanel.Height = 0; //To correct row height
         }
 
 
