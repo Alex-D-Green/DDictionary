@@ -37,11 +37,11 @@ namespace DDictionary.Presentation
 
         public static readonly RoutedUICommand ClearFilterCommand = new RoutedUICommand(
             "Clear filter", "Clear filter", typeof(UICommands),
-            new InputGestureCollection() { new KeyGesture(Key.C, ModifierKeys.Control) });
+            new InputGestureCollection() { new KeyGesture(Key.F, ModifierKeys.Control) });
 
         public static readonly RoutedUICommand ClearSortingCommand = new RoutedUICommand(
             "Clear sorting", "Clear sorting", typeof(UICommands),
-            new InputGestureCollection() { new KeyGesture(Key.C, ModifierKeys.Alt|ModifierKeys.Control) });
+            new InputGestureCollection() { new KeyGesture(Key.F, ModifierKeys.Alt|ModifierKeys.Control) });
 
         public static readonly RoutedUICommand AddWordCommand = new RoutedUICommand(
             "Add word", "Add word", typeof(UICommands),

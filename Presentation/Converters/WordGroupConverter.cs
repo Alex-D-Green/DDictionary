@@ -13,11 +13,15 @@ namespace DDictionary.Presentation.Converters
         {
             //https://stackoverflow.com/questions/3978937/how-to-pass-an-integer-as-converterparameter
 
-            System.Diagnostics.Debug.Assert(value is WordGroup && targetType == typeof(string));
+            System.Diagnostics.Debug.Assert(value is WordGroup && 
+                                            (targetType == typeof(string) || targetType == typeof(object)));
             System.Diagnostics.Debug.Assert(parameter is null || parameter is bool?);
 
-            return ((bool?)parameter == true) ? ((WordGroup)value).ToFullStr() 
-                                              : ((WordGroup)value).ToGradeStr();
+            if(targetType == typeof(object))
+                return value;
+            else
+                return ((bool?)parameter == true) ? ((WordGroup)value).ToFullStr() 
+                                                  : ((WordGroup)value).ToGradeStr();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

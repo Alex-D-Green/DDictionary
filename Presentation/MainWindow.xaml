@@ -5,11 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDictionary.Presentation"
         xmlns:converters="clr-namespace:DDictionary.Presentation.Converters"
+        xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
         Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200" MouseMove="OnMainWindow_MouseMove"
         PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
+        <collections:ArrayList x:Key="actionMenuItems" x:Shared="False">
+            <MenuItem Header="_Copy" Command="ApplicationCommands.Copy"/>
+            <Separator/>
+            <MenuItem Header="Select _all/Clear selection" Command="local:UICommands.SelectAllCommand"/>
+            <Separator/>
+            <MenuItem Header="Clear _filter" Command="local:UICommands.ClearFilterCommand"/>
+            <MenuItem Header="Clear _sorting" Command="local:UICommands.ClearSortingCommand"/>
+            <Separator/>
+            <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand"/>
+            <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand"/>
+            <MenuItem Header="C_reate multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
+            <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand"/>
+            <Separator/>
+            <MenuItem Header="_Move selected words to">
+                <MenuItem Header="Move words to group _A" Command="local:UICommands.MoveWordsToAGroupCommand"/>
+                <MenuItem Header="Move words to group _B" Command="local:UICommands.MoveWordsToBGroupCommand"/>
+                <MenuItem Header="Move words to group _C" Command="local:UICommands.MoveWordsToCGroupCommand"/>
+                <MenuItem Header="Move words to group _D" Command="local:UICommands.MoveWordsToDGroupCommand"/>
+                <MenuItem Header="Move words to group _E" Command="local:UICommands.MoveWordsToEGroupCommand"/>
+            </MenuItem>
+        </collections:ArrayList>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static local:UICommands.ExitCommand}" Executed="OnExitCommand" />
@@ -40,7 +62,7 @@
         <CommandBinding Command="{x:Static local:UICommands.MoveWordsToDGroupCommand}" Executed="OnMoveWordsToAGroup"
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.MoveWordsToEGroupCommand}" Executed="OnMoveWordsToAGroup"
-                        CanExecute="CommandBinding_CanExecute"/>        
+                        CanExecute="CommandBinding_CanExecute"/>
     </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -86,6 +108,9 @@
                   HeadersVisibility="Column" SelectionMode="Extended" BorderThickness="1" IsReadOnly="True"
                   AutoGenerateColumns="False" SelectionChanged="OnMainDataGrid_SelectionChanged" 
                   LayoutUpdated="OnMainDataGrid_LayoutUpdated" Hyperlink.Click="OnMainDataGrid_HyperlinkClick">
+            <DataGrid.ContextMenu>
+                <ContextMenu ItemsSource="{StaticResource actionMenuItems}"/>
+            </DataGrid.ContextMenu>
             <DataGrid.Resources>
                 <Style x:Key="ColumnElementStyle" TargetType="TextBlock">
                     <Setter Property="Padding" Value="7,2,7,2" />
@@ -222,25 +247,7 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
             </MenuItem>
-            <MenuItem Header="_Actions">
-                <MenuItem Header="Select _all/Clear selection" Command="local:UICommands.SelectAllCommand"/>
-                <Separator/>
-                <MenuItem Header="Clear _filter" Command="local:UICommands.ClearFilterCommand"/>
-                <MenuItem Header="Clear _sorting" Command="local:UICommands.ClearSortingCommand"/>
-                <Separator/>
-                <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand"/>
-                <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand"/>
-                <MenuItem Header="_Create multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
-                <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand"/>
-                <Separator/>
-                <MenuItem Header="_Move selected words to">
-                    <MenuItem Header="Move words to group _A" Command="local:UICommands.MoveWordsToAGroupCommand"/>
-                    <MenuItem Header="Move words to group _B" Command="local:UICommands.MoveWordsToBGroupCommand"/>
-                    <MenuItem Header="Move words to group _C" Command="local:UICommands.MoveWordsToCGroupCommand"/>
-                    <MenuItem Header="Move words to group _D" Command="local:UICommands.MoveWordsToDGroupCommand"/>
-                    <MenuItem Header="Move words to group _E" Command="local:UICommands.MoveWordsToEGroupCommand"/>
-                </MenuItem>
-            </MenuItem>
+            <MenuItem Header="_Actions" ItemsSource="{StaticResource actionMenuItems}"/>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
                 <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand"/>
                 <MenuItem Header="Online _help" Command="local:UICommands.OnlineHelpCommand"/>
