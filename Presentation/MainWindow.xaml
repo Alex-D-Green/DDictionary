@@ -12,17 +12,41 @@
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
         <collections:ArrayList x:Key="actionMenuItems" x:Shared="False">
-            <MenuItem Header="_Copy" Command="ApplicationCommands.Copy"/>
+            <MenuItem Header="_Copy" Command="ApplicationCommands.Copy">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/4498062351543238871-128.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
-            <MenuItem Header="Select _all/Clear selection" Command="local:UICommands.SelectAllCommand"/>
+            <MenuItem Header="Select _all/Clear selection" Command="local:UICommands.SelectAllCommand">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/20429544391543238900-128.png"/>
+                </MenuItem.Icon>                
+            </MenuItem>
             <Separator/>
             <MenuItem Header="Clear _filter" Command="local:UICommands.ClearFilterCommand"/>
             <MenuItem Header="Clear _sorting" Command="local:UICommands.ClearSortingCommand"/>
             <Separator/>
-            <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand"/>
-            <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand"/>
-            <MenuItem Header="C_reate multirelation..." Command="local:UICommands.CreateMultirelationCommand"/>
-            <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand"/>
+            <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/6362561671543238881-128.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="_Edit word relations" Command="local:UICommands.EditRelationsCommand">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/19101184011543238918-128.png"/>
+                </MenuItem.Icon>                
+            </MenuItem>
+            <MenuItem Header="C_reate multirelation..." Command="local:UICommands.CreateMultirelationCommand">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/19101184011543238918-128.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem Header="_Delete selected words" Command="local:UICommands.DeleteWordsCommand">
+                <MenuItem.Icon>
+                    <Image Source="/DDictionary;component/Icons/20407009431543238936-128.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
             <MenuItem Header="_Move selected words to">
                 <MenuItem Header="Move words to group _A" Command="local:UICommands.MoveWordsToAGroupCommand"/>
@@ -72,9 +96,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Margin="0" LastChildFill="False" Grid.Row="1">
-            <Button x:Name="selectAllBtn" Content="" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
+            <Button x:Name="selectAllBtn" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
                     TabIndex="1" ToolTip="Select all rows or clear selection" Command="local:UICommands.SelectAllCommand"
-                    BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"/>
+                    BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}">
+                <Image Source="../Icons/20429544391543238900-128.png"/>
+            </Button>
             <TextBox x:Name="textFilterEdit" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                      Height="22" TabIndex="2" 
                      ToolTip="Enter substring for filtration (use the underscore as a symbol placeholder)" 
@@ -92,17 +118,23 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Button x:Name="clearFilterBtn" Content="X" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
-                    TabIndex="4" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click"/>
+            <Button x:Name="clearFilterBtn" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
+                    TabIndex="4" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click">
+                <Image Source="../Icons/4177409791543238955-128.png"/>
+            </Button>
             <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                       DockPanel.Dock="Right" Height="22" TabIndex="7" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
                       DropDownClosed="OnToGroupCBox_DropDownClosed" ToolTip="Move selected words to the group"/>
-            <Button x:Name="deleteBtn" Content="Delete" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" 
+            <Button x:Name="deleteBtn" Width="22" HorizontalAlignment="Left" VerticalAlignment="Center" 
                     Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6"  
-                    ToolTip="Delete selected clauses" Command="local:UICommands.DeleteWordsCommand"/>
-            <Button Content="Add word" Width="75" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
+                    ToolTip="Delete selected clauses" Command="local:UICommands.DeleteWordsCommand">
+                <Image Source="/DDictionary;component/Icons/20407009431543238936-128.png"/>
+            </Button>
+            <Button Width="22" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                     DockPanel.Dock="Right" Height="22" TabIndex="5" Command="local:UICommands.AddWordCommand"
-                    ToolTip="Add new clause to the dictionary"/>
+                    ToolTip="Add new clause to the dictionary">
+                <Image Source="/DDictionary;component/Icons/6362561671543238881-128.png"/>
+            </Button>
         </DockPanel>
         <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 
                   HeadersVisibility="Column" SelectionMode="Extended" BorderThickness="1" IsReadOnly="True"
@@ -150,7 +182,8 @@
                                         MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Click="PlaySoundButton_Click" Content="Play">
+                            <Button Click="PlaySoundButton_Click" ToolTip="Play sound">
+                                <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Height="16"/>
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="IsEnabled" Value="True"/>
@@ -181,13 +214,14 @@
                                     ElementStyle="{StaticResource ColumnElementStyle}" FontSize="9" 
                                     MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
                 <DataGridHyperlinkColumn x:Name="mainDataGridRelationsColumn" Binding="{Binding Relations}" Header="Relations" 
-                                         ElementStyle="{StaticResource ColumnElementStyle}" 
+                                         ElementStyle="{StaticResource ColumnElementStyle}"
                                          MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
                 <DataGridTemplateColumn x:Name="mainDataGridShowRelationsColumn" CanUserSort="False" Header="Show relations" 
                                         MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Click="ShowRelationsButton_Click" Content="Show relations">
+                            <Button Click="ShowRelationsButton_Click" ToolTip="Show relations">
+                                <Image Source="/DDictionary;component/Icons/19101184011543238918-128.png" Height="16"/>
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}">
                                         <Setter Property="IsEnabled" Value="True"/>
@@ -243,14 +277,26 @@
                 <MenuItem Header="_Export shown words into CSV..." Command="local:UICommands.ExportToCSVCommand"/>
                 <MenuItem Header="_Import words from CSV..." Command="local:UICommands.ImportFromCSVCommand"/>
                 <Separator/>
-                <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand"/>
+                <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand">
+                    <MenuItem.Icon>
+                        <Image Source="/DDictionary;component/Icons/12040721761543238917-128.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
             </MenuItem>
             <MenuItem Header="_Actions" ItemsSource="{StaticResource actionMenuItems}"/>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
-                <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand"/>
-                <MenuItem Header="Online _help" Command="local:UICommands.OnlineHelpCommand"/>
+                <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand">
+                    <MenuItem.Icon>
+                        <Image Source="/DDictionary;component/Icons/17364432941543238894-128.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Online _help" Command="local:UICommands.OnlineHelpCommand">
+                    <MenuItem.Icon> 
+                        <Image Source="/DDictionary;component/Icons/20136677451543238895-128.png"/> 
+                    </MenuItem.Icon>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="_About DDictionary..." Command="local:UICommands.AboutCommand"/>
             </MenuItem>

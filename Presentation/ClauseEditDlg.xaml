@@ -18,19 +18,26 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <DockPanel Grid.Row="0">
-            <Button x:Name="scrollLeftBtn" Content="←" Width="30" Height="30" VerticalAlignment="Top" FontSize="16" 
-                    Margin="5" TabIndex="10" Click="OnScrollBtn_Click"/>
-            <Button x:Name="scrollRightBtn" Content="→" Width="30" Height="30" DockPanel.Dock="Right" VerticalAlignment="Top" 
-                    FontSize="16" Margin="5" TabIndex="11" Click="OnScrollBtn_Click"/>
+            <Button x:Name="scrollLeftBtn" Width="30" Height="30" VerticalAlignment="Top" FontSize="16" 
+                    Margin="5" TabIndex="10" Click="OnScrollBtn_Click">
+                <Image Source="/DDictionary;component/Icons/12150104031543238866-128.png"/>
+            </Button>
+            <Button x:Name="scrollRightBtn" Width="30" Height="30" DockPanel.Dock="Right" VerticalAlignment="Top" 
+                    FontSize="16" Margin="5" TabIndex="11" Click="OnScrollBtn_Click">
+                <Image Source="/DDictionary;component/Icons/15129603211543238866-128.png"/>
+            </Button>
             <StackPanel Margin="0,15">
                 <ComboBox x:Name="groupCBox" Width="150" Margin="5" TabIndex="20" SelectionChanged="OnSomeDataWasChanged"/>
                 <TextBox x:Name="wordEdit" Text="Word" HorizontalAlignment="Center" Margin="5" FontSize="16" FontWeight="Bold" 
                          TextAlignment="Center" Padding="15,5" TabIndex="21" TextChanged="OnSomeDataWasChanged" 
                          MaxLength="{x:Static DDictionary:Constrains.MaxWordLength}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                    <Button Content="#" Padding="5,2" TabIndex="22" Click="OnSoundRefBtn_Click"/>
-                    <Button x:Name="playBtn" Content="Play" Padding="10,2" Margin="0,0,5,0" TabIndex="23" 
-                            Click="OnPlayBtn_Click"/>
+                    <Button Padding="5,2" TabIndex="22" Click="OnSoundRefBtn_Click" ToolTip="Link a file">
+                        <Image Source="/DDictionary;component/Icons/4540339651543238899-128.png" Height="16" />
+                    </Button>
+                    <Button x:Name="playBtn" Padding="5,2" Margin="0,0,5,0" TabIndex="23" Click="OnPlayBtn_Click">
+                        <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Height="16" Width="16"/>
+                    </Button>
                     <TextBox x:Name="transcriptionEdit" Text="Transcription" Padding="10,2" TabIndex="24" 
                              TextChanged="OnSomeDataWasChanged" 
                              MaxLength="{x:Static DDictionary:Constrains.MaxTranscriptionLength}"/>
@@ -39,11 +46,17 @@
         </DockPanel>
         <StackPanel x:Name="translationsPanel" Grid.Row="1" Margin="0,10" VerticalAlignment="Center">
             <DockPanel x:Name="translationRow" Margin="5,0,5,5" HorizontalAlignment="Center">
-                <Button x:Name="trUpBtn" Content="↑" Padding="5,2" TabIndex="50"/>
-                <Button x:Name="trDownBtn" Content="↓" Padding="5,2" TabIndex="51"/>
+                <Button x:Name="trUpBtn" Padding="2" TabIndex="50">
+                    <Image Source="/DDictionary;component/Icons/16637225141543238859-128.png" Height="16" Width="16"/>
+                </Button>
+                <Button x:Name="trDownBtn" Padding="2" TabIndex="51">
+                    <Image Source="/DDictionary;component/Icons/3873060771543238855-128.png" Height="16" Width="16"/>
+                </Button>
                 <TextBlock x:Name="translationLbl" Text="Translation (part)" Margin="15,0" Padding="2" 
                            Foreground="Blue" TextDecorations="Underline" Cursor="Hand" />
-                <Button x:Name="trRemoveBtn" Content="X" Padding="5,2" TabIndex="52"/>
+                <Button x:Name="trRemoveBtn" Padding="2" TabIndex="52">
+                    <Image Source="/DDictionary;component/Icons/4177409791543238955-128.png" Height="16" Width="16"/>
+                </Button>
             </DockPanel>
             <Button x:Name="addTranslationBtn" Content="Add translation" HorizontalAlignment="Center" Margin="5" Padding="15,2" 
                     TabIndex="200" Click="OnAddTranslationBtn_Click"/>
@@ -53,12 +66,18 @@
                      TabIndex="201" TextChanged="OnSomeDataWasChanged"
                      MaxLength="{x:Static DDictionary:Constrains.MaxContextLength}"/>
             <DockPanel Margin="0,15,0,0">
-                <Button x:Name="deleteClauseBtn" Content="Delete" Width="60" Padding="2" TabIndex="300" 
-                        Click="OnDeleteClauseBtn_Click" ToolTip="Hold Ctrl to suppress confirmation"/>
-                <Button x:Name="saveClauseBtn" Content="Save" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="302"
-                        Click="OnSaveClauseBtn_Click"/>
-                <Button x:Name="newClauseBtn" Content="New" Width="60" DockPanel.Dock="Right" Padding="2" TabIndex="301"
-                        Click="OnNewClauseBtn_Click"/>
+                <Button x:Name="deleteClauseBtn" Padding="2" TabIndex="300" Width="30" Height="30"
+                        Click="OnDeleteClauseBtn_Click" ToolTip="Delete the clause (hold Ctrl to suppress confirmation)">
+                    <Image Source="/DDictionary;component/Icons/20407009431543238936-128.png"/>
+                </Button>
+                <Button x:Name="saveClauseBtn" Width="30" Height="30" DockPanel.Dock="Right" Padding="2" TabIndex="302"
+                        Click="OnSaveClauseBtn_Click" ToolTip="Save changes">
+                    <Image Source="/DDictionary;component/Icons/18769148821543238916-128.png"/>
+                </Button>
+                <Button x:Name="newClauseBtn" Width="30" Height="30" DockPanel.Dock="Right" Padding="2" TabIndex="301"
+                        Click="OnNewClauseBtn_Click" ToolTip="Add new clause to the dictionary">
+                    <Image Source="/DDictionary;component/Icons/6362561671543238881-128.png"/>
+                </Button>
             </DockPanel>
         </StackPanel>
         <StackPanel x:Name="relationsPanel" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"

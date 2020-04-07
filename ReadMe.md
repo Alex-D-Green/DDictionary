@@ -17,8 +17,10 @@ Todo list for the first version:
 - [x] Add ability to make relations with the same description among all selected words;
 - [x] Relations in the clause edit dialog should be seen with their descriptions;
 - [x] Implement CSV import feature;
-- [ ] Add icons + final strokes on GUI.
+- [x] Add icons + final strokes on GUI.
 
 ## License
 
 See the [LICENSE](LICENSE) file for license rights and limitations (Apache 2.0).
+
+Icons from [https://freeicons.io/](https://freeicons.io/)

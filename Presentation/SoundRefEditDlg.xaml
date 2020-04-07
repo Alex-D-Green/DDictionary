@@ -9,14 +9,18 @@
         WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight">
     <StackPanel Margin="5">
         <DockPanel Margin="10">
-            <Button x:Name="playBtn" Content="Play" TabIndex="10" Padding="5,2" Margin="0,0,5,0" 
-                    Click="OnPlayBtn_Click"/>
-            <Button x:Name="refreshBtn"  Content="Refresh" TabIndex="11" Padding="5,2" Margin="0,0,5,0" 
-                    Click="OnRefreshBtn_Click"/>
+            <Button x:Name="playBtn" TabIndex="10" Padding="5,2" Margin="0,0,5,0" Click="OnPlayBtn_Click">
+                <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Height="16" Width="16"/>
+            </Button>
+            <Button x:Name="refreshBtn" TabIndex="11" Padding="5,2" Margin="0,0,5,0" Click="OnRefreshBtn_Click">
+                <Image Source="/DDictionary;component/Icons/18635412531543238915-128.png" Height="16" Width="16"/>
+            </Button>
             <Button x:Name="localBtn" DockPanel.Dock="Right" Content="Browse local" TabIndex="14" Padding="5,2"
                     Click="OnLocalBtn_Click"/>
-            <Button x:Name="clearBtn" DockPanel.Dock="Right" Content="X" TabIndex="13" Padding="5,2" Margin="0,0,5,0"
-                    Click="OnClearBtn_Click"/>
+            <Button x:Name="clearBtn" DockPanel.Dock="Right" TabIndex="13" Padding="5,2" Margin="0,0,5,0" 
+                    Click="OnClearBtn_Click">
+                <Image Source="/DDictionary;component/Icons/4177409791543238955-128.png" Height="16" Width="16"/>
+            </Button>
             <TextBox x:Name="refEdit" Text="Ref" TabIndex="12" VerticalAlignment="Center" Padding="5,2" Margin="0,0,5,0"
                      MaxLength="{x:Static DDictionary:Constrains.MaxSoundUriLength}"/>
         </DockPanel>

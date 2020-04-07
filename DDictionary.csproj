@@ -227,6 +227,63 @@
   <ItemGroup>
     <Resource Include="Icon\DDictionary.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\6362561671543238881-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\4177409791543238955-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\20429544391543238900-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\20407009431543238936-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\4623858101543238953-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\19101184011543238918-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\12150104031543238866-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\15129603211543238866-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\4540339651543238899-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\16637225141543238859-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\3873060771543238855-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\18769148821543238916-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\18635412531543238915-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\117199341543238913-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\10079683381543238899-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\20136677451543238895-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\17364432941543238894-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\12040721761543238917-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\4498062351543238871-128.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

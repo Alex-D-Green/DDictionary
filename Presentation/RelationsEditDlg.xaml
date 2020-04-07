@@ -17,7 +17,9 @@
         <DockPanel x:Name="relationRow"  Margin="5,0">
             <Label x:Name="toWordLbl" Content="To word" Margin="5" Width="150" HorizontalContentAlignment="Right" 
                    VerticalContentAlignment="Center"/>
-            <Button x:Name="removeBtn" Content="Remove" Margin="5" Width="100" Height="22" DockPanel.Dock="Right" TabIndex="2" />
+            <Button x:Name="removeBtn" Margin="5" Height="22" DockPanel.Dock="Right" Padding="5,2" TabIndex="2">
+                <Image Source="/DDictionary;component/Icons/4177409791543238955-128.png" Height="16" Width="16"/>
+            </Button>
             <TextBox x:Name="descrTBox" Text="" Margin="5" Height="22" TabIndex="1" VerticalContentAlignment="Center"/>
         </DockPanel>
         <DockPanel Margin="5,0,5,5" x:Name="addNewRelationPanel">
@@ -37,11 +39,15 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <CheckBox x:Name="interconnectedCheck" Content="⇆" Margin="5" Width="30" DockPanel.Dock="Right" TabIndex="1004" 
-                      VerticalAlignment="Center" ToolTip="Add backward relation with the same description as well" 
-                      IsChecked="True" />            
-            <Button x:Name="addRelationBtn" Content="Add" Margin="5" Width="60" Height="22" DockPanel.Dock="Right" 
-                    TabIndex="1003" IsEnabled="False" Click="OnAddRelationBtn_Click" />
+            <CheckBox x:Name="interconnectedCheck" Margin="5" DockPanel.Dock="Right" TabIndex="1004" Padding="5,0" 
+                      ToolTip="Add backward relation with the same description as well" 
+                      IsChecked="True" VerticalAlignment="Center">
+                <Image Source="/DDictionary;component/Icons/10079683381543238899-128.png" Height="16" Width="16"/>
+            </CheckBox>
+            <Button x:Name="addRelationBtn" Margin="5" DockPanel.Dock="Right" TabIndex="1003" IsEnabled="False" Padding="5,2"
+                    Click="OnAddRelationBtn_Click">
+                <Image Source="/DDictionary;component/Icons/117199341543238913-128.png" Height="16" Width="16"/>
+            </Button>
             <TextBox x:Name="newRelationDescrTBox" Text="" Margin="5" Height="22" VerticalContentAlignment="Center" 
                      TabIndex="1002" TextChanged="OnNewRelationDescrTBox_TextChanged"
                      MaxLength="{x:Static DDictionary:Constrains.MaxRelationDescLength}" />
