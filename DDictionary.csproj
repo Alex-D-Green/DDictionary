@@ -92,6 +92,7 @@
     <Compile Include="Presentation\AboutProgramDlg.xaml.cs">
       <DependentUpon>AboutProgramDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\BootstrapHTMLPublisher.cs" />
     <Compile Include="Presentation\ClauseEditDlg.xaml.cs">
       <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
     </Compile>

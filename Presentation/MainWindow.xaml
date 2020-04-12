@@ -76,6 +76,8 @@
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.ExportToCSVCommand}" Executed="OnExportToCSVCommand"
                         CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.ExportToHtmlCommand}" Executed="OnExportToHtmlCommand"
+                        CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.ImportFromCSVCommand}" Executed="OnImportFromCSVCommand"/>
         <CommandBinding Command="{x:Static local:UICommands.MoveWordsToAGroupCommand}" Executed="OnMoveWordsToAGroup"
                         CanExecute="CommandBinding_CanExecute"/>
@@ -275,6 +277,8 @@
             </Menu.ItemsPanel>
             <MenuItem Header="_File">
                 <MenuItem Header="_Export shown words into CSV..." Command="local:UICommands.ExportToCSVCommand"/>
+                <MenuItem Header="Export shown words into _Html..." Command="local:UICommands.ExportToHtmlCommand"/>
+                <Separator/>
                 <MenuItem Header="_Import words from CSV..." Command="local:UICommands.ImportFromCSVCommand"/>
                 <Separator/>
                 <MenuItem Header="_Settings..." Command="local:UICommands.SettingsCommand">

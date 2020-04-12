@@ -151,6 +151,9 @@
   <data name="ExportToCSVTitle" xml:space="preserve">
     <value>Export shown words to a CSV file</value>
   </data>
+  <data name="ExportToHtmlTitle" xml:space="preserve">
+    <value>Export shown words to a Html file</value>
+  </data>
   <data name="FileNotFoundError" xml:space="preserve">
     <value>File "{0}" not found!</value>
   </data>

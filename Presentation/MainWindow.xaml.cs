@@ -912,6 +912,40 @@ namespace DDictionary.Presentation
             { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
+        private async void OnExportToHtmlCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(!currentFilter.Empty &&
+               MessageBox.Show(this, PrgResources.FilterIsActivated, PrgResources.QuestionCaption,
+                   MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.Cancel)
+                return;
+
+            var dlg = new SaveFileDialog {
+                OverwritePrompt = true,
+                DefaultExt = "html",
+                Filter = "Html files (*.html)|*.html|All files (*.*)|*.*",
+                FileName = $"{DateTime.Now:yyyy-MM-dd}.html",
+                Title = PrgResources.ExportToHtmlTitle
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            try
+            {
+                using(var writer = new StreamWriter(dlg.FileName))
+                {
+                    writer.Write(BootstrapHTMLPublisher.Publish($"{DateTime.Now:yyyy-MM-dd}", 
+                        await dbFacade.GetClausesAsync(currentFilter)));
+                }
+
+                MessageBox.Show(this, dlg.FileName, PrgResources.FileWasSuccessivelySaved,
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+        }
+
         private async void OnMoveWordsToAGroup(object sender, ExecutedRoutedEventArgs e)
         {
             if(e.Command == UICommands.MoveWordsToAGroupCommand)
@@ -939,7 +973,7 @@ namespace DDictionary.Presentation
             if(e.Command == UICommands.DeleteWordsCommand)
                 e.CanExecute = (mainDataGrid?.SelectedItems?.Count > 0);
 
-            if(e.Command == UICommands.ExportToCSVCommand)
+            if(e.Command == UICommands.ExportToCSVCommand || e.Command == UICommands.ExportToHtmlCommand)
                 e.CanExecute = (mainDataGrid?.Items?.Count > 0);
 
             if(e.Command == UICommands.MoveWordsToAGroupCommand || e.Command == UICommands.MoveWordsToBGroupCommand ||

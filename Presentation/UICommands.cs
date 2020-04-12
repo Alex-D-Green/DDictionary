@@ -58,6 +58,9 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand ExportToCSVCommand = new RoutedUICommand(
             "Export to CSV", "Export to CSV", typeof(UICommands));
 
+        public static readonly RoutedUICommand ExportToHtmlCommand = new RoutedUICommand(
+            "Export to Html", "Export to Html", typeof(UICommands));
+
         public static readonly RoutedUICommand ImportFromCSVCommand = new RoutedUICommand(
             "Import from CSV", "Import from CSV", typeof(UICommands));
 

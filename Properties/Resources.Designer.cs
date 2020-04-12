@@ -155,6 +155,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export shown words to a Html file.
+        /// </summary>
+        internal static string ExportToHtmlTitle {
+            get {
+                return ResourceManager.GetString("ExportToHtmlTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File &quot;{0}&quot; not found!.
         /// </summary>
         internal static string FileNotFoundError {
