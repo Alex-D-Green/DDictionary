@@ -6,7 +6,7 @@
         xmlns:DDictionary="clr-namespace:DDictionary"
         mc:Ignorable="d"
         Title="Clause editing" MinWidth="380" MaxWidth="800" WindowStartupLocation="CenterOwner" 
-        SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False">
+        SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False" KeyDown="OnWindow_KeyDown">
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

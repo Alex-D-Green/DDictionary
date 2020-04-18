@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 
-using DDictionary.DAL;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
@@ -78,12 +77,6 @@ namespace DDictionary.Presentation
                 CreateNewClause();
 
             InitializeComponent();
-
-            PreviewKeyDown += (s, e) =>
-            { //To close dialog by Escape key (cuz this dialog has no Cancel button)
-                if(e.Key == Key.Escape)
-                    Close();
-            };
 
             //ComboBox with groups initialization
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
@@ -690,6 +683,24 @@ namespace DDictionary.Presentation
             ClearWindow();
             LoadClauseData(clausesIdsLst[idx < clausesIdsLst.Count ? idx : clausesIdsLst.Count-1]);
             UpdateWindowInfo();
+        }
+
+        private void OnWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch(e.Key)
+            {
+                case Key.Escape: Close(); break; //To close dialog by Escape key
+
+                case Key.Left: 
+                    if(scrollLeftBtn.IsEnabled)
+                        OnScrollBtn_Click(scrollLeftBtn, null); 
+                    break;
+
+                case Key.Right:
+                    if(scrollRightBtn.IsEnabled)
+                        OnScrollBtn_Click(scrollRightBtn, null);
+                    break;
+            }
         }
     }
 }
