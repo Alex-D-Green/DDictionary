@@ -5,7 +5,9 @@ This is a simple WPF based program to manage the personal dictionary for those w
 The key features of the program is:
   - Customizable relations between the words (for better memorizing);
   - Advanced filtration & search;
-  - Ranging words by groups depending on how well they are known.
+  - Ranging words by groups depending on how well they are known;
+  - Import/Export through the CSV format;
+  - Trainings to memorize words.
 
 ## License
 

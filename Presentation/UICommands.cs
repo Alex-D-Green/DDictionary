@@ -83,5 +83,10 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand MoveWordsToEGroupCommand = new RoutedUICommand(
             "Move selected words to E group", "Move selected words to E group", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.E, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand TranslationWordTestCommand = new RoutedUICommand(
+            "Translation - Word test", "Translation - Word test", typeof(UICommands), 
+            new InputGestureCollection() { new KeyGesture(Key.F1, ModifierKeys.Control) });
+
     }
 }
