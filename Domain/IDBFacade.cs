@@ -48,7 +48,7 @@ namespace DDictionary.Domain
         /// <summary>
         /// Check if the word exists in the dictionary, if so returns its Id otherwise returns <c>0</c>.
         /// </summary>
-        Task<int> GetClauseIdByWord(string word);
+        Task<int> GetClauseIdByWordAsync(string word);
 
         /// <summary>
         /// Add or update clause data. If the id of the <paramref name="clause"/> equals 0 then a new 

@@ -193,7 +193,7 @@ namespace DDictionary.DAL
             return Task.FromResult(clauses.Count);
         }
 
-        public Task<int> GetClauseIdByWord(string word)
+        public Task<int> GetClauseIdByWordAsync(string word)
         {
             return Task.FromResult(clauses.SingleOrDefault(o => String.Equals(o.Word, word, sc))?.Id ?? 0);
         }

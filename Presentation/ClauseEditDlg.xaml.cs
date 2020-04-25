@@ -46,7 +46,7 @@ namespace DDictionary.Presentation
         private readonly List<int> watchedClauses = new List<int>();
 
 
-        /// <summary>The editing clause (<c>null</c> for new one).</summary>
+        /// <summary>The editing clause.</summary>
         private Clause clause;
 
         /// <summary>The count of translations in the dialog.</summary>
@@ -132,6 +132,19 @@ namespace DDictionary.Presentation
         /// </summary>
         private void OnSomeDataWasChanged(object sender, EventArgs e)
         {
+            ChangesHaveBeenMade();
+        }
+
+        private async void OnWordEdit_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int check = await dbFacade.GetClauseIdByWordAsync(wordEdit.Text);
+
+            if(check != 0 && check != clause.Id)
+            { //User notification that this word presents in the dictionary already
+                MessageBox.Show(this, String.Format(PrgResources.WordAlreadyPresents, wordEdit.Text),
+                    PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
             ChangesHaveBeenMade();
         }
 
@@ -587,6 +600,16 @@ namespace DDictionary.Presentation
                 Transcription = transcriptionEdit.Text,
                 Word = wordEdit.Text
             };
+
+            int check = await dbFacade.GetClauseIdByWordAsync(clauseDTO.Word);
+
+            if(check != 0 && check != clauseDTO.Id)
+            {
+                MessageBox.Show(this, String.Format(PrgResources.WordAlreadyPresents, clauseDTO.Word), 
+                    PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                return; //Can't save it
+            }
 
             clause.Id = await dbFacade.AddOrUpdateClauseAsync(clauseDTO, 
                 !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data

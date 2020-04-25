@@ -110,6 +110,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Correct: {0}.
+        /// </summary>
+        internal static string CorrectLabel {
+            get {
+                return ResourceManager.GetString("CorrectLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some errors occurred during import.
         /// </summary>
         internal static string CSVImportReportTitle {
@@ -202,11 +211,29 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Finish.
+        /// </summary>
+        internal static string FinishLabel {
+            get {
+                return ResourceManager.GetString("FinishLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move these {1} selected clause[s] to the group &quot;{0}&quot;?.
         /// </summary>
         internal static string GroupChangeConfirmation {
             get {
                 return ResourceManager.GetString("GroupChangeConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I don&apos;t know.
+        /// </summary>
+        internal static string IDontKnowLabel {
+            get {
+                return ResourceManager.GetString("IDontKnowLabel", resourceCulture);
             }
         }
         
@@ -234,6 +261,35 @@ namespace DDictionary.Properties {
         internal static string InformationCaption {
             get {
                 return ResourceManager.GetString("InformationCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mistakes: {0}.
+        /// </summary>
+        internal static string MistakesLabel {
+            get {
+                return ResourceManager.GetString("MistakesLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next question.
+        /// </summary>
+        internal static string NextQuestionLabel {
+            get {
+                return ResourceManager.GetString("NextQuestionLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t start the training, not enough words.
+        ///
+        ///Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for training..
+        /// </summary>
+        internal static string NotEnoughWords {
+            get {
+                return ResourceManager.GetString("NotEnoughWords", resourceCulture);
             }
         }
         
@@ -418,11 +474,29 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Right answers: {0} out of {1} ({2}%).
+        /// </summary>
+        internal static string RightTestAnswers {
+            get {
+                return ResourceManager.GetString("RightTestAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select a sound file for the word.
         /// </summary>
         internal static string SelectSoundFileTitle {
             get {
                 return ResourceManager.GetString("SelectSoundFileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show the options.
+        /// </summary>
+        internal static string ShowTheOptionsLabel {
+            get {
+                return ResourceManager.GetString("ShowTheOptionsLabel", resourceCulture);
             }
         }
         
@@ -486,6 +560,15 @@ namespace DDictionary.Properties {
         internal static string WGWellKnown {
             get {
                 return ResourceManager.GetString("WGWellKnown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Word &quot;{0}&quot; already presents in the dictionary..
+        /// </summary>
+        internal static string WordAlreadyPresents {
+            get {
+                return ResourceManager.GetString("WordAlreadyPresents", resourceCulture);
             }
         }
         
