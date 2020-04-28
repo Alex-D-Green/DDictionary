@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
-using System.Windows.Media;
 
-using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
@@ -23,163 +20,44 @@ namespace DDictionary.Presentation.Testing
     /// <summary>
     /// Interaction logic for TranslationWordDlg.xaml
     /// </summary>
-    public partial class TranslationWordDlg: Window
+    public partial class TranslationWordDlg: SelectiveTestDlgBase
     {
-        #region Internal types
-
-        private enum ButtonDecoration
-        {
-            ResetDecoration,
-            UserRightAnswer,
-            UserWrongAnswer,
-            RightAnswer
-        }
-
-        private enum CurrentAction
-        {
-            HidingAnswers,
-            WaitingForUserAnswer,
-            ShowingRoundResult
-        }
-
-        #endregion
-
-
         private const bool hideOptions = true; //TODO: Add option in the settings.
 
 
-        /// <summary>Random generator for this training.</summary>
-        private readonly Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
-
-        /// <summary>The answers given during the test by the user.</summary>
-        private readonly List<TestAnswer> answers = new List<TestAnswer>();
+        protected override Button actionButton { get => actionBtn; }
 
 
-        /// <summary>The list of available for training clauses' ids.</summary>
-        private IList<int> clausesIdsLst;
-
-        /// <summary>All words in the dictionary, sorted by alphabet.</summary>
-        private JustWordDTO[] allWords;
-
-        /// <summary>The index of the current round.</summary>
-        private int currentRound;
-        
-        /// <summary>Ids of the words that were selected for this training session.</summary>
-        private IList<int> wordsForTraining;
-
-        /// <summary>The right answer for this round.</summary>
-        private Clause rightAnswerForRound;
-
-        /// <summary>Current action.</summary>
-        private CurrentAction currentAction;
-
-        /// <summary>Time since the beginning of the try.</summary>
-        private DateTime answerTime;
-
-
-        /// <summary>Total rounds in the training considering amount of available words.</summary>
-        public int TotalRounds 
-        { get => clausesIdsLst.Count > MaxRounds ? MaxRounds : clausesIdsLst.Count; }
-
-        public int AnswersPerRound { get; } = 5;
-
-        public int MaxRounds { get; } = 10;
-
-        /// <summary>The object to work with data storage.</summary>
-        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
-
-        /// <summary>The brush to highlight error answers.</summary>
-        private Brush errorBrush { get; }
-
-        /// <summary>The brush to highlight correct answers.</summary>
-        private Brush correctBrush { get; }
-
-
-        public TranslationWordDlg(IList<int> clausesIdsLst)
+        public TranslationWordDlg(IList<int> clausesForTrainingList)
+            : base(clausesForTrainingList)
         {
-            if(clausesIdsLst is null)
-                throw new ArgumentNullException(nameof(clausesIdsLst));
+            if(clausesForTrainingList is null)
+                throw new ArgumentNullException(nameof(clausesForTrainingList));
 
-            this.clausesIdsLst = clausesIdsLst;
 
             InitializeComponent();
-
-            errorBrush = Resources["ErrorBrush"] as Brush ??
-                new SolidColorBrush(Colors.Coral);
-
-            correctBrush = Resources["CorrectBrush"] as Brush ??
-                new SolidColorBrush(Colors.LightGreen);
-
-            Activated += OnRelationsEditDlg_Activated; //To auto start training when form will be shown
         }
 
 
-        /// <summary>
-        /// Auto start of the training.
-        /// </summary>
-        private async void OnRelationsEditDlg_Activated(object sender, EventArgs e)
-        {
-            Activated -= OnRelationsEditDlg_Activated; //Not need to replay
-
-            await StartTrainingAsync();
-        }
-
-        private async Task StartTrainingAsync()
-        {
-            answers.Clear();
-            
-            int total = await dbFacade.GetTotalClausesAsync();
-
-            //Conditions checking
-            if(total < AnswersPerRound || clausesIdsLst.Count < 1)
-            {
-                Hide();
-
-                MessageBox.Show(this, String.Format(PrgResources.NotEnoughWords, AnswersPerRound, 1),
-                    PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
-
-                Close(); //Can't start training
-                return;
-            }
-
-            //Initializing
-            currentRound = 0;
-            wordsForTraining = GetWordsForTraining(TotalRounds);
-
-            await NextRoundAsync();
-        }
-
-        private async Task NextRoundAsync()
+        protected override async Task NextRoundAsync()
         {
             //Preparations for the round
-            rightAnswerForRound = await dbFacade.GetClauseByIdAsync(wordsForTraining[currentRound]);
+            currentAction = hideOptions ? CurrentAction.HidingAnswers : CurrentAction.WaitingForUserAnswer;
 
-            IList<Clause> answers = await GetAnswersForWordAsync(rightAnswerForRound, AnswersPerRound);
-            answers.Insert(random.Next(AnswersPerRound), rightAnswerForRound);
+            await base.NextRoundAsync();
+
+            IList<Clause> answersForRound = await GetAnswersForWordAsync(rightAnswerForRound, AnswersPerRound);
+            answersForRound.Insert(random.Next(AnswersPerRound), rightAnswerForRound);
 
             //Set up the controls
             counterLbl.Text = $"{currentRound + 1}/{TotalRounds}";
 
             for(int i=0; i<AnswersPerRound; i++)
-            {
-                Button btn = GetAnswerButton(i);
-
-                SetWordOnButton(btn, answers[i]);
-                DecorateButton(btn, ButtonDecoration.ResetDecoration);
-            }
-
-            DecorateButton(actionBtn, ButtonDecoration.ResetDecoration);
+                SetWordOnButton(GetAnswerButton(i), answersForRound[i]);
 
             translationLbl.Text = MakeTransaltionsString(rightAnswerForRound.Translations);
-
-            currentAction = hideOptions ? CurrentAction.HidingAnswers : CurrentAction.WaitingForUserAnswer;
-            UpdateActionButtons();
-
             transcriptionLbl.Visibility = relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
-
             ClearRelationsArea();
-
-            answerTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -199,92 +77,8 @@ namespace DDictionary.Presentation.Testing
                 await HandleAnswerAsync(null);
         }
 
-        private async Task HandleAnswerAsync(int? answerId)
+        protected override void ShowRightAnswerData()
         {
-            if(currentAction == CurrentAction.HidingAnswers)
-            {
-                if(answerId is null)
-                { //Space button was pressed
-                    currentAction = CurrentAction.WaitingForUserAnswer;
-                    UpdateActionButtons();
-                }
-
-                return;
-            }
-            else if(currentAction == CurrentAction.ShowingRoundResult)
-            {
-                if(answerId is null)
-                { //Space button was pressed
-                    if(++currentRound >= TotalRounds)
-                    { //Showing final result
-                        var dlg = new ResultDlg(answers) { Owner = this };
-
-                        if(dlg.ShowDialog() == true)
-                        {
-                            //Update the list of clauses
-                            clausesIdsLst =
-                                clausesIdsLst.Union(dlg.Answers.Select(o => o.Word.Id)) //In case of new words (wrong answers)
-                                             .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
-                                             .ToList();
-
-                            allWords = null;
-
-                            await StartTrainingAsync();
-                        }
-                        else
-                            Close();
-                    }
-                    else
-                        await NextRoundAsync();
-                }
-                else //An answer button
-                    await PlaySoundAsync(Enumerable.Range(0, AnswersPerRound)
-                                                   .Select(o => (Clause)GetAnswerButton(o).Tag)
-                                                   .Single(o => o.Id == answerId));
-
-                return;
-            }
-
-            Clause givenAnswer = null;
-
-            //Showing result
-            foreach(Button btn in Enumerable.Range(0, AnswersPerRound).Select(o => GetAnswerButton(o)))
-            {
-                var clause = (Clause)btn.Tag;
-
-                if(clause.Id == answerId)
-                { //The pressed by the user button
-                    givenAnswer = clause;
-
-                    if(answerId == rightAnswerForRound.Id)
-                        DecorateButton(btn, ButtonDecoration.UserRightAnswer);
-                    else
-                        DecorateButton(btn, ButtonDecoration.UserWrongAnswer);
-                }
-                else if(clause.Id == rightAnswerForRound.Id)
-                    DecorateButton(btn, ButtonDecoration.RightAnswer);
-                else
-                    DecorateButton(btn, ButtonDecoration.ResetDecoration);
-
-                //Show all words translations as tooltips
-                btn.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(((Clause)btn.Tag).Translations);
-            }
-
-            if(answerId is null)
-                DecorateButton(actionBtn, ButtonDecoration.UserWrongAnswer);
-
-            //Collect answer info
-            answers.Add(new TestAnswer { 
-                Word = rightAnswerForRound, 
-                GivenAnswer = givenAnswer,
-                Correct = (answerId == rightAnswerForRound.Id),
-                Time = DateTime.UtcNow - answerTime
-            });
-
-            actionBtn.Focus(); //To save ability to use Space
-            currentAction = CurrentAction.ShowingRoundResult;
-            UpdateActionButtons();
-
             if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
             {
                 transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
@@ -302,14 +96,6 @@ namespace DDictionary.Presentation.Testing
                 contextLbl.Text = rightAnswerForRound.Context;
                 contextLbl.Visibility = Visibility.Visible;
             }
-
-            if(answerId != null && answerId != rightAnswerForRound.Id)
-            {
-                SystemSounds.Hand.Play(); //Error sound
-                await Task.Delay(500);
-            }
-
-            await PlaySoundAsync(rightAnswerForRound);
         }
 
         private void ClearRelationsArea()
@@ -350,27 +136,6 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        private void DecorateButton(Button button, ButtonDecoration decoration)
-        {
-            var frame = (Panel)button.Parent;
-
-            switch(decoration)
-            {
-                case ButtonDecoration.RightAnswer:
-                case ButtonDecoration.UserRightAnswer:
-                    frame.Background = correctBrush;
-                    break;
-
-                case ButtonDecoration.UserWrongAnswer: 
-                    frame.Background = errorBrush; 
-                    break;
-
-                case ButtonDecoration.ResetDecoration:
-                    frame.Background = SystemColors.WindowBrush;
-                    break;
-            }
-        }
-
         private string MakeTransaltionsString(IEnumerable<Translation> translations)
         {
             var ret = new StringBuilder();
@@ -405,10 +170,7 @@ namespace DDictionary.Presentation.Testing
             btn.Tag = clause;
         }
 
-        /// <summary>
-        /// Get one of the answers buttons by given index.
-        /// </summary>
-        private Button GetAnswerButton(int index)
+        protected override Button GetAnswerButton(int index)
         {
             switch(index)
             {
@@ -423,7 +185,7 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        private void UpdateActionButtons()
+        protected override void UpdateActionButtons()
         {
             switch(currentAction)
             {
@@ -446,22 +208,6 @@ namespace DDictionary.Presentation.Testing
                                                                           : PrgResources.NextQuestionLabel;
                     break;
             }
-        }
-
-        private IList<int> GetWordsForTraining(int count)
-        {
-            var ret = new List<int>(count);
-
-            while(ret.Count < count)
-            {
-                //TODO: Select words by their training statistics not just random ones!
-                int n = clausesIdsLst[random.Next(clausesIdsLst.Count)];
-
-                if(!ret.Contains(n))
-                    ret.Add(n);
-            }
-
-            return ret;
         }
 
         private async Task<IList<Clause>> GetAnswersForWordAsync(Clause word, int count)
@@ -526,50 +272,6 @@ namespace DDictionary.Presentation.Testing
                         .Select(o => o.Text)
                         .Intersect(answer.Translations.Select(o => o.Text), StringComparer.CurrentCultureIgnoreCase)
                         .Any();
-        }
-
-        private async void OnWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch(e.Key)
-            {
-                case Key.Escape: Close(); break; //To close dialog by Escape key
-                
-                case Key.D1:
-                case Key.NumPad1: await HandleAnswerAsync(((Clause)GetAnswerButton(0).Tag).Id); break;
-
-                case Key.D2:
-                case Key.NumPad2: await HandleAnswerAsync(((Clause)GetAnswerButton(1).Tag).Id); break;
-
-                case Key.D3:
-                case Key.NumPad3: await HandleAnswerAsync(((Clause)GetAnswerButton(2).Tag).Id); break;
-
-                case Key.D4:
-                case Key.NumPad4: await HandleAnswerAsync(((Clause)GetAnswerButton(3).Tag).Id); break;
-
-                case Key.D5:
-                case Key.NumPad5: await HandleAnswerAsync(((Clause)GetAnswerButton(4).Tag).Id); break;
-
-                case Key.D0:
-                case Key.NumPad0:
-                case Key.Space: await HandleAnswerAsync(null); break;
-            }
-        }
-
-        private async Task PlaySoundAsync(Clause clause)
-        {
-            if(String.IsNullOrEmpty(clause.Sound))
-            {
-                SystemSounds.Beep.Play();
-                return;
-            }
-
-            try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound); }
-            catch(Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-
-                MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private async void OnEyePanel_MouseUp(object sender, MouseButtonEventArgs e)

@@ -147,6 +147,7 @@
     <Compile Include="Presentation\Testing\ResultDlg.xaml.cs">
       <DependentUpon>ResultDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\Testing\SelectiveTestDlgBase.cs" />
     <Compile Include="Presentation\Testing\TestAnswer.cs" />
     <Compile Include="Presentation\Testing\TranslationWordDlg.xaml.cs">
       <DependentUpon>TranslationWordDlg.xaml</DependentUpon>
