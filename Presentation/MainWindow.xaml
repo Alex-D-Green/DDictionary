@@ -91,6 +91,7 @@
                         CanExecute="CommandBinding_CanExecute"/>
 
         <CommandBinding Command="{x:Static local:UICommands.TranslationWordTestCommand}" Executed="OnStartTesting"/>
+        <CommandBinding Command="{x:Static local:UICommands.WordTranslationTestCommand}" Executed="OnStartTesting"/>
     </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -294,6 +295,7 @@
             <MenuItem Header="_Actions" ItemsSource="{StaticResource actionMenuItems}"/>
             <MenuItem Header="_Training">
                 <MenuItem Header="_Translation - Word" Command="local:UICommands.TranslationWordTestCommand"/>
+                <MenuItem Header="_Word - Translation" Command="local:UICommands.WordTranslationTestCommand"/>                
             </MenuItem>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
                 <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand">

@@ -18,9 +18,9 @@ using PrgResources = DDictionary.Properties.Resources;
 namespace DDictionary.Presentation.Testing
 {
     /// <summary>
-    /// Interaction logic for TranslationWordDlg.xaml
+    /// Interaction logic for WordTranslationDlg.xaml
     /// </summary>
-    public partial class TranslationWordDlg: SelectiveTestDlgBase
+    public partial class WordTranslationDlg: SelectiveTestDlgBase
     {
         private const bool hideOptions = true; //TODO: Add option in the settings.
 
@@ -28,7 +28,7 @@ namespace DDictionary.Presentation.Testing
         protected override Button actionButton { get => actionBtn; }
 
 
-        public TranslationWordDlg(IList<int> clausesForTrainingList)
+        public WordTranslationDlg(IList<int> clausesForTrainingList)
             : base(clausesForTrainingList)
         {
             if(clausesForTrainingList is null)
@@ -51,11 +51,28 @@ namespace DDictionary.Presentation.Testing
             //Set up the controls
             counterLbl.Text = $"{currentRound + 1}/{TotalRounds}";
 
-            for(int i=0; i<AnswersPerRound; i++)
+            for(int i = 0; i < AnswersPerRound; i++)
                 SetWordOnButton(GetAnswerButton(i), answersForRound[i]);
 
-            translationLbl.Text = MakeTransaltionsString(rightAnswerForRound.Translations);
-            transcriptionLbl.Visibility = relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
+            answerWordLbl.Text = rightAnswerForRound.Word;
+
+            if(!String.IsNullOrEmpty(rightAnswerForRound.Sound))
+            {
+                playBtn.Visibility = Visibility.Visible;
+                await PlaySoundAsync(rightAnswerForRound); //Auto play sound
+            }
+            else
+                playBtn.Visibility = Visibility.Collapsed;
+
+            if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
+            {
+                transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
+                transcriptionLbl.Visibility = Visibility.Visible;
+            }
+            else
+                transcriptionLbl.Visibility = Visibility.Hidden;
+
+            relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
             ClearRelationsArea();
         }
 
@@ -78,12 +95,6 @@ namespace DDictionary.Presentation.Testing
 
         protected override void ShowRightAnswerData()
         {
-            if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
-            {
-                transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
-                transcriptionLbl.Visibility = Visibility.Visible;
-            }
-
             if(rightAnswerForRound.Relations.Count > 0)
             {
                 UpdateRelations();
@@ -139,33 +150,36 @@ namespace DDictionary.Presentation.Testing
         {
             var ret = new StringBuilder();
 
-            int max = 7;
             foreach(Translation tr in translations.OrderBy(o => random.Next()))
             {
                 if(ret.Length > 0)
-                    ret.AppendLine(";");
+                {
+                    if(ret.Length + tr.Text.Length > 45)
+                        continue; //Too long let's try to find and add another translation
+
+                    ret.Append("; ");
+                }
 
                 ret.Append(tr.Text);
-
-                if(--max == 0)
-                    break;
             }
 
             return ret.ToString();
         }
 
-        private static void SetWordOnButton(Button btn, Clause clause)
+        private void SetWordOnButton(Button btn, Clause clause)
         {
-            if(clause.Word.Length > 29)
+            string text = MakeTransaltionsString(clause.Translations);
+
+            if(text.Length > 38)
                 btn.FontSize = 9;
-            else if(clause.Word.Length > 24)
+            else if(text.Length > 32)
                 btn.FontSize = 11;
-            else if(clause.Word.Length > 19)
+            else if(text.Length > 25)
                 btn.FontSize = 13;
             else
                 btn.FontSize = 16;
 
-            ((TextBlock)btn.Content).Text = clause.Word;
+            ((TextBlock)btn.Content).Text = text;
             btn.Tag = clause;
         }
 
@@ -198,7 +212,7 @@ namespace DDictionary.Presentation.Testing
                     buttonsPanel.Visibility = Visibility.Visible;
                     eyePanel.Visibility = Visibility.Hidden;
                     actionBtn.Content = PrgResources.IDontKnowLabel;
-
+                    
                     foreach(Button btn in Enumerable.Range(0, AnswersPerRound).Select(o => GetAnswerButton(o)))
                         btn.ToolTip = null;
 
@@ -207,12 +221,12 @@ namespace DDictionary.Presentation.Testing
                 case CurrentAction.ShowingRoundResult:
                     buttonsPanel.Visibility = Visibility.Visible;
                     eyePanel.Visibility = Visibility.Hidden;
-                    actionBtn.Content = (currentRound + 1 == TotalRounds) ? PrgResources.FinishLabel 
+                    actionBtn.Content = (currentRound + 1 == TotalRounds) ? PrgResources.FinishLabel
                                                                           : PrgResources.NextQuestionLabel;
 
-                    //Show all words translations as tooltips
+                    //Show the word as button's tooltip
                     foreach(Button btn in Enumerable.Range(0, AnswersPerRound).Select(o => GetAnswerButton(o)))
-                        btn.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(((Clause)btn.Tag).Translations);
+                        btn.ToolTip = ((Clause)btn.Tag).Word;
 
                     break;
             }
@@ -220,34 +234,15 @@ namespace DDictionary.Presentation.Testing
 
         private async Task<IList<Clause>> GetAnswersForWordAsync(Clause word, int count)
         {
-            var ret = new List<Clause>(count-1);
+            var ret = new List<Clause>(count - 1);
 
             if(allWords is null)
-                allWords = (await dbFacade.GetJustWordsAsync())
-                               .OrderBy(o => o.Word, StringComparer.CurrentCultureIgnoreCase)
-                               .ToArray();
-
-            //Get a similar word that placed nearly in alphabetical order
-            for(int i=0; i<allWords.Length; i++)
-            {
-                if(allWords[i].Id == word.Id)
-                {
-                    if(i != 0)
-                    {
-                        Clause tmp = await dbFacade.GetClauseByIdAsync(allWords[i - 1].Id);
-                        
-                        if(IsAppropriateAnswer(word, tmp))
-                            ret.Add(tmp);
-                    }
-
-                    break;
-                }
-            }
+                allWords = (await dbFacade.GetJustWordsAsync()).ToArray();
 
             //And some of random ones
             int maxTries = allWords.Length >= 15 ? 15 : allWords.Length; //Max amount of finding appropriate answers
             int tries = 0;
-            while(ret.Count < count-1)
+            while(ret.Count < count - 1)
             {
                 JustWordDTO w = allWords[random.Next(allWords.Length)];
 
@@ -280,6 +275,11 @@ namespace DDictionary.Presentation.Testing
                         .Select(o => o.Text)
                         .Intersect(answer.Translations.Select(o => o.Text), StringComparer.CurrentCultureIgnoreCase)
                         .Any();
+        }
+
+        private async void OnPlayBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await PlaySoundAsync(rightAnswerForRound);
         }
 
         private async void OnEyePanel_MouseUp(object sender, MouseButtonEventArgs e)

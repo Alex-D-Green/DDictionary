@@ -88,5 +88,8 @@ namespace DDictionary.Presentation
             "Translation - Word test", "Translation - Word test", typeof(UICommands), 
             new InputGestureCollection() { new KeyGesture(Key.F1, ModifierKeys.Control) });
 
+        public static readonly RoutedUICommand WordTranslationTestCommand = new RoutedUICommand(
+            "Word - Translation test", "Word - Translation test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F2, ModifierKeys.Control) });
     }
 }

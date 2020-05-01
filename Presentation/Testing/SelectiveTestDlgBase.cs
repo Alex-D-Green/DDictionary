@@ -11,7 +11,6 @@ using System.Windows.Media;
 
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
-using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
 
@@ -241,9 +240,6 @@ namespace DDictionary.Presentation.Testing
                     DecorateButton(btn, ButtonDecoration.RightAnswer);
                 else
                     DecorateButton(btn, ButtonDecoration.ResetDecoration);
-
-                //Show all words translations as tooltips
-                btn.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(((Clause)btn.Tag).Translations);
             }
 
             if(answerId is null)
@@ -333,9 +329,12 @@ namespace DDictionary.Presentation.Testing
             return ret;
         }
 
+
         /// <summary>
         /// Play clause's sound or beep if it has no sound.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", 
+            Justification = "<Pending>")]
         protected async Task PlaySoundAsync(Clause clause)
         {
             if(String.IsNullOrEmpty(clause.Sound))

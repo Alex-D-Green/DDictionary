@@ -968,7 +968,9 @@ namespace DDictionary.Presentation
 
             if(e.Command == UICommands.TranslationWordTestCommand)
                 dlg = new TranslationWordDlg(lst);
-            
+            else if(e.Command == UICommands.WordTranslationTestCommand)
+                dlg = new WordTranslationDlg(lst);
+
             Debug.Assert(dlg != null);
 
             dlg.Owner = this;
