@@ -111,6 +111,16 @@ namespace DDictionary.DAL
                 nextJoin = "AND";
             }
 
+            if(filter.HasSound != null)
+            {
+                if(filter.HasSound == true)
+                    sql.AppendFormat("    {0} [cl].[Sound] IS NOT NULL AND [cl].[Sound] <> ''\n", nextJoin);
+                else
+                    sql.AppendFormat("    {0} [cl].[Sound] IS NULL OR [cl].[Sound] = ''\n", nextJoin);
+
+                nextJoin = "AND";
+            }
+
             if(filter.ShownGroups?.Any() == true)
             {
                 string gr = filter.ShownGroups.Distinct()

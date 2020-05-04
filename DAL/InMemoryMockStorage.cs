@@ -157,6 +157,9 @@ namespace DDictionary.DAL
             if(filter.RelatedFrom != null)
                 ret = ret.Where(o => filter.RelatedFrom.Relations.Any(r => r.ToClause.Id == o.Id));
 
+            if(filter.HasSound != null)
+                ret = ret.Where(o => filter.HasSound.Value ? !String.IsNullOrEmpty(o.Sound) : String.IsNullOrEmpty(o.Sound));
+
             if(filter.ShownGroups?.Any() == true)
                 ret = ret.Where(o => filter.ShownGroups.Contains(o.Group));
 
