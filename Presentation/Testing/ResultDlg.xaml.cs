@@ -84,13 +84,19 @@ namespace DDictionary.Presentation.Testing
                 var newTimeLbl = (TextBlock)copy.FindName(nameof(timeLbl));
                 newTimeLbl.Text = $"{ans.Time.TotalSeconds:F0} s";
 
-                var newgroupLbl = (TextBlock)copy.FindName(nameof(groupLbl));
-                newgroupLbl.Text = ans.Word.Group.ToGradeStr();
+                var newGroupLbl = (TextBlock)copy.FindName(nameof(groupLbl));
+                newGroupLbl.Text = ans.Word.Group.ToGradeStr();
 
                 var newPlayBtn = (Button)copy.FindName(nameof(playBtn));
                 newPlayBtn.IsEnabled = !String.IsNullOrEmpty(ans.Word.Sound);
                 newPlayBtn.Click += OnPlayBtn_Click;
                 newPlayBtn.Tag = ans.Word;
+
+                var newTriesLbl = (TextBlock)copy.FindName(nameof(triesLbl));
+                if(ans.Tries <= 0)
+                    newTriesLbl.Visibility = Visibility.Collapsed; //Test without tries
+                else 
+                    newTriesLbl.Text = ans.Tries.ToString();
 
                 var newWordLbl = (TextBlock)copy.FindName(nameof(wordLbl));
                 newWordLbl.Text = ans.Word.Word;

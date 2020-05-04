@@ -9,10 +9,8 @@ The key features of the program is:
   - Import/Export through the CSV format;
   - Trainings to memorize words.
 
-
-## Future plans
-
-- [ ] Implement Words Constructor training;
+*Future plans:*
+- [x] Implement Words Constructor training;
 - [ ] Implement Perception by Sound training;
 - [ ] Implement Cards training;
 - [ ] Update database structure to collect training results and use them for trainings.

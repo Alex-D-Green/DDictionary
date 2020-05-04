@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Translation - word testing" Height="370" Width="600" WindowStartupLocation="CenterOwner" 
         SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow" 
-        KeyDown="OnWindow_KeyDown">
+        PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
@@ -50,7 +50,7 @@
                                Margin="10, 10" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                     <Grid Margin="5, 0">
                         <Button FontSize="16" Padding="10, 0" Margin="5, 5" HorizontalContentAlignment="Left"
-                                x:Name="btn01" IsTabStop="False" Height="43" Click="OnAnswerButton_Click">
+                                x:Name="btn01" Height="43" Click="OnAnswerButton_Click">
                             <TextBlock Text="Word #1" TextWrapping="Wrap"/>
                         </Button>
                     </Grid>
@@ -60,7 +60,7 @@
                                Margin="10, 10" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                     <Grid Margin="5, 0">
                         <Button FontSize="16" Padding="10, 0" Margin="5, 5" HorizontalContentAlignment="Left"
-                                x:Name="btn02" IsTabStop="False" Height="43" Click="OnAnswerButton_Click">
+                                x:Name="btn02" Height="43" Click="OnAnswerButton_Click">
                             <TextBlock Text="Word #2" TextWrapping="Wrap"/>
                         </Button>
                     </Grid>
@@ -70,7 +70,7 @@
                                Margin="10, 10" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                     <Grid Margin="5, 0">
                         <Button FontSize="16" Padding="10, 0" Margin="5, 5" HorizontalContentAlignment="Left"
-                                x:Name="btn03" IsTabStop="False" Height="43" Click="OnAnswerButton_Click">
+                                x:Name="btn03" Height="43" Click="OnAnswerButton_Click">
                             <TextBlock Text="Word #3" TextWrapping="Wrap"/>
                         </Button>
                     </Grid>
@@ -80,7 +80,7 @@
                                Margin="10, 10" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                     <Grid Margin="5, 0">
                         <Button FontSize="16" Padding="10, 0" Margin="5, 5" HorizontalContentAlignment="Left"
-                                x:Name="btn04" IsTabStop="False" Height="43" Click="OnAnswerButton_Click">
+                                x:Name="btn04" Height="43" Click="OnAnswerButton_Click">
                             <TextBlock Text="Word #4" TextWrapping="Wrap"/>
                         </Button>
                     </Grid>
@@ -90,18 +90,18 @@
                                Margin="10, 10" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                     <Grid Margin="5, 0">
                         <Button FontSize="16" Padding="10, 0" Margin="5, 5" HorizontalContentAlignment="Left"
-                            x:Name="btn05" IsTabStop="False" Height="43" Click="OnAnswerButton_Click">
+                            x:Name="btn05" Height="43" Click="OnAnswerButton_Click">
                             <TextBlock Text="Word #5" TextWrapping="Wrap"/>
                         </Button>
                     </Grid>
                 </DockPanel>
             </DockPanel>
             <DockPanel LastChildFill="True" DockPanel.Dock="Bottom">
-                <TextBlock Text="Space" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 
+                <TextBlock Text="Enter" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 
                            Margin="10, 15, 10, 5" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                 <Grid Margin="5, 10, 5, 0">
                     <Button Content="I don't know" FontSize="16" Padding="10, 10" Margin="5, 5" x:Name="actionBtn" 
-                            HorizontalContentAlignment="Left" IsTabStop="False" Height="43" Click="OnAnswerButton_Click" 
+                            HorizontalContentAlignment="Left" Height="43" Click="OnAnswerButton_Click" 
                             Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"/>
                 </Grid>
             </DockPanel>

@@ -73,7 +73,7 @@ namespace DDictionary.Presentation.Testing
                 transcriptionLbl.Visibility = Visibility.Hidden;
 
             relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
-            ClearRelationsArea();
+            ClearPanel(relationsPanel);
         }
 
         /// <summary>
@@ -108,20 +108,9 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        private void ClearRelationsArea()
-        {
-            //Remove all old added relations
-            FrameworkElement[] toRemove = relationsPanel.Children.OfType<FrameworkElement>()
-                                                                 .Where(o => o.Name == null) //The item that was added
-                                                                 .ToArray();
-
-            foreach(FrameworkElement item in toRemove)
-                relationsPanel.Children.Remove(item);
-        }
-
         private async void UpdateRelations()
         {
-            ClearRelationsArea();
+            ClearPanel(relationsPanel);
 
             int max = 7;
             foreach(Relation rel in rightAnswerForRound.Relations)
@@ -229,6 +218,9 @@ namespace DDictionary.Presentation.Testing
                         btn.ToolTip = ((Clause)btn.Tag).Word;
 
                     break;
+
+                default:
+                    throw new InvalidProgramException($"Unexpected current action value ({currentAction}).");
             }
         }
 

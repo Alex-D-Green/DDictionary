@@ -290,6 +290,9 @@ Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected
   <data name="TheClauseDeletionConfirmation" xml:space="preserve">
     <value>Delete "{0}" clause?</value>
   </data>
+  <data name="TrainingIsNotFinishedWarning" xml:space="preserve">
+    <value>The training is not finished yet, do you want to stop it and close the window?</value>
+  </data>
   <data name="WatchedDateCount" xml:space="preserve">
     <value>Watched: {0:yyyy-MM-dd} ({1})</value>
   </data>

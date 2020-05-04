@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Word - Translation testing" Height="370" Width="600" WindowStartupLocation="CenterOwner" 
         SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow" 
-        KeyDown="OnWindow_KeyDown">
+        PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
@@ -20,7 +20,7 @@
 
         <DockPanel Grid.Column="0">
             <Button x:Name="playBtn" Margin="10, 5" MaxWidth="40" Click="OnPlayBtn_Click" TabIndex="100" 
-                    DockPanel.Dock="Top" HorizontalAlignment="Left">
+                    DockPanel.Dock="Top" HorizontalAlignment="Left" ToolTip="Play answer [Ctrl+Space]">
                 <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Margin="5, 0" 
                                Height="24" Width="24"/>
             </Button>
@@ -109,7 +109,7 @@
                 </DockPanel>
             </DockPanel>
             <DockPanel LastChildFill="True" DockPanel.Dock="Bottom">
-                <TextBlock Text="Space" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 
+                <TextBlock Text="Enter" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 
                            Margin="10, 15, 10, 5" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" />
                 <Grid Margin="5, 10, 5, 0">
                     <Button Content="I don't know" FontSize="16" Padding="10, 0" Margin="5, 5" x:Name="actionBtn" 

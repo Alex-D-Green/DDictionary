@@ -970,6 +970,8 @@ namespace DDictionary.Presentation
                 dlg = new TranslationWordDlg(lst);
             else if(e.Command == UICommands.WordTranslationTestCommand)
                 dlg = new WordTranslationDlg(lst);
+            else if(e.Command == UICommands.WordsConstructorTestCommand)
+                dlg = new WordsConstructorDlg(lst);
 
             Debug.Assert(dlg != null);
 

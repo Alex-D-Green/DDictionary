@@ -91,5 +91,9 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand WordTranslationTestCommand = new RoutedUICommand(
             "Word - Translation test", "Word - Translation test", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.F2, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand WordsConstructorTestCommand = new RoutedUICommand(
+            "Words constructor test", "Words constructor test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F3, ModifierKeys.Control) });
     }
 }

@@ -149,8 +149,12 @@
     </Compile>
     <Compile Include="Presentation\Testing\SelectiveTestDlgBase.cs" />
     <Compile Include="Presentation\Testing\TestAnswer.cs" />
+    <Compile Include="Presentation\Testing\TestDlgBase.cs" />
     <Compile Include="Presentation\Testing\TranslationWordDlg.xaml.cs">
       <DependentUpon>TranslationWordDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\WordsConstructorDlg.xaml.cs">
+      <DependentUpon>WordsConstructorDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="Presentation\Testing\WordTranslationDlg.xaml.cs">
       <DependentUpon>WordTranslationDlg.xaml</DependentUpon>
@@ -193,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Presentation\Testing\TranslationWordDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\WordsConstructorDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

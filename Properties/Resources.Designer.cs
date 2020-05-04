@@ -510,6 +510,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The training is not finished yet, do you want to stop it and close the window?.
+        /// </summary>
+        internal static string TrainingIsNotFinishedWarning {
+            get {
+                return ResourceManager.GetString("TrainingIsNotFinishedWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Watched: {0:yyyy-MM-dd} ({1}).
         /// </summary>
         internal static string WatchedDateCount {
