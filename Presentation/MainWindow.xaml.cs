@@ -963,7 +963,7 @@ namespace DDictionary.Presentation
 
         private async void OnStartTesting(object sender, ExecutedRoutedEventArgs e)
         {
-            Window dlg = null;
+            TestDlgBase dlg = null;
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
 
             if(e.Command == UICommands.TranslationWordTestCommand)
@@ -972,6 +972,8 @@ namespace DDictionary.Presentation
                 dlg = new WordTranslationDlg(lst);
             else if(e.Command == UICommands.WordsConstructorTestCommand)
                 dlg = new WordsConstructorDlg(lst);
+            else if(e.Command == UICommands.ListeningTestCommand)
+                dlg = new ListeningDlg(lst);
 
             Debug.Assert(dlg != null);
 

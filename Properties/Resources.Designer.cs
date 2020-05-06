@@ -101,6 +101,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check the answer.
+        /// </summary>
+        internal static string CheckLabel {
+            get {
+                return ResourceManager.GetString("CheckLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete {0} selected clause[s]?.
         /// </summary>
         internal static string ClausesDeletionConfirmation {
@@ -283,13 +292,33 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ---.
+        /// </summary>
+        internal static string NoAnswer {
+            get {
+                return ResourceManager.GetString("NoAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t start the training, not enough words.
         ///
-        ///Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for training..
+        ///Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for the training..
         /// </summary>
         internal static string NotEnoughWords {
             get {
                 return ResourceManager.GetString("NotEnoughWords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t start the training, not enough words with the sound links.
+        ///
+        ///Must be at least {0} word[s] with the sound link[s] selected for the training..
+        /// </summary>
+        internal static string NotEnoughWordsWithSounds {
+            get {
+                return ResourceManager.GetString("NotEnoughWordsWithSounds", resourceCulture);
             }
         }
         

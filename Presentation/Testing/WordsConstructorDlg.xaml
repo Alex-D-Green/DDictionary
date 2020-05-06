@@ -11,7 +11,7 @@
     <Window.Resources>
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
-    </Window.Resources>    
+    </Window.Resources>
     <DockPanel Margin="10">
         <DockPanel DockPanel.Dock="Top" Margin="0, 0, 0, 15">
             <StackPanel x:Name="soundPanel" DockPanel.Dock="Left" Orientation="Horizontal">
@@ -80,7 +80,7 @@
             
             <Grid Margin="5, 10, 5, 0" Width="220" DockPanel.Dock="Right">
                 <Button Content="I don't know" FontSize="16" Padding="10, 10" Margin="5, 5" x:Name="actionBtn"
-                        HorizontalContentAlignment="Left" Height="43" Click="OnActionButton_Click" TabIndex="400"
+                        HorizontalContentAlignment="Center" Height="43" Click="OnActionButton_Click" TabIndex="400"
                         Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"/>
             </Grid>
             <TextBlock Text="Enter" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 

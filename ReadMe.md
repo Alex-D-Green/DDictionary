@@ -7,13 +7,14 @@ The key features of the program is:
   - Advanced filtration & search;
   - Ranging words by groups depending on how well they are known;
   - Import/Export through the CSV format;
-  - Trainings to memorize words.
+  - Trainings to memorize the words.
 
-*Future plans:*
+**Future plans:**
 - [x] Implement Words Constructor training;
-- [ ] Implement Perception by Sound training;
-- [ ] Implement Cards training;
-- [ ] Update database structure to collect training results and use them for trainings.
+- [x] Implement Listening training;
+- [ ] Implement Sprint training;
+- [ ] Update database structure to collect training results and use them for trainings;
+- [ ] Implement Cards training.
 
 
 ## License

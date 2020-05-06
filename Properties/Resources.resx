@@ -133,6 +133,9 @@
   <data name="ChangesDiscardingWarning" xml:space="preserve">
     <value>All not saved changes will be discard!</value>
   </data>
+  <data name="CheckLabel" xml:space="preserve">
+    <value>Check the answer</value>
+  </data>
   <data name="ClausesDeletionConfirmation" xml:space="preserve">
     <value>Delete {0} selected clause[s]?</value>
   </data>
@@ -195,10 +198,18 @@ Continue and save only filtered clauses?</value>
   <data name="NextQuestionLabel" xml:space="preserve">
     <value>Next question</value>
   </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>---</value>
+  </data>
   <data name="NotEnoughWords" xml:space="preserve">
     <value>Can't start the training, not enough words.
 
-Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for training.</value>
+Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for the training.</value>
+  </data>
+  <data name="NotEnoughWordsWithSounds" xml:space="preserve">
+    <value>Can't start the training, not enough words with the sound links.
+
+Must be at least {0} word[s] with the sound link[s] selected for the training.</value>
   </data>
   <data name="POFFullAdjective" xml:space="preserve">
     <value>adjective</value>

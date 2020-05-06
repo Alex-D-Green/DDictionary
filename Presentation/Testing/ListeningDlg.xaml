@@ -1,0 +1,67 @@
+﻿<base:TestDlgBase x:Class="DDictionary.Presentation.Testing.ListeningDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:base="clr-namespace:DDictionary.Presentation.Testing"
+        mc:Ignorable="d"
+        Title="Listening testing" MinHeight="400" Width="600" WindowStartupLocation="CenterOwner" 
+        SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow"
+        PreviewKeyDown="OnWindow_PreviewKeyDown">
+    <Window.Resources>
+        <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
+        <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
+    </Window.Resources>
+    <DockPanel Margin="10">
+        <Button x:Name="playBtn" Margin="10, 5" MaxWidth="40" Click="OnPlayBtn_Click" TabIndex="100" DockPanel.Dock="Top"
+               ToolTip="Play sound [Ctrl+Space]">
+            <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Margin="5, 0" Height="24" Width="24"/>
+        </Button>
+
+        <TextBlock x:Name="transcriptionLbl" Padding="10, 5" Text="[transcription]" DockPanel.Dock="Top" 
+                   HorizontalAlignment="Center"/>
+
+        <TextBox x:Name="answerEdit" FontSize="20" Text="answer" DockPanel.Dock="Top" HorizontalContentAlignment="Center"
+                 Padding="3" Margin="20,20,20,5" TextChanged="OnAnswerEdit_TextChanged"/>
+
+        <TextBlock x:Name="enterHereLbl" FontSize="9" Text="enter what you heard here" DockPanel.Dock="Top" 
+                   HorizontalAlignment="Center" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+
+        <TextBlock x:Name="correctAnsLbl" FontSize="20" Text="correct answer" DockPanel.Dock="Top" Padding="3"
+                   HorizontalAlignment="Center" Margin="20, 20, 20, 0" Foreground="{StaticResource CorrectBrush}"/>
+
+        <TextBlock x:Name="wrongAnsLbl" FontSize="20" Text="wrong answer" DockPanel.Dock="Top" Padding="3"
+                   HorizontalAlignment="Center" Margin="20, 0" Foreground="{StaticResource ErrorBrush}"
+                   TextDecorations="Strikethrough"/>
+
+        <TextBlock x:Name="translationLbl" Text="Translation; Translation; Translation; Translation; Translation" 
+                   TextWrapping="Wrap" Padding="10,20" HorizontalAlignment="Center" DockPanel.Dock="Top" FontSize="20"/>
+
+        <DockPanel DockPanel.Dock="Bottom">
+            <TextBlock x:Name="counterLbl" Text="1/10" FontSize="25" Padding="10, 0" Margin="0, 5" DockPanel.Dock="Left"
+                       Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" VerticalAlignment="Bottom"/>
+
+            <Grid Margin="5, 10, 5, 0" Width="220" DockPanel.Dock="Right">
+                <Button Content="I don't know" FontSize="16" Padding="10, 10" Margin="5, 5" x:Name="actionBtn"
+                        HorizontalContentAlignment="Center" Height="43" Click="OnActionButton_Click" TabIndex="400"
+                        Background="{StaticResource {x:Static SystemColors.ControlBrushKey}}"/>
+            </Grid>
+            <TextBlock Text="Enter" FontSize="16" MinWidth="50" TextAlignment="Right" VerticalAlignment="Center" 
+                       Margin="10, 15, 10, 5" Foreground="{StaticResource {x:Static SystemColors.ControlDarkBrushKey}}" 
+                       DockPanel.Dock="Right"/>
+            <StackPanel DockPanel.Dock="Right"/>
+        </DockPanel>
+
+        <TextBlock x:Name="contextLbl" FontSize="9" Padding="10, 5" Text="context" DockPanel.Dock="Bottom" 
+                   TextWrapping="Wrap" TextAlignment="Center"/>
+
+        <StackPanel x:Name="relationsPanel" Margin="10, 5" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <StackPanel x:Name="relTemplatePanel" Orientation="Horizontal">
+                <Label x:Name="wordLbl" FontSize="9" FontWeight="Bold" Padding="0, 5"/>
+                <Label x:Name="descriptionLbl" FontSize="9" Padding="0, 2" VerticalAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom"/>
+    </DockPanel>
+</base:TestDlgBase>

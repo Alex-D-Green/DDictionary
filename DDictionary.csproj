@@ -144,6 +144,9 @@
     <Compile Include="Presentation\SoundRefEditDlg.xaml.cs">
       <DependentUpon>SoundRefEditDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\Testing\ListeningDlg.xaml.cs">
+      <DependentUpon>ListeningDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\Testing\ResultDlg.xaml.cs">
       <DependentUpon>ResultDlg.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Presentation\SoundRefEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\ListeningDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

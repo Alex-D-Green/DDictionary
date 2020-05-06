@@ -88,12 +88,6 @@ namespace DDictionary.Presentation.Testing
             await NextRoundAsync();
         }
 
-        /// <summary>
-        /// Start the next round.
-        /// Base method set up the <see cref="rightAnswerForRound"/> and <see cref="answerTime"/>,
-        /// resets buttons' decorations and update their state 
-        /// <see cref="DDictionary.Presentation.Testing.SelectiveTestDlgBase.UpdateActionButtons"/>.
-        /// </summary>
         private async Task NextRoundAsync()
         {
             //Preparations for the round
@@ -116,6 +110,8 @@ namespace DDictionary.Presentation.Testing
 
             if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
                 transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
+            else
+                transcriptionLbl.Text = "";
 
             contextLbl.Text = rightAnswerForRound.Context;
 

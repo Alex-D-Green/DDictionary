@@ -44,7 +44,8 @@ namespace DDictionary.Presentation.Testing
                                                          Correct = false, 
                                                          Word = o.GivenAnswer, 
                                                          Time = o.Time, 
-                                                         GivenAnswer = o.Word 
+                                                         GivenAnswer = o.Word,
+                                                         Tries = o.Tries
                                                      } })
                              .Distinct(new TestAnswerSameWordComparer())
                              .OrderBy(o => o.Correct) //To have the similar order in the editing dialog
