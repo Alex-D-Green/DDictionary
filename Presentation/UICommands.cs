@@ -83,5 +83,25 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand MoveWordsToEGroupCommand = new RoutedUICommand(
             "Move selected words to E group", "Move selected words to E group", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.E, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand TranslationWordTestCommand = new RoutedUICommand(
+            "Translation - Word test", "Translation - Word test", typeof(UICommands), 
+            new InputGestureCollection() { new KeyGesture(Key.F1, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand WordTranslationTestCommand = new RoutedUICommand(
+            "Word - Translation test", "Word - Translation test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F2, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand WordsConstructorTestCommand = new RoutedUICommand(
+            "Words constructor test", "Words constructor test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F3, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand ListeningTestCommand = new RoutedUICommand(
+            "Listening test", "Listening test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F4, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand SprintTestCommand = new RoutedUICommand(
+            "Sprint test", "Sprint test", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F5, ModifierKeys.Control) });
     }
 }

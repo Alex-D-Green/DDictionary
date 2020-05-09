@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 
-using DDictionary.DAL;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
@@ -47,7 +46,7 @@ namespace DDictionary.Presentation
         private readonly List<int> watchedClauses = new List<int>();
 
 
-        /// <summary>The editing clause (<c>null</c> for new one).</summary>
+        /// <summary>The editing clause.</summary>
         private Clause clause;
 
         /// <summary>The count of translations in the dialog.</summary>
@@ -78,12 +77,6 @@ namespace DDictionary.Presentation
                 CreateNewClause();
 
             InitializeComponent();
-
-            PreviewKeyDown += (s, e) =>
-            { //To close dialog by Escape key (cuz this dialog has no Cancel button)
-                if(e.Key == Key.Escape)
-                    Close();
-            };
 
             //ComboBox with groups initialization
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
@@ -139,6 +132,19 @@ namespace DDictionary.Presentation
         /// </summary>
         private void OnSomeDataWasChanged(object sender, EventArgs e)
         {
+            ChangesHaveBeenMade();
+        }
+
+        private async void OnWordEdit_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int check = await dbFacade.GetClauseIdByWordAsync(wordEdit.Text);
+
+            if(check != 0 && check != clause.Id)
+            { //User notification that this word presents in the dictionary already
+                MessageBox.Show(this, String.Format(PrgResources.WordAlreadyPresents, wordEdit.Text),
+                    PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
             ChangesHaveBeenMade();
         }
 
@@ -595,6 +601,16 @@ namespace DDictionary.Presentation
                 Word = wordEdit.Text
             };
 
+            int check = await dbFacade.GetClauseIdByWordAsync(clauseDTO.Word);
+
+            if(check != 0 && check != clauseDTO.Id)
+            {
+                MessageBox.Show(this, String.Format(PrgResources.WordAlreadyPresents, clauseDTO.Word), 
+                    PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                return; //Can't save it
+            }
+
             clause.Id = await dbFacade.AddOrUpdateClauseAsync(clauseDTO, 
                 !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data
 
@@ -690,6 +706,24 @@ namespace DDictionary.Presentation
             ClearWindow();
             LoadClauseData(clausesIdsLst[idx < clausesIdsLst.Count ? idx : clausesIdsLst.Count-1]);
             UpdateWindowInfo();
+        }
+
+        private void OnWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch(e.Key)
+            {
+                case Key.Escape: Close(); break; //To close dialog by Escape key
+
+                case Key.Left: 
+                    if(scrollLeftBtn.IsEnabled)
+                        OnScrollBtn_Click(scrollLeftBtn, null); 
+                    break;
+
+                case Key.Right:
+                    if(scrollRightBtn.IsEnabled)
+                        OnScrollBtn_Click(scrollRightBtn, null);
+                    break;
+            }
         }
     }
 }

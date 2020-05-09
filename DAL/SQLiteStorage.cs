@@ -111,6 +111,16 @@ namespace DDictionary.DAL
                 nextJoin = "AND";
             }
 
+            if(filter.HasSound != null)
+            {
+                if(filter.HasSound == true)
+                    sql.AppendFormat("    {0} [cl].[Sound] IS NOT NULL AND [cl].[Sound] <> ''\n", nextJoin);
+                else
+                    sql.AppendFormat("    {0} [cl].[Sound] IS NULL OR [cl].[Sound] = ''\n", nextJoin);
+
+                nextJoin = "AND";
+            }
+
             if(filter.ShownGroups?.Any() == true)
             {
                 string gr = filter.ShownGroups.Distinct()
@@ -234,14 +244,15 @@ namespace DDictionary.DAL
             { return 0; }
         }
 
-        public async Task<int> GetClauseIdByWord(string word)
+        public async Task<int> GetClauseIdByWordAsync(string word)
         {
             try
             {
                 using(IDbConnection cnn = GetConnection())
                 {
                     IEnumerable<int> ids = 
-                        await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE [Word] = @Word", new { Word = word });
+                        await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE", 
+                            new { Word = word });
 
                     if(ids.Count() > 1)
                         throw new DataException($"There are more than one clause \"{word}\" in the DB.");
@@ -567,9 +578,9 @@ namespace DDictionary.DAL
 
             const string insertRelationSql =
                 "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description])\n" +
-                "    VALUES (@From, (SELECT [Id] FROM [Clauses] WHERE [Word] = @Word), @Descr); ";
+                "    VALUES (@From, (SELECT [Id] FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE), @Descr); ";
 
-            const string isWordExistSql = "SELECT 1 FROM [Clauses] WHERE [Word] = @Word; ";
+            const string isWordExistSql = "SELECT 1 FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE; ";
 
             DateTime now = DateTime.Now;
 

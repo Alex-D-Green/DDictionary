@@ -157,6 +157,9 @@ namespace DDictionary.DAL
             if(filter.RelatedFrom != null)
                 ret = ret.Where(o => filter.RelatedFrom.Relations.Any(r => r.ToClause.Id == o.Id));
 
+            if(filter.HasSound != null)
+                ret = ret.Where(o => filter.HasSound.Value ? !String.IsNullOrEmpty(o.Sound) : String.IsNullOrEmpty(o.Sound));
+
             if(filter.ShownGroups?.Any() == true)
                 ret = ret.Where(o => filter.ShownGroups.Contains(o.Group));
 
@@ -193,7 +196,7 @@ namespace DDictionary.DAL
             return Task.FromResult(clauses.Count);
         }
 
-        public Task<int> GetClauseIdByWord(string word)
+        public Task<int> GetClauseIdByWordAsync(string word)
         {
             return Task.FromResult(clauses.SingleOrDefault(o => String.Equals(o.Word, word, sc))?.Id ?? 0);
         }

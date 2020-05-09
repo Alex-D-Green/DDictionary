@@ -89,6 +89,12 @@
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.MoveWordsToEGroupCommand}" Executed="OnMoveWordsToAGroup"
                         CanExecute="CommandBinding_CanExecute"/>
+
+        <CommandBinding Command="{x:Static local:UICommands.TranslationWordTestCommand}" Executed="OnStartTesting"/>
+        <CommandBinding Command="{x:Static local:UICommands.WordTranslationTestCommand}" Executed="OnStartTesting"/>
+        <CommandBinding Command="{x:Static local:UICommands.WordsConstructorTestCommand}" Executed="OnStartTesting"/>
+        <CommandBinding Command="{x:Static local:UICommands.ListeningTestCommand}" Executed="OnStartTesting"/>
+        <CommandBinding Command="{x:Static local:UICommands.SprintTestCommand}" Executed="OnStartTesting"/>
     </Window.CommandBindings>
     <Grid Margin="0">
         <Grid.RowDefinitions>
@@ -290,6 +296,13 @@
                 <MenuItem Header="E_xit" Command="local:UICommands.ExitCommand"/>
             </MenuItem>
             <MenuItem Header="_Actions" ItemsSource="{StaticResource actionMenuItems}"/>
+            <MenuItem Header="_Trainings">
+                <MenuItem Header="_Translation - Word" Command="local:UICommands.TranslationWordTestCommand"/>
+                <MenuItem Header="_Word - Translation" Command="local:UICommands.WordTranslationTestCommand"/>
+                <MenuItem Header="Words _Constructor" Command="local:UICommands.WordsConstructorTestCommand"/>
+                <MenuItem Header="_Listening" Command="local:UICommands.ListeningTestCommand"/>
+                <MenuItem Header="_Sprint" Command="local:UICommands.SprintTestCommand"/>                
+            </MenuItem>
             <MenuItem Header="_Help" HorizontalAlignment="Right">
                 <MenuItem Header="_Program site" Command="local:UICommands.GoToSiteCommand">
                     <MenuItem.Icon>

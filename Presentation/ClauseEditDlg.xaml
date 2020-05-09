@@ -6,7 +6,7 @@
         xmlns:DDictionary="clr-namespace:DDictionary"
         mc:Ignorable="d"
         Title="Clause editing" MinWidth="380" MaxWidth="800" WindowStartupLocation="CenterOwner" 
-        SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False">
+        SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False" KeyDown="OnWindow_KeyDown">
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,7 +30,7 @@
                 <ComboBox x:Name="groupCBox" Width="150" Margin="5" TabIndex="20" SelectionChanged="OnSomeDataWasChanged"/>
                 <TextBox x:Name="wordEdit" Text="Word" HorizontalAlignment="Center" Margin="5" FontSize="16" FontWeight="Bold" 
                          TextAlignment="Center" Padding="15,5" TabIndex="21" TextChanged="OnSomeDataWasChanged" 
-                         MaxLength="{x:Static DDictionary:Constrains.MaxWordLength}"/>
+                         LostFocus="OnWordEdit_LostFocus" MaxLength="{x:Static DDictionary:Constrains.MaxWordLength}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                     <Button Padding="5,2" TabIndex="22" Click="OnSoundRefBtn_Click" ToolTip="Link a file">
                         <Image Source="/DDictionary;component/Icons/4540339651543238899-128.png" Height="16" />

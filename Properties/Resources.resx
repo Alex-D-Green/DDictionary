@@ -133,8 +133,14 @@
   <data name="ChangesDiscardingWarning" xml:space="preserve">
     <value>All not saved changes will be discard!</value>
   </data>
+  <data name="CheckLabel" xml:space="preserve">
+    <value>Check the answer</value>
+  </data>
   <data name="ClausesDeletionConfirmation" xml:space="preserve">
     <value>Delete {0} selected clause[s]?</value>
+  </data>
+  <data name="CorrectLabel" xml:space="preserve">
+    <value>Correct: {0}</value>
   </data>
   <data name="CSVImportReportTitle" xml:space="preserve">
     <value>Some errors occurred during import</value>
@@ -168,8 +174,17 @@
 
 Continue and save only filtered clauses?</value>
   </data>
+  <data name="FinishLabel" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="GetReadyLabel" xml:space="preserve">
+    <value>Get ready!</value>
+  </data>
   <data name="GroupChangeConfirmation" xml:space="preserve">
     <value>Move these {1} selected clause[s] to the group "{0}"?</value>
+  </data>
+  <data name="IDontKnowLabel" xml:space="preserve">
+    <value>I don't know</value>
   </data>
   <data name="ImportErrorsMsg" xml:space="preserve">
     <value>No changes were made because of errors. Please rectify errors that shown below and retry import again.</value>
@@ -179,6 +194,25 @@ Continue and save only filtered clauses?</value>
   </data>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>
+  </data>
+  <data name="MistakesLabel" xml:space="preserve">
+    <value>Mistakes: {0}</value>
+  </data>
+  <data name="NextQuestionLabel" xml:space="preserve">
+    <value>Next question</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>---</value>
+  </data>
+  <data name="NotEnoughWords" xml:space="preserve">
+    <value>Can't start the training, not enough words.
+
+Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected for the training.</value>
+  </data>
+  <data name="NotEnoughWordsWithSounds" xml:space="preserve">
+    <value>Can't start the training, not enough words with the sound links.
+
+Must be at least {0} word[s] with the sound link[s] selected for the training.</value>
   </data>
   <data name="POFFullAdjective" xml:space="preserve">
     <value>adjective</value>
@@ -258,11 +292,20 @@ Continue and save only filtered clauses?</value>
   <data name="RelationsFilterTextTmpl" xml:space="preserve">
     <value>"{0}" relations</value>
   </data>
+  <data name="RightTestAnswers" xml:space="preserve">
+    <value>Right answers: {0} out of {1} ({2}%)</value>
+  </data>
   <data name="SelectSoundFileTitle" xml:space="preserve">
     <value>Select a sound file for the word</value>
   </data>
+  <data name="ShowTheOptionsLabel" xml:space="preserve">
+    <value>Show the options</value>
+  </data>
   <data name="TheClauseDeletionConfirmation" xml:space="preserve">
     <value>Delete "{0}" clause?</value>
+  </data>
+  <data name="TrainingIsNotFinishedWarning" xml:space="preserve">
+    <value>The training is not finished yet, do you want to stop it and close the window?</value>
   </data>
   <data name="WatchedDateCount" xml:space="preserve">
     <value>Watched: {0:yyyy-MM-dd} ({1})</value>
@@ -286,6 +329,9 @@ Continue and save only filtered clauses?</value>
   <data name="WGWellKnown" xml:space="preserve">
     <value>Well known</value>
     <comment>WordGroup</comment>
+  </data>
+  <data name="WordAlreadyPresents" xml:space="preserve">
+    <value>Word "{0}" already presents in the dictionary.</value>
   </data>
   <data name="WordRelationTo" xml:space="preserve">
     <value>"{0}" relation to:</value>

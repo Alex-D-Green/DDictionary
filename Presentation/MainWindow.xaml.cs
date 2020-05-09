@@ -20,6 +20,7 @@ using CsvHelper;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
+using DDictionary.Presentation.Testing;
 using DDictionary.Presentation.ViewModels;
 
 using Microsoft.Win32;
@@ -43,8 +44,6 @@ namespace DDictionary.Presentation
         /// <summary>Folder to place downloaded sounds' files.</summary>
         private static readonly DirectoryInfo soundsCacheFolder = new DirectoryInfo(".\\sndCache");
 
-        //https://www.wpf-tutorial.com/audio-video/playing-audio/
-        private readonly MediaPlayer mediaPlayer = new MediaPlayer { Volume = 1 };
 
         /// <summary>The currently applied filter.</summary>
         private readonly FiltrationCriteria currentFilter = new FiltrationCriteria();
@@ -960,6 +959,30 @@ namespace DDictionary.Presentation
                 await MoveSelectedWordsToGroup(WordGroup.E_TotallyUnknown);
             else
                 Debug.Assert(false);
+        }
+
+        private async void OnStartTesting(object sender, ExecutedRoutedEventArgs e)
+        {
+            TestDlgBase dlg = null;
+            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
+
+            if(e.Command == UICommands.TranslationWordTestCommand)
+                dlg = new TranslationWordDlg(lst);
+            else if(e.Command == UICommands.WordTranslationTestCommand)
+                dlg = new WordTranslationDlg(lst);
+            else if(e.Command == UICommands.WordsConstructorTestCommand)
+                dlg = new WordsConstructorDlg(lst);
+            else if(e.Command == UICommands.ListeningTestCommand)
+                dlg = new ListeningDlg(lst);
+            else if(e.Command == UICommands.SprintTestCommand)
+                dlg = new SprintDlg(lst);
+
+            Debug.Assert(dlg != null);
+
+            dlg.Owner = this;
+            dlg.ShowDialog();
+
+            await UpdateDataGridAsync();
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)

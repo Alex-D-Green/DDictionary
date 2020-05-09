@@ -144,6 +144,27 @@
     <Compile Include="Presentation\SoundRefEditDlg.xaml.cs">
       <DependentUpon>SoundRefEditDlg.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Presentation\Testing\ListeningDlg.xaml.cs">
+      <DependentUpon>ListeningDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\ResultDlg.xaml.cs">
+      <DependentUpon>ResultDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\SelectiveTestDlgBase.cs" />
+    <Compile Include="Presentation\Testing\SprintDlg.xaml.cs">
+      <DependentUpon>SprintDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\TestAnswer.cs" />
+    <Compile Include="Presentation\Testing\TestDlgBase.cs" />
+    <Compile Include="Presentation\Testing\TranslationWordDlg.xaml.cs">
+      <DependentUpon>TranslationWordDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\WordsConstructorDlg.xaml.cs">
+      <DependentUpon>WordsConstructorDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\WordTranslationDlg.xaml.cs">
+      <DependentUpon>WordTranslationDlg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Presentation\TranslationsEditDlg.xaml.cs">
       <DependentUpon>TranslationsEditDlg.xaml</DependentUpon>
     </Compile>
@@ -174,6 +195,30 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Presentation\SoundRefEditDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\ListeningDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\ResultDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\SprintDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\TranslationWordDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\WordsConstructorDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\WordTranslationDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -284,6 +329,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\4498062351543238871-128.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\5518752821543238880-128.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('packages\System.Data.SQLite.Core.1.0.112.0\build\net46\System.Data.SQLite.Core.targets')" />

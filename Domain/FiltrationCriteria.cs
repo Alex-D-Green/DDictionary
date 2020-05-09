@@ -31,11 +31,18 @@ namespace DDictionary.Domain
         public Clause RelatedFrom { get; set; }
 
         /// <summary>
+        /// Clauses have to have or not have sound link.
+        /// <c>null</c> means there is no filtration by sound link.
+        /// </summary>
+        public bool? HasSound { get; set; }
+
+        /// <summary>
         /// The filter is empty (there is no filtration).
         /// </summary>
         public bool Empty 
         { 
-            get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && ShownGroups?.Any() != true);
+            get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && 
+                    ShownGroups?.Any() != true && HasSound is null);
         }
 
 
@@ -47,6 +54,7 @@ namespace DDictionary.Domain
             TextFilter = "";
             ShownGroups = Enumerable.Empty<WordGroup>();
             RelatedFrom = null;
+            HasSound = null;
 
             Debug.Assert(Empty);
         }
