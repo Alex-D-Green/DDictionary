@@ -67,8 +67,10 @@
                         Executed="OnCreateMultirelationCommand"
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.SelectAllCommand}" Executed="OnSelectAllCommand" />
-        <CommandBinding Command="{x:Static local:UICommands.ClearFilterCommand}" Executed="OnClearFilterCommand" />
-        <CommandBinding Command="{x:Static local:UICommands.ClearSortingCommand}" Executed="OnClearSortingCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.ClearFilterCommand}" Executed="OnClearFilterCommand" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.ClearSortingCommand}" Executed="OnClearSortingCommand" 
+                        CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.AddWordCommand}" Executed="OnAddWordCommand" />
         <CommandBinding Command="{x:Static local:UICommands.DeleteWordsCommand}" Executed="OnDeleteWordsCommand" 
                         CanExecute="CommandBinding_CanExecute"/>

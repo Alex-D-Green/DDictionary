@@ -250,6 +250,9 @@ namespace DDictionary.Presentation.Testing
 
             await Task.Delay(1000); //Delay for showing the answer
 
+            if(currentAction != CurrentAction.ShowingRoundResult)
+                return; //Probably the window is closed already
+
             //Automatically go to the next round
             currentRound++;
             await NextRoundAsync();
@@ -294,6 +297,7 @@ namespace DDictionary.Presentation.Testing
         protected override void OnClosed(EventArgs e)
         {
             answerTimer.Stop();
+            currentAction = CurrentAction.WaitingForStart; //To show that the training is finished
 
             base.OnClosed(e);
         }

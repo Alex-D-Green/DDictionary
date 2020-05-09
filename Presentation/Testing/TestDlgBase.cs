@@ -66,7 +66,7 @@ namespace DDictionary.Presentation.Testing
         protected Clause rightAnswerForRound;
 
         /// <summary>Current action.</summary>
-        protected CurrentAction currentAction;
+        protected volatile CurrentAction currentAction;
 
         /// <summary>Time since the beginning of the try.</summary>
         protected DateTime answerTime;

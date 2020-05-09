@@ -999,6 +999,12 @@ namespace DDictionary.Presentation
             if(e.Command == UICommands.ExportToCSVCommand || e.Command == UICommands.ExportToHtmlCommand)
                 e.CanExecute = (mainDataGrid?.Items?.Count > 0);
 
+            if(e.Command == UICommands.ClearFilterCommand)
+                e.CanExecute = !currentFilter.Empty;
+
+            if(e.Command == UICommands.ClearSortingCommand)
+                e.CanExecute = mainDataGrid.Items.SortDescriptions.Count > 0;
+
             if(e.Command == UICommands.MoveWordsToAGroupCommand || e.Command == UICommands.MoveWordsToBGroupCommand ||
                e.Command == UICommands.MoveWordsToCGroupCommand || e.Command == UICommands.MoveWordsToDGroupCommand ||
                e.Command == UICommands.MoveWordsToEGroupCommand)

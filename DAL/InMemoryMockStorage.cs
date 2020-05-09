@@ -155,7 +155,8 @@ namespace DDictionary.DAL
             var ret = clauses.AsEnumerable();
 
             if(filter.RelatedFrom != null)
-                ret = ret.Where(o => filter.RelatedFrom.Relations.Any(r => r.ToClause.Id == o.Id));
+                ret = ret.Where(o => o.Id == filter.RelatedFrom.Id || 
+                                filter.RelatedFrom.Relations.Any(r => r.ToClause.Id == o.Id));
 
             if(filter.HasSound != null)
                 ret = ret.Where(o => filter.HasSound.Value ? !String.IsNullOrEmpty(o.Sound) : String.IsNullOrEmpty(o.Sound));

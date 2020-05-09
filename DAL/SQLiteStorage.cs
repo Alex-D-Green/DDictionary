@@ -104,8 +104,9 @@ namespace DDictionary.DAL
 
             if(filter.RelatedFrom != null)
             {
-                sql.AppendFormat("    {0} EXISTS(SELECT * FROM [Relations] [srl] ", nextJoin);
-                sql.AppendFormat(                "WHERE [srl].[ToClauseId] = [cl].[Id] AND [srl].[FromClauseId] = {0})\n", 
+                sql.AppendFormat("    {0} [cl].[Id] = {1} OR ", nextJoin, filter.RelatedFrom.Id);
+                sql.AppendFormat(         "EXISTS( SELECT * FROM [Relations] [srl] WHERE ");
+                sql.AppendFormat(                 "[srl].[ToClauseId] = [cl].[Id] AND [srl].[FromClauseId] = {0})\n", 
                     filter.RelatedFrom.Id);
 
                 nextJoin = "AND";
