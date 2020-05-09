@@ -135,21 +135,23 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        private string MakeTransaltionsString(IEnumerable<Translation> translations)
+        private string MakeTranslationsString(IEnumerable<Translation> translations)
         {
             var ret = new StringBuilder();
 
-            foreach(Translation tr in translations.OrderBy(o => random.Next()))
+            foreach(string tr in translations.OrderBy(o => random.Next())
+                                             .Select(o => o.Text)
+                                             .Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 if(ret.Length > 0)
                 {
-                    if(ret.Length + tr.Text.Length > 45)
+                    if(ret.Length + tr.Length > 45)
                         continue; //Too long let's try to find and add another translation
 
                     ret.Append("; ");
                 }
 
-                ret.Append(tr.Text);
+                ret.Append(tr);
             }
 
             return ret.ToString();
@@ -157,7 +159,7 @@ namespace DDictionary.Presentation.Testing
 
         private void SetWordOnButton(Button btn, Clause clause)
         {
-            string text = MakeTransaltionsString(clause.Translations);
+            string text = MakeTranslationsString(clause.Translations);
 
             if(text.Length > 38)
                 btn.FontSize = 9;

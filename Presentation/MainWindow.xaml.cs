@@ -974,6 +974,8 @@ namespace DDictionary.Presentation
                 dlg = new WordsConstructorDlg(lst);
             else if(e.Command == UICommands.ListeningTestCommand)
                 dlg = new ListeningDlg(lst);
+            else if(e.Command == UICommands.SprintTestCommand)
+                dlg = new SprintDlg(lst);
 
             Debug.Assert(dlg != null);
 

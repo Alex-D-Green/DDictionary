@@ -12,9 +12,9 @@ The key features of the program is:
 **Future plans:**
 - [x] Implement Words Constructor training;
 - [x] Implement Listening training;
-- [ ] Implement Sprint training;
-- [ ] Update database structure to collect training results and use them for trainings;
-- [ ] Implement Cards training.
+- [x] Implement Sprint training;
+- [ ] Implement Cards training;
+- [ ] Update database structure to collect training results and use them for trainings.
 
 
 ## License

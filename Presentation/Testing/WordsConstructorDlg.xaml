@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:base="clr-namespace:DDictionary.Presentation.Testing"
         mc:Ignorable="d"
-        Title="Words Constructor testing" MinHeight="400" Width="600" WindowStartupLocation="CenterOwner" 
+        Title="Words constructor test" MinHeight="400" Width="600" WindowStartupLocation="CenterOwner" 
         SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow" 
         PreviewKeyDown="OnWindow_PreviewKeyDown" PreviewTextInput="OnPreviewTextInput">
     <Window.Resources>

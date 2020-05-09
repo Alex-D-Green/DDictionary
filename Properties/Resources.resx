@@ -177,6 +177,9 @@ Continue and save only filtered clauses?</value>
   <data name="FinishLabel" xml:space="preserve">
     <value>Finish</value>
   </data>
+  <data name="GetReadyLabel" xml:space="preserve">
+    <value>Get ready!</value>
+  </data>
   <data name="GroupChangeConfirmation" xml:space="preserve">
     <value>Move these {1} selected clause[s] to the group "{0}"?</value>
   </data>

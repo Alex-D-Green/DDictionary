@@ -106,7 +106,7 @@ namespace DDictionary.Presentation.Testing
             //Set up the controls
             counterLbl.Text = $"{currentRound + 1}/{TotalRounds}";
 
-            translationLbl.Text = MakeTransaltionsString(rightAnswerForRound.Translations);
+            translationLbl.Text = MakeTranslationsString(rightAnswerForRound.Translations);
 
             if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
                 transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
@@ -125,21 +125,23 @@ namespace DDictionary.Presentation.Testing
             UpdateTipButton();
         }
 
-        private string MakeTransaltionsString(IEnumerable<Translation> translations)
+        private string MakeTranslationsString(IEnumerable<Translation> translations)
         {
             var ret = new StringBuilder();
 
-            foreach(Translation tr in translations.OrderBy(o => random.Next()))
+            foreach(string tr in translations.OrderBy(o => random.Next())
+                                             .Select(o => o.Text)
+                                             .Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 if(ret.Length > 0)
                 {
-                    if(ret.Length + tr.Text.Length > 128)
+                    if(ret.Length + tr.Length > 128)
                         continue; //Too long let's try to find and add another translation
 
                     ret.Append("; ");
                 }
 
-                ret.Append(tr.Text);
+                ret.Append(tr);
             }
 
             return ret.ToString();

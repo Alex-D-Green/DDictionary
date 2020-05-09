@@ -232,6 +232,12 @@ namespace DDictionary.Presentation.Testing
             if(answerResult != AnswerCheckResult.Correct)
             {
                 wrongAnsLbl.Text = (answerResult == AnswerCheckResult.Absent) ? PrgResources.NoAnswer : answerEdit.Text;
+                
+                wrongAnsLbl.TextDecorations.Clear();
+
+                if(answerResult != AnswerCheckResult.Absent)
+                    wrongAnsLbl.TextDecorations.Add(TextDecorations.Strikethrough);
+
                 wrongAnsLbl.Visibility = Visibility.Visible;
             }
 

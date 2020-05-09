@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:base="clr-namespace:DDictionary.Presentation.Testing"
         mc:Ignorable="d"
-        Title="Word - Translation testing" Height="370" Width="600" WindowStartupLocation="CenterOwner" 
+        Title="Word - translation test" Height="370" Width="600" WindowStartupLocation="CenterOwner" 
         SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow" 
         PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>

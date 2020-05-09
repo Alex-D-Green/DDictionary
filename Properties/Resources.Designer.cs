@@ -229,6 +229,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Get ready!.
+        /// </summary>
+        internal static string GetReadyLabel {
+            get {
+                return ResourceManager.GetString("GetReadyLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Move these {1} selected clause[s] to the group &quot;{0}&quot;?.
         /// </summary>
         internal static string GroupChangeConfirmation {

@@ -54,7 +54,7 @@ namespace DDictionary.Presentation.Testing
             for(int i=0; i<AnswersPerRound; i++)
                 SetWordOnButton(GetAnswerButton(i), answersForRound[i]);
 
-            translationLbl.Text = MakeTransaltionsString(rightAnswerForRound.Translations);
+            translationLbl.Text = MakeTranslationsString(rightAnswerForRound.Translations);
             transcriptionLbl.Visibility = relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
             ClearPanel(relationsPanel);
         }
@@ -124,17 +124,19 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        private string MakeTransaltionsString(IEnumerable<Translation> translations)
+        private string MakeTranslationsString(IEnumerable<Translation> translations)
         {
             var ret = new StringBuilder();
 
             int max = 7;
-            foreach(Translation tr in translations.OrderBy(o => random.Next()))
+            foreach(string tr in translations.OrderBy(o => random.Next())
+                                             .Select(o => o.Text)
+                                             .Distinct(StringComparer.OrdinalIgnoreCase))
             {
                 if(ret.Length > 0)
                     ret.AppendLine(";");
 
-                ret.Append(tr.Text);
+                ret.Append(tr);
 
                 if(--max == 0)
                     break;

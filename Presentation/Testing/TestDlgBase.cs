@@ -26,6 +26,7 @@ namespace DDictionary.Presentation.Testing
 
         protected enum CurrentAction
         {
+            WaitingForStart,
             HidingAnswers,
             WaitingForUserAnswer,
             ShowingRoundResult
