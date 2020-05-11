@@ -28,8 +28,8 @@ namespace DDictionary.Presentation.Testing
         protected override Button actionButton { get => actionBtn; }
 
 
-        public TranslationWordDlg(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        public TranslationWordDlg(IEnumerable<int> clausesForTrainingList)
+            : base(clausesForTrainingList, TestType.TranslationWord)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -216,19 +216,18 @@ namespace DDictionary.Presentation.Testing
         {
             var ret = new List<Clause>(count-1);
 
-            if(allWords is null)
-                allWords = (await dbFacade.GetJustWordsAsync())
-                               .OrderBy(o => o.Word, StringComparer.CurrentCultureIgnoreCase)
-                               .ToArray();
+            var sortedWords =  allWords.Values
+                                       .OrderBy(o => o.Word, StringComparer.CurrentCultureIgnoreCase)
+                                       .ToArray();
 
             //Get a similar word that placed nearly in alphabetical order
-            for(int i=0; i<allWords.Length; i++)
+            for(int i=0; i< sortedWords.Length; i++)
             {
-                if(allWords[i].Id == word.Id)
+                if(sortedWords[i].Id == word.Id)
                 {
                     if(i != 0)
                     {
-                        Clause tmp = await dbFacade.GetClauseByIdAsync(allWords[i - 1].Id);
+                        Clause tmp = await dbFacade.GetClauseByIdAsync(sortedWords[i - 1].Id);
                         
                         if(IsAppropriateAnswer(word, tmp))
                             ret.Add(tmp);
@@ -239,11 +238,11 @@ namespace DDictionary.Presentation.Testing
             }
 
             //And some of random ones
-            int maxTries = allWords.Length >= 15 ? 15 : allWords.Length; //Max amount of finding appropriate answers
+            int maxTries = allWords.Count >= 15 ? 15 : allWords.Count; //Max amount of finding appropriate answers
             int tries = 0;
             while(ret.Count < count-1)
             {
-                JustWordDTO w = allWords[random.Next(allWords.Length)];
+                WordTrainingStatisticDTO w = allWords.Values.ElementAt(random.Next(allWords.Count));
 
                 if(word.Id != w.Id && !ret.Any(o => o.Id == w.Id))
                 {

@@ -50,17 +50,14 @@ namespace DDictionary.Presentation.Testing
         protected readonly List<TestAnswer> answers = new List<TestAnswer>();
 
 
-        /// <summary>The list of available for training clauses' ids.</summary>
-        protected IList<int> clausesForTrainingList;
-
-        /// <summary>All words in the dictionary, sorted by alphabet.</summary>
-        protected JustWordDTO[] allWords;
-
-        /// <summary>The index of the current round.</summary>
-        protected int currentRound;
+        /// <summary>The sorted list of available for training clauses' ids.</summary>
+        private List<int> clausesForTrainingListInternal;
 
         /// <summary>Ids of the words that were selected for this training session.</summary>
         protected IList<int> wordsForTraining;
+
+        /// <summary>The index of the current round.</summary>
+        protected int currentRound;
 
         /// <summary>The right answer for this round.</summary>
         protected Clause rightAnswerForRound;
@@ -71,6 +68,22 @@ namespace DDictionary.Presentation.Testing
         /// <summary>Time since the beginning of the try.</summary>
         protected DateTime answerTime;
 
+
+        /// <summary>All words from the dictionary. Key it's clause's id.</summary>
+        protected IReadOnlyDictionary<int, WordTrainingStatisticDTO> allWords { get; private set; }
+
+        /// <summary>The sorted list of available for training clauses' ids.</summary>
+        /// <value><see cref="clausesForTrainingListInternal"/></value>
+        protected IReadOnlyList<int> clausesForTrainingList 
+        { 
+            get => clausesForTrainingListInternal;
+
+            set
+            {
+                clausesForTrainingListInternal = value.ToList();
+                clausesForTrainingListInternal.Sort(Comparer); //Sort words according to their rating for this training
+            }
+        }
 
         /// <summary>Total rounds in the training considering amount of available words.</summary>
         public int TotalRounds
@@ -88,14 +101,19 @@ namespace DDictionary.Presentation.Testing
         /// <summary>The brush to highlight correct answers.</summary>
         protected Brush correctBrush { get; }
 
+        /// <summary>Test's type.</summary>
+        public TestType TrainingType { get; }
 
-        protected TestDlgBase(IList<int> clausesForTrainingList)
+
+        protected TestDlgBase(IEnumerable<int> clausesForTrainingList, TestType type)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
 
+            RefreshAllWords().Wait();
 
-            this.clausesForTrainingList = clausesForTrainingList;
+            this.clausesForTrainingList = clausesForTrainingList.ToList();
+            TrainingType = type;
 
             errorBrush = Resources["ErrorBrush"] as Brush ??
                 new SolidColorBrush(Colors.Coral);
@@ -118,10 +136,25 @@ namespace DDictionary.Presentation.Testing
         }
 
         /// <summary>
+        /// Load all words from the data source into <see cref="allWords"/>.
+        /// </summary>
+        protected async Task RefreshAllWords()
+        {
+            allWords = (await dbFacade.GetWordTrainingStatisticsAsync(TrainingType)).ToDictionary(o => o.Id);
+        }
+
+        /// <summary>
         /// Check ability to start a new training depend on available amount of words in the dictionary and 
         /// in the training list, then start the first round or close the window.
         /// </summary>
-        protected abstract Task StartTrainingAsync();
+        /// <remarks>Base version just clear the <see cref="DDictionary.Presentation.Testing.TestDlgBase.answers"/>.
+        /// </remarks>
+        protected virtual Task StartTrainingAsync()
+        {
+            answers.Clear();
+
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Set up the button (and its frame) appearance according to the given state decoration.
@@ -154,14 +187,26 @@ namespace DDictionary.Presentation.Testing
         {
             var ret = new List<int>(count);
 
-            while(ret.Count < count)
+            //Take one third of the words by random
+            while(ret.Count < Math.Round(count * 0.3333))
             {
-                //TODO: Select words by their training statistics not just random ones!
-                int n = clausesForTrainingList[random.Next(clausesForTrainingList.Count)];
+                int id = clausesForTrainingList[random.Next(clausesForTrainingList.Count)];
 
-                if(!ret.Contains(n))
-                    ret.Add(n);
+                if(!ret.Contains(id))
+                    ret.Add(id);
             }
+
+            //The rest ones according to their statistic (the list is sorted)
+            foreach(int id in clausesForTrainingList)
+            {
+                if(!ret.Contains(id))
+                    ret.Add(id);
+
+                if(ret.Count == count)
+                    break;
+            }
+
+            ret.Sort((x, y) => random.Next(3) - 1); //Shuffle the list
 
             return ret;
         }
@@ -220,6 +265,50 @@ namespace DDictionary.Presentation.Testing
             {
                 e.Cancel = true;
             }
+        }
+
+        protected async Task SaveAnswerAsync(TestAnswer answer)
+        {
+            if(answer is null)
+                throw new ArgumentNullException(nameof(answer));
+
+
+            answers.Add(answer);
+
+            await dbFacade.AddOrUpdateTrainingStatisticAsync(TrainingType, answer.Word.Id, answer.Correct);
+
+            if(!answer.Correct && answer.GivenAnswer != null)
+                await dbFacade.AddOrUpdateTrainingStatisticAsync(TrainingType, answer.GivenAnswer.Id, false);
+        }
+
+        /// <summary>
+        /// Compare two words in terms of desirability for this training type.
+        /// More desirable word will be "less".
+        /// </summary>
+        private int Comparer(int firstId, int secondId)
+        {
+            TrainingStatisticDTO w1 = allWords[firstId].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
+            TrainingStatisticDTO w2 = allWords[secondId].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
+
+            if(w1 is null && w2 is null)
+                return firstId - secondId; //There is no statistics, compare by ids
+            else if(w1 is null || w2 is null)
+                return w1 is null ? -1 : 1; //The word with no statistic is "less"
+            else if(getPercent(w1) != getPercent(w2))
+                return getPercent(w1) - getPercent(w2); //The less successful word is "less"
+            else if(getTotal(w1) != getTotal(w2))
+                return getTotal(w1) - getTotal(w2); //The less trained word is "less"
+            else if(w1.LastTraining != w2.LastTraining)
+                return DateTime.Compare(w1.LastTraining, w2.LastTraining); //The word that was trained earlier is "less"
+            else
+                return firstId - secondId; //Equal statistics, compare by ids
+
+
+            //Get the total tries for the word
+            int getTotal(TrainingStatisticDTO tr) => tr.Success + tr.Fail;
+
+            //Get the percent of success for the word
+            int getPercent(TrainingStatisticDTO tr) => (int)((double)tr.Success / getTotal(tr) * 100);
         }
     }
 }

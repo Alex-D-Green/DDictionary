@@ -28,8 +28,8 @@ namespace DDictionary.Presentation.Testing
         protected override Button actionButton { get => actionBtn; }
 
 
-        public WordTranslationDlg(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        public WordTranslationDlg(IEnumerable<int> clausesForTrainingList)
+            : base(clausesForTrainingList, TestType.WordTranslation)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -230,15 +230,12 @@ namespace DDictionary.Presentation.Testing
         {
             var ret = new List<Clause>(count - 1);
 
-            if(allWords is null)
-                allWords = (await dbFacade.GetJustWordsAsync()).ToArray();
-
             //And some of random ones
-            int maxTries = allWords.Length >= 15 ? 15 : allWords.Length; //Max amount of finding appropriate answers
+            int maxTries = allWords.Count >= 15 ? 15 : allWords.Count; //Max amount of finding appropriate answers
             int tries = 0;
             while(ret.Count < count - 1)
             {
-                JustWordDTO w = allWords[random.Next(allWords.Length)];
+                WordTrainingStatisticDTO w = allWords.Values.ElementAt(random.Next(allWords.Count));
 
                 if(word.Id != w.Id && !ret.Any(o => o.Id == w.Id))
                 {

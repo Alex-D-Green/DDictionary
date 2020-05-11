@@ -40,8 +40,8 @@ namespace DDictionary.Presentation.Testing
         private readonly DispatcherTimer answerTimer;
 
 
-        public SprintDlg(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        public SprintDlg(IEnumerable<int> clausesForTrainingList)
+            : base(clausesForTrainingList, TestType.Sprint)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -57,7 +57,7 @@ namespace DDictionary.Presentation.Testing
 
         protected override async Task StartTrainingAsync()
         {
-            answers.Clear();
+            await base.StartTrainingAsync();
 
             int total = await dbFacade.GetTotalClausesAsync();
 
@@ -104,7 +104,7 @@ namespace DDictionary.Presentation.Testing
                             .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                             .ToList();
 
-                    allWords = null;
+                    await RefreshAllWords();
 
                     await StartTrainingAsync();
                 }
@@ -152,14 +152,11 @@ namespace DDictionary.Presentation.Testing
 
         private async Task<Clause> GetWrongAnswerForWordAsync(Clause word)
         {
-            if(allWords is null)
-                allWords = (await dbFacade.GetJustWordsAsync()).ToArray();
-
-            int maxTries = allWords.Length >= 15 ? 15 : allWords.Length; //Max amount of finding appropriate answer
+            int maxTries = allWords.Count >= 15 ? 15 : allWords.Count; //Max amount of finding appropriate answer
             int tries = 0;
             while(true)
             {
-                JustWordDTO w = allWords[random.Next(allWords.Length)];
+                WordTrainingStatisticDTO w = allWords.Values.ElementAt(random.Next(allWords.Count));
 
                 if(word.Id == w.Id)
                     continue;
@@ -241,7 +238,7 @@ namespace DDictionary.Presentation.Testing
                 PlayErrorSound();
 
             //Collect answer info
-            answers.Add(new TestAnswer {
+            await SaveAnswerAsync(new TestAnswer {
                 Word = rightAnswerForRound,
                 GivenAnswer = (pressedButton == yesBtn ? givenAnswer : null),
                 Correct = (givenAnswer?.Id == rightAnswerForRound.Id),

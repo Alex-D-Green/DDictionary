@@ -25,8 +25,8 @@ namespace DDictionary.Presentation.Testing
         protected abstract Button actionButton { get; }
 
 
-        protected SelectiveTestDlgBase(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        protected SelectiveTestDlgBase(IEnumerable<int> clausesForTrainingList, TestType type)
+            : base(clausesForTrainingList, type)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -35,7 +35,7 @@ namespace DDictionary.Presentation.Testing
 
         protected override async Task StartTrainingAsync()
         {
-            answers.Clear();
+            await base.StartTrainingAsync();
 
             int total = await dbFacade.GetTotalClausesAsync();
 
@@ -109,7 +109,7 @@ namespace DDictionary.Presentation.Testing
                                     .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                                     .ToList();
 
-                            allWords = null;
+                            await RefreshAllWords();
 
                             await StartTrainingAsync();
                         }
@@ -153,7 +153,7 @@ namespace DDictionary.Presentation.Testing
                 DecorateButton(actionButton, ButtonDecoration.UserWrongAnswer);
 
             //Collect answer info
-            answers.Add(new TestAnswer {
+            await SaveAnswerAsync(new TestAnswer {
                 Word = rightAnswerForRound,
                 GivenAnswer = givenAnswer,
                 Correct = (answerId == rightAnswerForRound.Id),

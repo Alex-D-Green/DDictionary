@@ -41,8 +41,8 @@ namespace DDictionary.Presentation.Testing
         private int triesWereMade;
 
 
-        public ListeningDlg(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        public ListeningDlg(IEnumerable<int> clausesForTrainingList)
+            : base(clausesForTrainingList, TestType.Listening)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -62,7 +62,7 @@ namespace DDictionary.Presentation.Testing
 
         protected override async Task StartTrainingAsync()
         {
-            answers.Clear();
+            await base.StartTrainingAsync();
 
             int total = await dbFacade.GetTotalClausesAsync();
 
@@ -161,7 +161,7 @@ namespace DDictionary.Presentation.Testing
                                 .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                                 .ToList();
 
-                        allWords = null;
+                        await RefreshAllWords();
 
                         await StartTrainingAsync();
                     }
@@ -259,7 +259,7 @@ namespace DDictionary.Presentation.Testing
                 wrongWordId = await dbFacade.GetClauseIdByWordAsync(wrongAnsLbl.Text);
 
             //Collect answer info
-            answers.Add(new TestAnswer {
+            await SaveAnswerAsync(new TestAnswer {
                 Word = rightAnswerForRound,
                 GivenAnswer = (wrongWordId == 0 ? null : await dbFacade.GetClauseByIdAsync(wrongWordId)),
                 Correct = (answerResult == AnswerCheckResult.Correct),

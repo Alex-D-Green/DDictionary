@@ -47,8 +47,8 @@ namespace DDictionary.Presentation.Testing
         private int hintsCount;
 
 
-        public WordsConstructorDlg(IList<int> clausesForTrainingList)
-            : base(clausesForTrainingList)
+        public WordsConstructorDlg(IEnumerable<int> clausesForTrainingList)
+            : base(clausesForTrainingList, TestType.WordConstructor)
         {
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
@@ -65,7 +65,7 @@ namespace DDictionary.Presentation.Testing
 
         protected override async Task StartTrainingAsync()
         {
-            answers.Clear();
+            await base.StartTrainingAsync();
 
             int total = await dbFacade.GetTotalClausesAsync();
 
@@ -307,7 +307,7 @@ namespace DDictionary.Presentation.Testing
             await PlaySoundAsync(rightAnswerForRound);
 
             //Collect answer info
-            answers.Add(new TestAnswer {
+            await SaveAnswerAsync(new TestAnswer {
                 Word = rightAnswerForRound,
                 GivenAnswer = null,
                 Correct = correctAnswer,
@@ -349,7 +349,7 @@ namespace DDictionary.Presentation.Testing
                                 .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                                 .ToList();
 
-                        allWords = null;
+                        await RefreshAllWords();
 
                         await StartTrainingAsync();
                     }
