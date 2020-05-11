@@ -122,5 +122,27 @@ namespace DDictionary.Domain
         /// <returns>All founded errors in data. If the list is empty then the operation is successful.</returns>
         /// <seealso cref="DDictionary.Presentation.Converters.ClauseToCsvClauseMapper.MapFromCsvClause"/>
         Task<List<string>> BulkAddClausesAsync(IEnumerable<Clause> clauses);
+
+        /// <summary>
+        /// Add or update training statistic. 
+        /// Creates a new record for the pair Test type + Word, or update the exists one.
+        /// </summary>
+        /// <param name="test">Test type.</param>
+        /// <param name="clauseId">Clause's id.</param>
+        /// <param name="success">Word's training was success.</param>
+        Task AddOrUpdateTrainingStatisticAsync(TestType test, int clauseId, bool success);
+
+        /// <summary>
+        /// Get the clause training statistic.
+        /// </summary>
+        /// <param name="test">Test type.</param>
+        /// <param name="clauseId">Clause's id.</param>
+        Task<TrainingStatisticDTO> GetClauseTrainingStatisticAsync(TestType test, int clauseId);
+
+        /// <summary>
+        /// Get <b>all words</b> with their training statistics for the needed kinds of tests.
+        /// </summary>
+        /// <param name="types">Needed tests' types, <b>empty array - return statistic of all tests' types</b>.</param>
+        Task<IEnumerable<WordTrainingStatisticDTO>> GetWordTrainingStatisticsAsync(params TestType[] types);
     }
 }

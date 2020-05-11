@@ -705,6 +705,111 @@ namespace DDictionary.DAL
             return errors;
         }
 
+        public async Task AddOrUpdateTrainingStatisticAsync(TestType test, int clauseId, bool success)
+        {
+            if(clauseId <= 0)
+                throw new ArgumentException("Identifier has to be greater than 0.", nameof(clauseId));
+
+            try
+            {
+                TrainingStatisticDTO tmp = await GetClauseTrainingStatisticAsync(test, clauseId);
+
+                if(tmp is null)
+                { //Insert a new record
+                    tmp = new TrainingStatisticDTO {
+                        TestType = test,
+                        ClauseId = clauseId,
+                        Success = success ? 1 : 0,
+                        Fail = success ? 0 : 1,
+                        LastTraining = DateTime.Now
+                    };
+
+                    const string sql =
+                        "INSERT INTO [TrainingStatistics] ([TestType], [ClauseId], [Success], [Fail], [LastTraining])\n" +
+                        "VALUES (@TestType, @ClauseId, @Success, @Fail, @LastTraining);";
+
+                    using(IDbConnection cnn = GetConnection())
+                        cnn.Execute(sql, tmp);
+                }
+                else
+                { //Update an existing record
+                    if(success)
+                        tmp.Success++;
+                    else
+                        tmp.Fail++;
+
+                    tmp.LastTraining = DateTime.Now;
+
+                    const string sql =
+                        "UPDATE [TrainingStatistics] SET [Success] = @Success, [Fail] = @Fail, [LastTraining] = @LastTraining\n" +
+                        "    WHERE [TestType] = @TestType AND [ClauseId] = @ClauseId;";
+
+                    using(IDbConnection cnn = GetConnection())
+                        cnn.Execute(sql, tmp);
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
+        }
+
+        public async Task<TrainingStatisticDTO> GetClauseTrainingStatisticAsync(TestType test, int clauseId)
+        {
+            if(clauseId <= 0)
+                throw new ArgumentException("Identifier has to be greater than 0.", nameof(clauseId));
+
+            try
+            {
+                using(IDbConnection cnn = GetConnection())
+                {
+                    IEnumerable<TrainingStatisticDTO> ret =
+                        await cnn.QueryAsync<TrainingStatisticDTO>(
+                            "SELECT * FROM [TrainingStatistics] WHERE [TestType] = @Type AND [ClauseId] = @Id",
+                            new { Type = test, Id = clauseId });
+
+                    return ret.SingleOrDefault();
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { return null; }
+        }
+
+        public async Task<IEnumerable<WordTrainingStatisticDTO>> GetWordTrainingStatisticsAsync(params TestType[] types)
+        {
+            if(types is null)
+                throw new ArgumentNullException(nameof(types));
+
+
+            try
+            {
+                const string sql = "SELECT [CL].[Id], [Cl].[Word], [TS].* FROM [Clauses] [Cl]\n" +
+                                   "    LEFT JOIN [TrainingStatistics] [TS] ON [Cl].[Id] = [TS].[ClauseId]";
+
+                using(IDbConnection cnn = GetConnection())
+                {
+                    var query = 
+                        cnn.QueryAsync<(int id, string w, TestType? t, int? clId, int? s, int? f, DateTime? d)>(sql);
+
+                    return (await query)
+                        .GroupBy(o => new { o.id, o.w })
+                        .Select(gr => new WordTrainingStatisticDTO {
+                            Id = gr.Key.id,
+                            Word = gr.Key.w,
+                            Statistics = gr.Where(o => o.t != null && (types.Length == 0 || types.Contains(o.t.Value)))
+                                           .Select(o => new TrainingStatisticDTO {
+                                               ClauseId = o.clId.Value,
+                                               TestType = o.t.Value,
+                                               Success = o.s.Value,
+                                               Fail = o.f.Value,
+                                               LastTraining = o.d.Value
+                                           })
+                                           .ToArray()
+                        });
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { return Enumerable.Empty<WordTrainingStatisticDTO>(); }
+        }
+
         /// <summary>
         /// Get connection to SQLite database with default connection string.
         /// </summary>

@@ -89,6 +89,9 @@
     <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
     <Compile Include="Domain\Entities\RelationDTO.cs" />
+    <Compile Include="Domain\Entities\TestType.cs" />
+    <Compile Include="Domain\Entities\TrainingStatisticDTO.cs" />
+    <Compile Include="Domain\Entities\WordTrainingStatisticDTO.cs" />
     <Compile Include="Presentation\AboutProgramDlg.xaml.cs">
       <DependentUpon>AboutProgramDlg.xaml</DependentUpon>
     </Compile>
@@ -171,7 +174,6 @@
     <Compile Include="Presentation\UICommands.cs" />
     <Compile Include="Presentation\ViewModels\CsvClause.cs" />
     <Compile Include="Presentation\ViewModels\DataGridClause.cs" />
-    <Compile Include="DAL\InMemoryMockStorage.cs" />
     <Compile Include="Presentation\ViewModels\CheckBoxItem.cs" />
     <Compile Include="Domain\Entities\Clause.cs" />
     <Compile Include="Domain\Entities\WordGroup.cs" />
@@ -254,7 +256,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="DictionaryDB.db" />
+    <None Include="DictionaryDB.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Icon\DDictionary.fla" />
     <None Include="LICENSE" />
     <None Include="packages.config" />
