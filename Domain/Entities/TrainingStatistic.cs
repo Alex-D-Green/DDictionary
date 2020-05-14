@@ -3,11 +3,9 @@
 
 namespace DDictionary.Domain.Entities
 {
-    public class TrainingStatisticDTO
+    public class TrainingStatistic
     {
         public TestType TestType { get; set; }
-
-        public int ClauseId { get; set; }
 
         public int Success { get; set; }
 

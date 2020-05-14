@@ -67,11 +67,11 @@ namespace DDictionary.Presentation
         {
             #region Upgrade application settings if needed
 
-            if(Properties.Settings.Default.UpgradeRequired)
+            if(PrgSettings.Default.UpgradeRequired)
             {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.UpgradeRequired = false;
-                Properties.Settings.Default.Save();
+                PrgSettings.Default.Upgrade();
+                PrgSettings.Default.UpgradeRequired = false;
+                PrgSettings.Default.Save();
             }
 
             #endregion

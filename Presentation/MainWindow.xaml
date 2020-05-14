@@ -260,7 +260,16 @@
                                     MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
                 <DataGridTextColumn Binding="{Binding Group, Converter={StaticResource WordGroupConverter}}" Header="Group" 
                                     ElementStyle="{StaticResource ColumnElementStyle}" 
-                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>                
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding UnderstandingScore, StringFormat=\{0:F0\}%}" Header="Meaning score" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding SpellingScore, StringFormat=\{0:F0\}%}" Header="Spelling score" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn Binding="{Binding ListeningScore, StringFormat=\{0:F0\}%}" Header="Listening score" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
             </DataGrid.Columns>
         </DataGrid>
         <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" 

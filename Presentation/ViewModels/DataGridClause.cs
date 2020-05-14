@@ -20,5 +20,9 @@ namespace DDictionary.Presentation.ViewModels
         public DateTime Watched { get; set; }
         public int WatchedCount { get; set; }
         public WordGroup Group { get; set; }
+        
+        public double UnderstandingScore { get; set; }
+        public double SpellingScore { get; set; }
+        public double ListeningScore { get; set; }
     }
 }

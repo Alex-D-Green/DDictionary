@@ -77,6 +77,7 @@ namespace DDictionary.DAL
                  "    LEFT JOIN [Translations] [tr] ON [tr].[ClauseId] = [cl].[Id]\n" +
                  "    LEFT JOIN [Relations] [rl] ON [rl].[FromClauseId] = [cl].[Id]\n" +
                  "    LEFT JOIN [Clauses] [cl2] ON [cl2].[Id] = [rl].[ToClauseId]\n" +
+                 "    LEFT JOIN [TrainingStatistics] [trst] ON [trst].[ClauseId] = [cl].[Id]\n" +
                  "    WHERE [cl].[Id] = @ClauseId; ";
 
             try
@@ -99,6 +100,7 @@ namespace DDictionary.DAL
             sql.AppendLine("    LEFT JOIN [Translations] [tr] ON [tr].[ClauseId] = [cl].[Id]");
             sql.AppendLine("    LEFT JOIN [Relations] [rl] ON [rl].[FromClauseId] = [cl].[Id]");
             sql.AppendLine("    LEFT JOIN [Clauses] [cl2] ON [cl2].[Id] = [rl].[ToClauseId]");
+            sql.AppendLine("    LEFT JOIN [TrainingStatistics] [trst] ON [trst].[ClauseId] = [cl].[Id]");
 
             string nextJoin = "WHERE";
 
@@ -200,8 +202,8 @@ namespace DDictionary.DAL
                     try
                     {
                         IEnumerable<Clause> clauses =
-                            await cnn.QueryAsync<Clause, Translation, Relation, Clause, Clause>(cmd,
-                                (clause, translation, relation, clauseTo) =>
+                            await cnn.QueryAsync<Clause, Translation, Relation, Clause, TrainingStatistic, Clause>(cmd,
+                                (clause, translation, relation, clauseTo, trainingStatistics) =>
                                 {
 
                                     if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
@@ -219,8 +221,14 @@ namespace DDictionary.DAL
                                         clauseEntry.Relations.Add(relation);
                                     }
 
+                                    if(trainingStatistics != null && 
+                                       !clauseEntry.TrainingStatistics.Any(o => o.TestType == trainingStatistics.TestType))
+                                    {
+                                        clauseEntry.TrainingStatistics.Add(trainingStatistics);
+                                    }
+
                                     return clauseEntry;
-                                });
+                                }, "Id,TestType");
 
                         return clauses.Distinct();
                     }

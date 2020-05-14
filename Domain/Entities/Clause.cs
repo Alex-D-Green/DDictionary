@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace DDictionary.Domain.Entities
 {
     public class Clause
@@ -17,5 +18,6 @@ namespace DDictionary.Domain.Entities
         public DateTime Watched { get; set; }
         public int WatchedCount { get; set; }
         public WordGroup Group { get; set; }
+        public List<TrainingStatistic> TrainingStatistics { get; set; } = new List<TrainingStatistic>();
     }
 }

@@ -14,7 +14,7 @@ The key features of the program is:
 - [x] Implement Listening training;
 - [x] Implement Sprint training;
 - [x] Update database structure to collect training results and use them for trainings;
-- [ ] Add trainings' statistic columns into the main grid.
+- [x] Add trainings' statistics columns into the main grid.
 
 
 ## License

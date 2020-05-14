@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using DDictionary.Domain.Entities;
@@ -31,7 +32,11 @@ namespace DDictionary.Presentation.Converters
                 Updated = cl.Updated,
                 Watched = cl.Watched,
                 WatchedCount = cl.WatchedCount,
-                Group = cl.Group
+                Group = cl.Group,
+
+                UnderstandingScore = CalculateUnderstandingScore(cl.TrainingStatistics),
+                SpellingScore = CalculateSpellingScore(cl.TrainingStatistics),
+                ListeningScore = CalculateListeningScore(cl.TrainingStatistics)
             };
         }
 
@@ -60,6 +65,69 @@ namespace DDictionary.Presentation.Converters
                             .OrderBy(o => o)
                             .Aggregate("", (s, o) => s += $"{o}; ")
                             .TrimEnd(' ', ';');
+        }
+
+        /// <summary>
+        /// Get the score for understanding that accumulates results from all related tests.
+        /// </summary>
+        /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
+        public static double CalculateUnderstandingScore(IEnumerable<TrainingStatistic> statistics)
+        {
+            return CalculateScore(statistics, new List<TestType> {
+                TestType.TranslationWord,
+                TestType.WordTranslation,
+                TestType.WordConstructor,
+                TestType.Sprint
+            });
+        }
+
+        /// <summary>
+        /// Get the score for spelling that accumulates results from all related tests.
+        /// </summary>
+        /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
+        public static double CalculateSpellingScore(IEnumerable<TrainingStatistic> statistics)
+        {
+            return CalculateScore(statistics, new List<TestType> {
+                TestType.WordConstructor,
+                TestType.Listening
+            });
+        }
+
+        /// <summary>
+        /// Get the score for listening that accumulates results from all related tests.
+        /// </summary>
+        /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
+        public static double CalculateListeningScore(IEnumerable<TrainingStatistic> statistics)
+        {
+            return CalculateScore(statistics, new List<TestType> {
+                TestType.Listening
+            });
+        }
+
+        private static double CalculateScore(IEnumerable<TrainingStatistic> statistics, IList<TestType> types)
+        {
+            //              meaning  spelling  hearing
+            // tr-word         *
+            // word-tr         *
+            // constr          *        *
+            // listening                *         *
+            // sprint          *
+
+            if(statistics is null)
+                return 0;
+
+            double success = 0;
+            double fail = 0;
+
+            foreach(TrainingStatistic st in statistics.Where(o => types.Contains(o.TestType)))
+            {
+                success += st.Success;
+                fail += st.Fail;
+            }
+
+            double total = success + fail;
+
+            return total > 0 ? (success / total * 100) : 0;
         }
     }
 }
