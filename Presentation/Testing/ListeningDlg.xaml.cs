@@ -154,14 +154,14 @@ namespace DDictionary.Presentation.Testing
 
                     if(dlg.ShowDialog() == true)
                     {
+                        await RefreshAllWords();
+
                         //Update the list of clauses
                         clausesForTrainingList = clausesForTrainingList
                                 .Union(dlg.Answers.Where(o => !String.IsNullOrEmpty(o.Word.Sound))
                                                   .Select(o => o.Word.Id)) //In case of new words (wrong answers)
                                 .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                                 .ToList();
-
-                        await RefreshAllWords();
 
                         await StartTrainingAsync();
                     }

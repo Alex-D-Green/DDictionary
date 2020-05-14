@@ -344,12 +344,12 @@ namespace DDictionary.Presentation.Testing
 
                     if(dlg.ShowDialog() == true)
                     {
+                        await RefreshAllWords();
+
                         //Update the list of clauses
                         clausesForTrainingList = clausesForTrainingList
                                 .Except(dlg.Answers.Where(o => o.Deleted).Select(o => o.Word.Id)) //Deleted words
                                 .ToList();
-
-                        await RefreshAllWords();
 
                         await StartTrainingAsync();
                     }

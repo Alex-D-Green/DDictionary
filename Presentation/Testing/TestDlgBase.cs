@@ -291,17 +291,21 @@ namespace DDictionary.Presentation.Testing
             TrainingStatisticDTO w2 = allWords[secondId].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
 
             if(w1 is null && w2 is null)
-                return firstId - secondId; //There is no statistics, compare by ids
+                return random.Next(3) - 1; //There is no statistic - random choice
             else if(w1 is null || w2 is null)
                 return w1 is null ? -1 : 1; //The word with no statistic is "less"
-            else if(getPercent(w1) != getPercent(w2))
-                return getPercent(w1) - getPercent(w2); //The less successful word is "less"
-            else if(getTotal(w1) != getTotal(w2))
-                return getTotal(w1) - getTotal(w2); //The less trained word is "less"
-            else if(w1.LastTraining != w2.LastTraining)
-                return DateTime.Compare(w1.LastTraining, w2.LastTraining); //The word that was trained earlier is "less"
-            else
-                return firstId - secondId; //Equal statistics, compare by ids
+
+            //Both words have statistics, let's calculate the estimation
+            int dPercent = getPercent(w1) - getPercent(w2); //The less successful word is "less"
+            int dTries = getTotal(w1) - getTotal(w2); //The less trained word is "less"
+            int dDays = (int)(w1.LastTraining - w2.LastTraining).TotalDays; //The word that was trained earlier is "less"
+
+            int estimate = dPercent + dTries*10 + dDays;
+
+            if(estimate != 0)
+                return estimate; //Consider the estimate as words are not "equal"
+            else //Words are "equal" by the estimation
+                return DateTime.Compare(w1.LastTraining, w2.LastTraining); //Then let's consider their date and time
 
 
             //Get the total tries for the word
