@@ -55,6 +55,13 @@ namespace DDictionary.Presentation
             "Edit word relations", "Edit word relations", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.R, ModifierKeys.Control) });
 
+        public static readonly RoutedUICommand CreateNewDBCommand = new RoutedUICommand(
+            "Create new data base", "Create new data base", typeof(UICommands));
+
+        public static readonly RoutedUICommand OpenDBCommand = new RoutedUICommand(
+            "Open data base", "Open data base", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.O, ModifierKeys.Control) });
+
         public static readonly RoutedUICommand ExportToCSVCommand = new RoutedUICommand(
             "Export to CSV", "Export to CSV", typeof(UICommands));
 

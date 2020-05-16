@@ -58,6 +58,8 @@
         </collections:ArrayList>
     </Window.Resources>
     <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:UICommands.CreateNewDBCommand}" Executed="OnCreateNewDBCommand" />
+        <CommandBinding Command="{x:Static local:UICommands.OpenDBCommand}" Executed="OnOpenDBCommand" />
         <CommandBinding Command="{x:Static local:UICommands.ExitCommand}" Executed="OnExitCommand" />
         <CommandBinding Command="{x:Static local:UICommands.SettingsCommand}" Executed="OnSettingsCommand" />
         <CommandBinding Command="{x:Static local:UICommands.GoToSiteCommand}" Executed="OnGoToSiteCommand" />
@@ -292,7 +294,11 @@
                     <DockPanel HorizontalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
-            <MenuItem Header="_File">
+            <MenuItem Header="_File" x:Name="fileMenu">
+                <MenuItem Header="_Create new dictionary..." Command="local:UICommands.CreateNewDBCommand"/>
+                <MenuItem Header="_Open dictionary..." Command="local:UICommands.OpenDBCommand"/>
+                <Separator x:Name="recentSep" Visibility="Collapsed"/>
+                <Separator/>
                 <MenuItem Header="_Export shown words into CSV..." Command="local:UICommands.ExportToCSVCommand"/>
                 <MenuItem Header="Export shown words into _Html..." Command="local:UICommands.ExportToHtmlCommand"/>
                 <Separator/>

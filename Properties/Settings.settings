@@ -47,5 +47,11 @@
     <Setting Name="Sorting" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="DataSource" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\DictionaryDB.db</Value>
+    </Setting>
+    <Setting Name="RecentSources" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

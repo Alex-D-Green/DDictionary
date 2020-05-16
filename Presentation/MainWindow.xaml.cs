@@ -36,6 +36,9 @@ namespace DDictionary.Presentation
     /// </summary>
     public partial class MainWindow: Window
     {
+        private const char recentDataSeparator = ';';
+        private const string recentPrefix = "recent";
+
         /// <summary>The minimal main data grid's columns width that used when a column is "hidden".</summary>
         public const double ZeroColumnWidth = 3; //This width could be used in the future to indicate skipped columns 
                                                  //while importing data (e.g. printing).
@@ -103,6 +106,181 @@ namespace DDictionary.Presentation
             UpdateGroupFilterText();
 
             #endregion
+
+            //Set up data source
+            dbFacade.SetUpDataSource(PrgSettings.Default.DataSource);
+            UpdateWindowTitle();
+            
+            UpdateRecentSourcesList(null);
+        }
+
+        private void UpdateWindowTitle()
+        {
+            string dictionary = Path.GetFileNameWithoutExtension(dbFacade.DataSource);
+
+            Title = $"{dictionary} - {PrgResources.MainWindowTitle}";
+        }
+
+        #region Recent files handling
+
+        /// <summary>
+        /// Update list of recently used dictionaries in settings and File menu.
+        /// </summary>
+        private void UpdateRecentSourcesList(string newDataSource)
+        {
+            //Updating settings
+            const int maxRecentItems = 3;
+
+            var recentLst = new List<string>();
+
+            if(!String.IsNullOrEmpty(PrgSettings.Default.RecentSources))
+                foreach(string item in PrgSettings.Default.RecentSources.Split(recentDataSeparator)
+                                                                        .Where(o => !String.IsNullOrWhiteSpace(o)))
+                {
+                    recentLst.Add(item); //Fetch data from string into a list
+                }
+
+            if(newDataSource != null)
+            {
+                recentLst.Insert(0, PrgSettings.Default.DataSource); //Save previous data source
+
+                int idx = recentLst.IndexOf(newDataSource);
+
+                if(idx != -1)
+                    recentLst.RemoveAt(idx); //Remove current data source from the list
+
+                if(recentLst.Count > maxRecentItems)
+                    recentLst = recentLst.Take(maxRecentItems).ToList();
+
+                //Update list in the settings
+                PrgSettings.Default.RecentSources = recentLst.Aggregate("", (s, o) => $"{s}{o}{recentDataSeparator}");
+                PrgSettings.Default.Save();
+            }
+
+
+            //Updating File menu
+            MenuItem[] recentItems = fileMenu.Items.OfType<MenuItem>()
+                                                   .Where(o => o.Name?.StartsWith(recentPrefix) == true)
+                                                   .ToArray();
+
+            foreach(MenuItem item in recentItems)
+                fileMenu.Items.Remove(item);
+
+            recentSep.Visibility = recentLst.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+            recentLst.Reverse();
+            int insertInto = fileMenu.Items.IndexOf(recentSep) + 1;
+            int i = 0;
+            foreach(string item in recentLst)
+            {
+                var menuItem = new MenuItem {
+                    Name = $"{recentPrefix}{i++}",
+                    Header = CreateShortPathString(item, 100),
+                    ToolTip = item,
+                    Tag = item
+                };
+
+                menuItem.Click += OnRecentFileMenuItem_Click;
+
+                fileMenu.Items.Insert(insertInto, menuItem);
+            }
+        }
+
+        private void RemoveFromRecentSourcesList(string dataSource)
+        {
+            //Updating settings
+            var recentLst = new List<string>();
+
+            if(!String.IsNullOrEmpty(PrgSettings.Default.RecentSources))
+                foreach(string item in PrgSettings.Default.RecentSources.Split(recentDataSeparator)
+                                                                        .Where(o => !String.IsNullOrWhiteSpace(o)))
+                {
+                    recentLst.Add(item); //Fetch data from string into a list
+                }
+
+            int idx = recentLst.IndexOf(dataSource);
+
+            if(idx != -1)
+            {
+                recentLst.RemoveAt(idx); //Remove current data source from the list
+
+                //Update list in the settings
+                PrgSettings.Default.RecentSources = recentLst.Aggregate("", (s, o) => $"{s}{o}{recentDataSeparator}");
+                PrgSettings.Default.Save();
+            }
+
+
+            //Updating File menu
+            MenuItem menuItem = fileMenu.Items.OfType<MenuItem>()
+                                              .Where(o => o.Name?.StartsWith(recentPrefix) == true)
+                                              .FirstOrDefault(o => (string)o.Tag == dataSource);
+
+            if(menuItem != null)
+                fileMenu.Items.Remove(menuItem);
+
+            bool haveRecentItems = fileMenu.Items.OfType<MenuItem>()
+                                                 .Any(o => o.Name?.StartsWith(recentPrefix) == true);
+
+            recentSep.Visibility = haveRecentItems ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private async void OnRecentFileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            string fileName = (string)((MenuItem)sender).Tag;
+
+            if(!File.Exists(fileName))
+            {
+                MessageBox.Show(this, PrgResources.RecentLinkWillBeRemoved, PrgResources.InformationCaption, 
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+
+                RemoveFromRecentSourcesList(fileName);
+                
+                return;
+            }
+
+            await OpenDBAsync(fileName);
+        }
+
+        private static string CreateShortPathString(string path, int maxLength)
+        {
+            if(path.Length <= maxLength)
+                return path;
+
+            string prefix = Path.IsPathRooted(path) ? Path.GetPathRoot(path) : "";
+
+            const string eclipses = "...";
+            string end = path.Substring(path.Length - maxLength + eclipses.Length + prefix.Length);
+
+            int idx = end.IndexOfAny(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+
+            if(idx != -1)
+                end = end.Substring(idx); //To cut exactly by separator
+
+            return $"{prefix}{eclipses}{end}";
+        }
+
+        #endregion
+
+        private async Task OpenDBAsync(string fileName)
+        {
+            try
+            {
+                dbFacade.SetUpDataSource(fileName); //Switch on new DB
+                await dbFacade.GetClauseByIdAsync(1); //Create DB structure
+
+                //Save data source
+                UpdateRecentSourcesList(fileName);
+
+                PrgSettings.Default.DataSource = fileName;
+                PrgSettings.Default.Save();
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+
+            //Refresh window
+            currentFilter.Clear();
+            await UpdateDataGridAsync(true);
+            UpdateWindowTitle();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -983,6 +1161,45 @@ namespace DDictionary.Presentation
             dlg.ShowDialog();
 
             await UpdateDataGridAsync();
+        }
+
+        private async void OnCreateNewDBCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dlg = new SaveFileDialog {
+                OverwritePrompt = true,
+                DefaultExt = "db",
+                Filter = "dictionaries (*.db)|*.db|All files (*.*)|*.*",
+                Title = PrgResources.CreateNewDBTitle
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            try
+            {
+                if(File.Exists(dlg.FileName))
+                    File.Delete(dlg.FileName); //To recreate file
+
+                await OpenDBAsync(dlg.FileName);
+            }
+            catch(Exception ex)
+            { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
+        }
+
+        private async void OnOpenDBCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog {
+                Multiselect = false,
+                CheckFileExists = true,
+                DefaultExt = "db",
+                Filter = "dictionaries (*.db)|*.db|All files (*.*)|*.*",
+                Title = PrgResources.OpenDictionaryTitle
+            };
+
+            if(dlg.ShowDialog() != true)
+                return;
+
+            await OpenDBAsync(dlg.FileName);
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
