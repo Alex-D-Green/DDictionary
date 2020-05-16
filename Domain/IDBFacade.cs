@@ -26,6 +26,18 @@ namespace DDictionary.Domain
         /// </summary>
         event ErrorHandler OnErrorOccurs;
 
+        /// <summary>
+        /// Currently used data source.
+        /// </summary>
+        /// <seealso cref="DDictionary.Domain.IDBFacade.SetUpDataSource"/>
+        string DataSource { get; }
+
+
+        /// <summary>
+        /// Set up data source (e.g. data base's file name). <b>For this kind of provider.</b>
+        /// </summary>
+        /// <seealso cref="DDictionary.Domain.IDBFacade.DataSource"/>
+        void SetUpDataSource(string DataSource);
 
         /// <summary>
         /// Get dictionary clause by id.

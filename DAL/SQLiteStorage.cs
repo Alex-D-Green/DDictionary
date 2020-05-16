@@ -19,52 +19,22 @@ namespace DDictionary.DAL
 
     public sealed class SQLiteStorage: IDBFacade
     {
-        static SQLiteStorage()
-        {
-            //using(IDbConnection cnn = new SQLiteStorage().GetConnection())
-            //{
-            //    const string sql1 =
-            //        "INSERT INTO [Clauses] ([Sound], [Word], [Transcription], [Context], [Added], [Updated], [Watched]," + 
-            //        " [WatchedCount], [Group])\n" +
-            //        "    VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group); ";
+        private static string dataSource = ".\\DictionaryDB.db";
 
-            //    const string sql2 =
-            //        "INSERT INTO [Translations] ([Index], [Text], [Part], [ClauseId]) " +
-            //        "VALUES (@Index, @Text, @Part, @ClauseId); ";
-
-            //    var clause = new Clause
-            //    {
-            //        Id = 0,
-            //        Sound = "https://audiocdn.lingualeo.com/v2/2/29775-631152008.mp3",
-            //        Word = "pear",
-            //        Transcription = "pɛə",
-            //        Context = "I hate pears!",
-            //        Added = new DateTime(2019, 9, 2, 12, 0, 0, DateTimeKind.Local),
-            //        Updated = new DateTime(2019, 9, 3, 12, 0, 0, DateTimeKind.Local),
-            //        Watched = new DateTime(2019, 9, 4, 12, 0, 0, DateTimeKind.Local),
-            //        Group = WordGroup.C_KindaKnown
-            //    };
-
-            //    var transl = (
-            //        Index: 0,
-            //        Text: "груша",
-            //        Part: PartOfSpeech.Noun,
-            //        ClauseId: 0
-            //    );
-
-            //    for(int i = 0; i < 5000; i++) //It takes a while
-            //    {
-            //        clause.Word = $"pear{i}";
-            //        cnn.Execute(sql1, clause);
-
-            //        transl.ClauseId = 4 + i;
-            //        cnn.Execute(sql2, transl);
-            //    }
-            //}
-        }
 
         public event ErrorHandler OnErrorOccurs;
 
+        /// <summary>
+        /// Currently used data source.
+        /// </summary>
+        /// <value><seealso cref="DDictionary.DAL.SQLiteStorage.dataSource"/></value>
+        public string DataSource { get => dataSource; }
+
+
+        public void SetUpDataSource(string dataSource)
+        {
+            SQLiteStorage.dataSource = dataSource ?? throw new ArgumentNullException(nameof(dataSource));
+        }
 
         public async Task<Clause> GetClauseByIdAsync(int id)
         {
@@ -825,10 +795,29 @@ namespace DDictionary.DAL
         {
             try
             {
-                return new SQLiteConnection(ConfigurationManager.ConnectionStrings["Default"].ConnectionString);
+                var cnn = new SQLiteConnection(
+                    String.Format(ConfigurationManager.ConnectionStrings["Default"].ConnectionString, DataSource));
+
+                CreateDBStructureIfNeeded(cnn);
+
+                return cnn;
             }
             catch(Exception e) when(HandleError(e))
             { return null; }
+        }
+
+        /// <summary>
+        /// Create the correct structure in a new data base if needed.
+        /// </summary>
+        private static void CreateDBStructureIfNeeded(IDbConnection cnn)
+        {
+            const string sql = "SELECT Count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Clauses'";
+
+            if(cnn.Query<int>(sql).SingleOrDefault() == 1)
+                return; //Tables are there already
+
+            //Create correct structure
+            cnn.Execute(Properties.Resources.DictionaryDB);
         }
 
         /// <summary>

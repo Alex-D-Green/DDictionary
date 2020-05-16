@@ -128,11 +128,42 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create a new empty dictionary.
+        /// </summary>
+        internal static string CreateNewDBTitle {
+            get {
+                return ResourceManager.GetString("CreateNewDBTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Some errors occurred during import.
         /// </summary>
         internal static string CSVImportReportTitle {
             get {
                 return ResourceManager.GetString("CSVImportReportTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BEGIN TRANSACTION;
+        ///DROP TABLE IF EXISTS &quot;TrainingStatistics&quot;;
+        ///CREATE TABLE IF NOT EXISTS &quot;TrainingStatistics&quot; (
+        ///	&quot;TestType&quot;	INTEGER NOT NULL,
+        ///	&quot;ClauseId&quot;	INTEGER NOT NULL,
+        ///	&quot;Success&quot;	INTEGER NOT NULL,
+        ///	&quot;Fail&quot;	INTEGER NOT NULL,
+        ///	&quot;LastTraining&quot;	TEXT NOT NULL,
+        ///	PRIMARY KEY(&quot;TestType&quot;,&quot;ClauseId&quot;),
+        ///	FOREIGN KEY(&quot;ClauseId&quot;) REFERENCES &quot;Clauses&quot;(&quot;Id&quot;) ON DELETE CASCADE ON UPDATE CASCADE
+        ///);
+        ///DROP TABLE IF EXISTS &quot;Clauses&quot;;
+        ///CREATE TABLE IF NOT EXISTS &quot;Clauses&quot; (
+        ///	&quot;Id&quot;	INTEGER NOT NULL PRIMARY KEY AUTOINC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DictionaryDB {
+            get {
+                return ResourceManager.GetString("DictionaryDB", resourceCulture);
             }
         }
         
@@ -283,6 +314,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DDictionary.
+        /// </summary>
+        internal static string MainWindowTitle {
+            get {
+                return ResourceManager.GetString("MainWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mistakes: {0}.
         /// </summary>
         internal static string MistakesLabel {
@@ -328,6 +368,15 @@ namespace DDictionary.Properties {
         internal static string NotEnoughWordsWithSounds {
             get {
                 return ResourceManager.GetString("NotEnoughWordsWithSounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the dictionary.
+        /// </summary>
+        internal static string OpenDictionaryTitle {
+            get {
+                return ResourceManager.GetString("OpenDictionaryTitle", resourceCulture);
             }
         }
         
@@ -499,6 +548,15 @@ namespace DDictionary.Properties {
         internal static string QuestionCaption {
             get {
                 return ResourceManager.GetString("QuestionCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This file was not found. The link will be removed from the list..
+        /// </summary>
+        internal static string RecentLinkWillBeRemoved {
+            get {
+                return ResourceManager.GetString("RecentLinkWillBeRemoved", resourceCulture);
             }
         }
         

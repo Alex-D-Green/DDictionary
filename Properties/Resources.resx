@@ -142,8 +142,15 @@
   <data name="CorrectLabel" xml:space="preserve">
     <value>Correct: {0}</value>
   </data>
+  <data name="CreateNewDBTitle" xml:space="preserve">
+    <value>Create a new empty dictionary</value>
+  </data>
   <data name="CSVImportReportTitle" xml:space="preserve">
     <value>Some errors occurred during import</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="DictionaryDB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\DictionaryDB.db.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
   <data name="ErrorCaption" xml:space="preserve">
     <value>An error occured!</value>
@@ -195,6 +202,9 @@ Continue and save only filtered clauses?</value>
   <data name="InformationCaption" xml:space="preserve">
     <value>Attention please!</value>
   </data>
+  <data name="MainWindowTitle" xml:space="preserve">
+    <value>DDictionary</value>
+  </data>
   <data name="MistakesLabel" xml:space="preserve">
     <value>Mistakes: {0}</value>
   </data>
@@ -213,6 +223,9 @@ Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected
     <value>Can't start the training, not enough words with the sound links.
 
 Must be at least {0} word[s] with the sound link[s] selected for the training.</value>
+  </data>
+  <data name="OpenDictionaryTitle" xml:space="preserve">
+    <value>Choose the dictionary</value>
   </data>
   <data name="POFFullAdjective" xml:space="preserve">
     <value>adjective</value>
@@ -288,6 +301,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
   </data>
   <data name="QuestionCaption" xml:space="preserve">
     <value>Attention please!</value>
+  </data>
+  <data name="RecentLinkWillBeRemoved" xml:space="preserve">
+    <value>This file was not found. The link will be removed from the list.</value>
   </data>
   <data name="RelationsFilterTextTmpl" xml:space="preserve">
     <value>"{0}" relations</value>
