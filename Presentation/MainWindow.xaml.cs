@@ -781,7 +781,7 @@ namespace DDictionary.Presentation
             {
                 var clauseDTO = (DataGridClause)ctrl.DataContext;
 
-                await SoundManager.PlaySoundAsync(clauseDTO.Id, clauseDTO.Sound); 
+                await SoundManager.PlaySoundAsync(clauseDTO.Id, clauseDTO.Sound, dbFacade.DataSource); 
             }
             catch(IOException ex)
             {
@@ -996,9 +996,12 @@ namespace DDictionary.Presentation
                 PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
                 return;
 
-            await dbFacade.RemoveClausesAsync(mainDataGrid.SelectedItems.Cast<DataGridClause>()
-                                                                        .Select(o => o.Id)
-                                                                        .ToArray());
+            DataGridClause[] toDelete = mainDataGrid.SelectedItems.Cast<DataGridClause>().ToArray();
+
+            await dbFacade.RemoveClausesAsync(toDelete.Select(o => o.Id).ToArray());
+
+            foreach(DataGridClause cl in toDelete)
+                SoundManager.RemoveFromCache(cl.Id, cl.Sound, dbFacade.DataSource); //Remove clause's cache
 
             await UpdateDataGridAsync();
         }

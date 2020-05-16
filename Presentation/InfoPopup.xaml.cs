@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -93,8 +94,9 @@ namespace DDictionary.Presentation
                 //HACK: Somehow resend this input to the parent window...
             }
             else if(!String.IsNullOrEmpty(clause.Sound) && e.Key == Key.Space)
-            { 
-                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound); 
+            {
+                try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
+                catch(FileNotFoundException) { }
             }
         }
     }

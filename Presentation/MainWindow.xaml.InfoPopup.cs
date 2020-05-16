@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -148,7 +149,10 @@ namespace DDictionary.Presentation
 
 
             if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
-                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound);
+            {
+                try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
+                catch(FileNotFoundException) { }
+            }
 
             //Update clause's watch data
             if(clause.Watched.Date == DateTime.Now.Date)

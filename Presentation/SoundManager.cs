@@ -29,11 +29,15 @@ namespace DDictionary.Presentation
         /// </summary>
         /// <param name="clauseId">Clause Id.</param>
         /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
         /// <seealso cref="DDictionary.Presentation.SoundManager.UpdateSoundCache"/>
         /// <exception cref="System.IO.FileNotFoundException"/>
         /// <exception cref="System.IO.IOException"/>
-        public static async Task PlaySoundAsync(int clauseId, string soundUri)
+        public static async Task PlaySoundAsync(int clauseId, string soundUri, string dictionary)
         {
+            if(String.IsNullOrEmpty(dictionary))
+                throw new ArgumentNullException(nameof(dictionary));
+
             try
             {
                 if(String.IsNullOrEmpty(soundUri))
@@ -42,7 +46,7 @@ namespace DDictionary.Presentation
                     return;
                 }
 
-                Uri source = await UpdateSoundCache(clauseId, soundUri, overwriteCache: false);
+                Uri source = await UpdateSoundCache(clauseId, soundUri, dictionary, overwriteCache: false);
 
                 //Play sound file
                 if(mediaPlayer.Source != source)
@@ -72,14 +76,21 @@ namespace DDictionary.Presentation
         /// <paramref name="overwriteCache"/> is true.
         /// </summary>
         /// <remarks>For local files it only checks whether the file in place or not.</remarks>
-        /// <returns>Uri to the local file.</returns>
+        /// <param name="clauseId">Clause Id.</param>
+        /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
         /// <param name="overwriteCache">Update file in the cache.</param>
+        /// <returns>Uri to the local file.</returns>
         /// <exception cref="System.ArgumentNullException"/>
         /// <exception cref="System.IO.FileNotFoundException"/>
-        public static async Task<Uri> UpdateSoundCache(int clauseId, string soundUri, bool overwriteCache)
+        public static async Task<Uri> UpdateSoundCache(int clauseId, string soundUri, string dictionary, bool overwriteCache)
         {
             if(String.IsNullOrEmpty(soundUri))
                 throw new ArgumentNullException(nameof(soundUri));
+
+            if(String.IsNullOrEmpty(dictionary))
+                throw new ArgumentNullException(nameof(dictionary));
+
 
             var source = new Uri(soundUri);
 
@@ -89,7 +100,7 @@ namespace DDictionary.Presentation
                     SoundsCacheFolder.Create();
 
                 var localFile = new FileInfo(
-                    Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source)));
+                    Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
 
                 if(!localFile.Exists || overwriteCache)
                 { //It's not in the cache yet or need to update
@@ -115,13 +126,46 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
+        /// Remove cached file.
+        /// It removes <b>only downloaded sounds' caches</b> not local files (like c:\myfile.mp3).
+        /// </summary>
+        /// <param name="clauseId">Clause Id.</param>
+        /// <param name="soundUri">Sound Uri. Local file will be skipped. Empty string or <c>null</c> as well.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
+        public static void RemoveFromCache(int clauseId, string soundUri, string dictionary)
+        {
+            if(String.IsNullOrEmpty(dictionary))
+                throw new ArgumentNullException(nameof(dictionary));
+
+
+            if(String.IsNullOrEmpty(soundUri))
+                return; //There is no link
+
+            var source = new Uri(soundUri);
+
+            if(!source.IsAbsoluteUri || source.IsFile)
+                return; //Local file
+
+            var localFile = new FileInfo(
+                Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
+
+            if(localFile.Exists)
+                localFile.Delete();
+        }
+
+        /// <summary>
         /// Is there file in cache for this clause.
         /// </summary>
         /// <param name="clauseId">Clause Id.</param>
         /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
         /// <param name="fullName">Full name of the local file in the cache.</param>
-        public static bool IsFileCached(int clauseId, string soundUri, out string fullName)
+        public static bool IsFileCached(int clauseId, string soundUri, string dictionary, out string fullName)
         {
+            if(String.IsNullOrEmpty(dictionary))
+                throw new ArgumentNullException(nameof(dictionary));
+
+
             fullName = null;
 
             if(String.IsNullOrEmpty(soundUri))
@@ -135,7 +179,7 @@ namespace DDictionary.Presentation
                     return false;
 
                 var localFile =
-                    new FileInfo(Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source)));
+                    new FileInfo(Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
 
                 if(localFile.Exists)
                     fullName = localFile.FullName;
@@ -150,11 +194,16 @@ namespace DDictionary.Presentation
         /// </summary>
         /// <param name="clauseId">Clause Id.</param>
         /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
         /// <seealso cref="DDictionary.Presentation.SoundManager.UpdateSoundCache"/>
         /// <exception cref="System.IO.FileNotFoundException"/>
         /// <exception cref="System.IO.IOException"/>
-        public static async Task TryRefreshAsync(int clauseId, string soundUri)
+        public static async Task TryRefreshAsync(int clauseId, string soundUri, string dictionary)
         {
+            if(String.IsNullOrEmpty(dictionary))
+                throw new ArgumentNullException(nameof(dictionary));
+
+
             try
             {
                 if(String.IsNullOrEmpty(soundUri))
@@ -163,7 +212,7 @@ namespace DDictionary.Presentation
                     return;
                 }
 
-                await UpdateSoundCache(clauseId, soundUri, overwriteCache: true);
+                await UpdateSoundCache(clauseId, soundUri, dictionary, overwriteCache: true);
             }
             catch(Exception ex) when(!(ex is FileNotFoundException))
             {
@@ -177,9 +226,10 @@ namespace DDictionary.Presentation
         /// </summary>
         /// <param name="clauseId">Clause Id.</param>
         /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
+        /// <param name="dictionary">Name of the dictionary.</param>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="ArgumentException">If <paramref name="soundUri"/> is local file's Uri.</exception>
-        public static string MakeCachedFileName(int clauseId, Uri soundUri)
+        public static string MakeCachedFileName(int clauseId, Uri soundUri, string dictionary)
         {
             if(soundUri is null)
                 throw new ArgumentNullException(nameof(soundUri));
@@ -187,11 +237,15 @@ namespace DDictionary.Presentation
             if(!soundUri.IsAbsoluteUri || soundUri.IsFile)
                 throw new ArgumentException("It shouldn't be file uri.", nameof(soundUri));
 
+            if(dictionary is null)
+                throw new ArgumentNullException(nameof(dictionary));
+
 
             return String.Concat(
-                clauseId.ToString("x8"),                //The new name consists of the clause id
-                soundUri.GetHashCode().ToString("x8"),  //and the hash of the original source path.
-                Path.GetExtension(soundUri.LocalPath)); //File extension remains the same.
+                dictionary.GetHashCode().ToString("x8"),   //The new name consists of the hash of the dictionary
+                clauseId.ToString("x8"),                   //the clause id
+                soundUri.GetHashCode().ToString("x8"),     //and the hash of the original source path.
+                Path.GetExtension(soundUri.LocalPath));    //File extension remains the same.
         }
     }
 }

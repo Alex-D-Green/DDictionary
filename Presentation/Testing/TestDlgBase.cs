@@ -238,7 +238,7 @@ namespace DDictionary.Presentation.Testing
                 return;
             }
 
-            try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound); }
+            try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
             catch(Exception ex)
             {
                 Debug.WriteLine(ex.ToString());

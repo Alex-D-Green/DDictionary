@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows;
 
+using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 
 using Microsoft.Win32;
@@ -18,6 +19,9 @@ namespace DDictionary.Presentation
     {
         private readonly Clause clause;
 
+
+        /// <summary>The object to work with data storage.</summary>
+        private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
         /// <summary>Selected sound uri.</summary>
         public string SoundRef { get; private set; } = null;
@@ -59,7 +63,7 @@ namespace DDictionary.Presentation
             refreshBtn.IsEnabled = haveSound && 
                 Uri.TryCreate(refEdit.Text, UriKind.RelativeOrAbsolute, out Uri uri) && uri.IsAbsoluteUri && !uri.IsFile;
 
-            if(SoundManager.IsFileCached(clause.Id, refEdit.Text, out string fullName))
+            if(SoundManager.IsFileCached(clause.Id, refEdit.Text, dbFacade.DataSource, out string fullName))
                 refEdit.ToolTip = fullName;
             else
                 refEdit.ToolTip = null;
@@ -103,10 +107,10 @@ namespace DDictionary.Presentation
 
             try
             { 
-                await SoundManager.PlaySoundAsync(clause.Id, refEdit.Text);
+                await SoundManager.PlaySoundAsync(clause.Id, refEdit.Text, dbFacade.DataSource);
                 UpdateGUIState();
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
 
@@ -125,7 +129,7 @@ namespace DDictionary.Presentation
             {
                 SoundManager.StopPlaying(); //To free local file 
 
-                await SoundManager.TryRefreshAsync(clause.Id, refEdit.Text);
+                await SoundManager.TryRefreshAsync(clause.Id, refEdit.Text, dbFacade.DataSource);
                 UpdateGUIState();
             }
             catch (Exception ex)

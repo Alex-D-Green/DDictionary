@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -124,7 +125,10 @@ namespace DDictionary.Presentation
             }
 
             if(Properties.Settings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
-                await SoundManager.PlaySoundAsync(clause.Id, clause.Sound);
+            {
+                try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
+                catch(FileNotFoundException) { }
+            }
         }
 
         /// <summary>
@@ -439,7 +443,7 @@ namespace DDictionary.Presentation
             ctrl.IsEnabled = false; //Temporary disabled to prevent multiple clicking
 
             try
-            { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound); }
+            { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch(Exception ex)
             {
@@ -464,6 +468,8 @@ namespace DDictionary.Presentation
 
             if(dlg.ShowDialog() == true)
             {
+                SoundManager.RemoveFromCache(clause.Id, clause.Sound, dbFacade.DataSource); //Remove clause's old cache
+
                 clause.Sound = dlg.SoundRef;
                 UpdatePlaySoundButtonState();
 
@@ -611,6 +617,9 @@ namespace DDictionary.Presentation
                 return; //Can't save it
             }
 
+            if(clause.Id == 0) //Remove "temporary" clause's cache for a new clause
+                SoundManager.RemoveFromCache(clause.Id, clause.Sound, dbFacade.DataSource);
+
             clause.Id = await dbFacade.AddOrUpdateClauseAsync(clauseDTO, 
                 !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data
 
@@ -674,7 +683,7 @@ namespace DDictionary.Presentation
         /// <summary>
         /// Handle Delete button click.
         /// </summary>
-        private void OnDeleteClauseBtn_Click(object sender, RoutedEventArgs e)
+        private async void OnDeleteClauseBtn_Click(object sender, RoutedEventArgs e)
         {
             if(Keyboard.Modifiers != ModifierKeys.Control &&
                MessageBox.Show(this, String.Format(PrgResources.TheClauseDeletionConfirmation, wordEdit.Text),
@@ -683,7 +692,8 @@ namespace DDictionary.Presentation
 
             int id = clause.Id;
 
-            dbFacade.RemoveClausesAsync(id);
+            await dbFacade.RemoveClausesAsync(id);
+            SoundManager.RemoveFromCache(id, clause.Sound, dbFacade.DataSource); //Remove clause's cache
             dataWasUpdated = true; //Data was changed
 
             int idx = clausesIdsLst.IndexOf(id);
