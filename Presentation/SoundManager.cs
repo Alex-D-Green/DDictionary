@@ -21,8 +21,24 @@ namespace DDictionary.Presentation
 
 
         /// <summary>Folder to place downloaded sounds' files.</summary>
-        public static readonly DirectoryInfo SoundsCacheFolder = new DirectoryInfo(".\\sndCache");
+        /// <seealso cref="DDictionary.Presentation.SoundManager.GetSoundCacheFolder"/>
+        private static readonly DirectoryInfo soundsCacheFolder = new DirectoryInfo(".\\sndCache");
 
+
+        /// <summary>
+        /// Get the folder with downloaded sounds' files for the certain dictionary.
+        /// </summary>
+        /// <param name="dictionary">Name of the dictionary.</param>
+        /// <seealso cref="DDictionary.Presentation.SoundManager.soundsCacheFolder"/>
+        public static DirectoryInfo GetSoundCacheFolderFor(string dictionary)
+        {
+            if(dictionary is null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+
+            return new DirectoryInfo(Path.Combine(soundsCacheFolder.FullName,
+                dictionary.GetHashCode().ToString("x8"))); //Include subfolder - the hash of the dictionary name
+        }
 
         /// <summary>
         /// Try to download clause's sound if it's necessary and play it.
@@ -96,11 +112,13 @@ namespace DDictionary.Presentation
 
             if(source.IsAbsoluteUri && !source.IsFile)
             { //Let's try to download this file
-                if(!SoundsCacheFolder.Exists)
-                    SoundsCacheFolder.Create();
+                DirectoryInfo sounds = GetSoundCacheFolderFor(dictionary);
+
+                if(!sounds.Exists)
+                    sounds.Create();
 
                 var localFile = new FileInfo(
-                    Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
+                    Path.Combine(sounds.FullName, MakeCachedFileName(clauseId, source)));
 
                 if(!localFile.Exists || overwriteCache)
                 { //It's not in the cache yet or need to update
@@ -146,8 +164,8 @@ namespace DDictionary.Presentation
             if(!source.IsAbsoluteUri || source.IsFile)
                 return; //Local file
 
-            var localFile = new FileInfo(
-                Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
+            var localFile = new FileInfo(Path.Combine(GetSoundCacheFolderFor(dictionary).FullName, 
+                MakeCachedFileName(clauseId, source)));
 
             if(localFile.Exists)
                 localFile.Delete();
@@ -178,8 +196,8 @@ namespace DDictionary.Presentation
                 if(!source.IsAbsoluteUri || source.IsFile)
                     return false;
 
-                var localFile =
-                    new FileInfo(Path.Combine(SoundsCacheFolder.FullName, MakeCachedFileName(clauseId, source, dictionary)));
+                var localFile = new FileInfo(Path.Combine(GetSoundCacheFolderFor(dictionary).FullName, 
+                    MakeCachedFileName(clauseId, source)));
 
                 if(localFile.Exists)
                     fullName = localFile.FullName;
@@ -226,10 +244,9 @@ namespace DDictionary.Presentation
         /// </summary>
         /// <param name="clauseId">Clause Id.</param>
         /// <param name="soundUri">Sound Uri. It shouldn't be a local file.</param>
-        /// <param name="dictionary">Name of the dictionary.</param>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="ArgumentException">If <paramref name="soundUri"/> is local file's Uri.</exception>
-        public static string MakeCachedFileName(int clauseId, Uri soundUri, string dictionary)
+        public static string MakeCachedFileName(int clauseId, Uri soundUri)
         {
             if(soundUri is null)
                 throw new ArgumentNullException(nameof(soundUri));
@@ -237,15 +254,16 @@ namespace DDictionary.Presentation
             if(!soundUri.IsAbsoluteUri || soundUri.IsFile)
                 throw new ArgumentException("It shouldn't be file uri.", nameof(soundUri));
 
-            if(dictionary is null)
-                throw new ArgumentNullException(nameof(dictionary));
 
+            string ext = Path.GetExtension(soundUri.LocalPath);
+
+            if(String.IsNullOrEmpty(ext))
+                ext = ".mp3"; //Set default extension
 
             return String.Concat(
-                dictionary.GetHashCode().ToString("x8"),   //The new name consists of the hash of the dictionary
-                clauseId.ToString("x8"),                   //the clause id
-                soundUri.GetHashCode().ToString("x8"),     //and the hash of the original source path.
-                Path.GetExtension(soundUri.LocalPath));    //File extension remains the same.
+                clauseId.ToString("x8"),               //The new name consists of the clause id
+                soundUri.GetHashCode().ToString("x8"), //and the hash of the original source path.
+                ext);
         }
     }
 }
