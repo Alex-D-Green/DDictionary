@@ -226,5 +226,65 @@ namespace DDictionary.Properties {
                 this["RecentSources"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int SprintSecondsOnAnswer {
+            get {
+                return ((int)(this["SprintSecondsOnAnswer"]));
+            }
+            set {
+                this["SprintSecondsOnAnswer"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TranslationWordHideAnswers {
+            get {
+                return ((bool)(this["TranslationWordHideAnswers"]));
+            }
+            set {
+                this["TranslationWordHideAnswers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool WordTranslationHideAnswers {
+            get {
+                return ((bool)(this["WordTranslationHideAnswers"]));
+            }
+            set {
+                this["WordTranslationHideAnswers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConstructorHideLetters {
+            get {
+                return ((bool)(this["ConstructorHideLetters"]));
+            }
+            set {
+                this["ConstructorHideLetters"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ListeningAllowOneMistake {
+            get {
+                return ((bool)(this["ListeningAllowOneMistake"]));
+            }
+            set {
+                this["ListeningAllowOneMistake"] = value;
+            }
+        }
     }
 }

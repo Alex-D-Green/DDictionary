@@ -14,7 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-
+using System.Windows.Media.Effects;
 using CsvHelper;
 
 using DDictionary.Domain;
@@ -1146,6 +1146,8 @@ namespace DDictionary.Presentation
         {
             TestDlgBase dlg = null;
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
+            
+            mainDataGrid.Effect = new BlurEffect { Radius = 10 }; //To hide data on the background
 
             if(e.Command == UICommands.TranslationWordTestCommand)
                 dlg = new TranslationWordDlg(lst);
@@ -1160,8 +1162,11 @@ namespace DDictionary.Presentation
 
             Debug.Assert(dlg != null);
 
+
             dlg.Owner = this;
             dlg.ShowDialog();
+
+            mainDataGrid.Effect = null;
 
             await UpdateDataGridAsync();
         }

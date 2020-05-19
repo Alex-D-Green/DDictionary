@@ -7,22 +7,72 @@
         Title="Program settings" MinHeight="100" MinWidth="350" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
     <StackPanel Margin="10">
-        <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 5">
-            <CheckBox x:Name="showPopupChk" Content="Show info popup" TabIndex="10" 
-                      ToolTip=
+        <TabControl MinHeight="120">
+            <TabItem Header="Main" ToolTip="Main settings">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 5">
+                        <CheckBox x:Name="showPopupChk" Content="Show info popup" TabIndex="10" 
+                          ToolTip=
 "Show quick info popup while hover over the main table.&#x0A;
 The popup does not appear over the 'active' columns or when the filtration field has focus.&#x0A;
 To hide the popup just click on it or press Escape or hold Shift to prevent it from popping up."/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10, 5">
-            <CheckBox x:Name="autoPlayChk" Content="Autoplay sound" TabIndex="20" 
-                      ToolTip="Automatically play the word's sound when the info popup or edit dialog appears."/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10, 5">
-            <CheckBox x:Name="saveContextChk" Content="Save browser context" TabIndex="30"
-                      ToolTip="Save filter, sorting, scroll position etc. on exit."/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10,25,10,0" HorizontalAlignment="Center">
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="autoPlayChk" Content="Autoplay sound" TabIndex="20" 
+                          ToolTip="Automatically play the word's sound when the info popup or edit dialog appears."/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="saveContextChk" Content="Save browser context" TabIndex="30"
+                          ToolTip="Save filter, sorting, scroll position etc. on exit."/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Trans-Word" ToolTip="Translation-Word training">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="trwHideAnswersChk" Content="Do not show the answers right away" TabIndex="10" 
+                          ToolTip="If checked then the user have to press button before the possible answers will be shown."/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Word-Trans" ToolTip="Word-Translation training">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="wtrHideAnswersChk" Content="Do not show the answers right away" TabIndex="10" 
+                          ToolTip="If checked then the user have to press button before the possible answers will be shown."/>
+                    </StackPanel>
+                </StackPanel>                
+            </TabItem>
+            <TabItem Header="Constructor" ToolTip="Constructor training">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="ctorHideLettersChk" Content="Do not show word's letters right away" TabIndex="10" 
+                          ToolTip="If checked then the user have to press button to will see the word's letters."/>
+                    </StackPanel>
+                </StackPanel>                
+            </TabItem>
+            <TabItem Header="Listening" ToolTip="Listening training">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <CheckBox x:Name="listenSecondChanceChk" Content="One mistake is allowed" TabIndex="10" 
+                                  ToolTip="If checked then one mistake wouldn't lead to fail the question."/>
+                    </StackPanel>                    
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Sprint">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal" Margin="10, 5">
+                        <ComboBox x:Name="sprintTimeCBox" TabIndex="10" SelectedIndex="1" IsReadOnly="True">
+                            <TextBlock Text="2"/>
+                            <TextBlock Text="3"/>
+                            <TextBlock Text="4"/>
+                        </ComboBox>
+                        <Label Content="Seconds on answer" Margin="10, 0"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>            
+        </TabControl>
+        <StackPanel Orientation="Horizontal" Margin="10,10,10,0" HorizontalAlignment="Center">
             <Button x:Name="saveBtn" Content="Save" MinWidth="75" Margin="5" IsDefault="True" TabIndex="100"
                     Click="OnSaveBtn_Click"/>
             <Button x:Name="cancelBtn" Content="Cancel" MinWidth="75" Margin="5" IsCancel="True" TabIndex="110"/>

@@ -13,6 +13,7 @@ using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -22,9 +23,6 @@ namespace DDictionary.Presentation.Testing
     /// </summary>
     public partial class TranslationWordDlg: SelectiveTestDlgBase
     {
-        private const bool hideOptions = true; //TODO: Add option in the settings.
-
-
         protected override Button actionButton { get => actionBtn; }
 
 
@@ -41,7 +39,8 @@ namespace DDictionary.Presentation.Testing
         protected override async Task NextRoundAsync()
         {
             //Preparations for the round
-            currentAction = hideOptions ? CurrentAction.HidingAnswers : CurrentAction.WaitingForUserAnswer;
+            currentAction = PrgSettings.Default.TranslationWordHideAnswers ? CurrentAction.HidingAnswers 
+                                                                           : CurrentAction.WaitingForUserAnswer;
 
             await base.NextRoundAsync();
 

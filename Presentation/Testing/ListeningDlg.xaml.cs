@@ -13,6 +13,7 @@ using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -32,9 +33,6 @@ namespace DDictionary.Presentation.Testing
         }
 
         #endregion
-
-
-        private const bool giveSecondChance = true; //TODO: Add option in the settings.
 
 
         /// <summary>How many additional tries were made by this round.</summary>
@@ -176,7 +174,9 @@ namespace DDictionary.Presentation.Testing
 
             Debug.Assert(currentAction == CurrentAction.WaitingForUserAnswer);
 
-            if(IsAnswerCorrect() == AnswerCheckResult.Incorrect && giveSecondChance && triesWereMade < 1)
+            if(IsAnswerCorrect() == AnswerCheckResult.Incorrect && 
+               PrgSettings.Default.ListeningAllowOneMistake && 
+               triesWereMade < 1)
             { //Give a second chance
                 triesWereMade++;
                 PlayErrorSound();

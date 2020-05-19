@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using DDictionary.Domain.Entities;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -30,10 +31,6 @@ namespace DDictionary.Presentation.Testing
         }
 
         #endregion
-
-
-        /// <summary>Time is allocated for answer.</summary>
-        private readonly TimeSpan timeForAnswer = TimeSpan.FromSeconds(3); //TODO: Add option in the settings.
 
 
         /// <summary>Timer that count time on answer.</summary>
@@ -262,7 +259,7 @@ namespace DDictionary.Presentation.Testing
 
         private async void OnAnswerTimerTick(object sender, EventArgs e)
         {
-            mainPBar.Value = ((DateTime.UtcNow - answerTime).TotalMilliseconds / timeForAnswer.TotalMilliseconds) * 100;
+            mainPBar.Value = (DateTime.UtcNow - answerTime).TotalSeconds / PrgSettings.Default.SprintSecondsOnAnswer * 100;
 
             if(mainPBar.Value >= 100)
                 await HandleAnswer(GivenAnswer.Unknow);

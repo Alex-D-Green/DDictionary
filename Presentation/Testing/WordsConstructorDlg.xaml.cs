@@ -13,6 +13,7 @@ using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -32,9 +33,6 @@ namespace DDictionary.Presentation.Testing
         }
 
         #endregion
-
-
-        private const bool hideLetters = true; //TODO: Add option in the settings.
 
 
         /// <summary>What the user correctly typed so far.</summary>
@@ -96,7 +94,7 @@ namespace DDictionary.Presentation.Testing
             UpdateActionButton();
             DecorateButton(actionBtn, ButtonDecoration.ResetDecoration);
 
-            ShowHideLettersButtons(!hideLetters);
+            ShowHideLettersButtons(!PrgSettings.Default.ConstructorHideLetters);
 
             rightAnswerForRound = await dbFacade.GetClauseByIdAsync(wordsForTraining[currentRound]);
             givenAnswer = "";
