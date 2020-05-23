@@ -119,7 +119,7 @@ namespace DDictionary.Presentation
             { //Update data only once for each clause per dialog showing and only once a day
                 await dbFacade.UpdateClauseWatchAsync(clauseId);
 
-                //Do not call ClausesWereUpdated here cuz it's not such sufficient changes...
+                //Do not call ClausesWereUpdated here because it's not such sufficient changes...
 
                 watchedClauses.Add(clauseId); //Remember updated clause's id
             }
@@ -141,6 +141,9 @@ namespace DDictionary.Presentation
 
         private async void OnWordEdit_LostFocus(object sender, RoutedEventArgs e)
         {
+            if(String.Equals(wordEdit.Text, clause.Word))
+                return; //There are no changes
+
             int check = await dbFacade.GetClauseIdByWordAsync(wordEdit.Text);
 
             if(check != 0 && check != clause.Id)
