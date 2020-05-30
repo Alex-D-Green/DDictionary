@@ -156,5 +156,11 @@ namespace DDictionary.Domain
         /// </summary>
         /// <param name="types">Needed tests' types, <b>empty array - return statistic of all tests' types</b>.</param>
         Task<IEnumerable<WordTrainingStatisticDTO>> GetWordTrainingStatisticsAsync(params TestType[] types);
+
+        /// <summary>
+        /// Get general statistics for all training types (if any).
+        /// </summary>
+        /// <param name="since">Consider data that isn't older than this date (<c>null</c> - all data).</param>
+        Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime? since);
     }
 }

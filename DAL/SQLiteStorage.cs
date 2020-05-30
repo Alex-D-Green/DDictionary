@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -12,6 +13,7 @@ using Dapper;
 
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
+
 
 namespace DDictionary.DAL
 {
@@ -90,6 +92,22 @@ namespace DDictionary.DAL
                     sql.AppendFormat("    {0} [cl].[Sound] IS NOT NULL AND [cl].[Sound] <> ''\n", nextJoin);
                 else
                     sql.AppendFormat("    {0} [cl].[Sound] IS NULL OR [cl].[Sound] = ''\n", nextJoin);
+
+                nextJoin = "AND";
+            }
+
+            if(filter.AddedAfter != null)
+            {
+                sql.AppendFormat("    {0} [cl].[Added] >= '{1}'\n", nextJoin, 
+                    filter.AddedAfter.Value.ToString(DateTimeFormatInfo.CurrentInfo.UniversalSortableDateTimePattern));
+
+                nextJoin = "AND";
+            }
+
+            if(filter.AddedBefore != null)
+            {
+                sql.AppendFormat("    {0} [cl].[Added] <= '{1}'\n", nextJoin, 
+                    filter.AddedBefore.Value.ToString(DateTimeFormatInfo.CurrentInfo.UniversalSortableDateTimePattern));
 
                 nextJoin = "AND";
             }
@@ -786,6 +804,25 @@ namespace DDictionary.DAL
             }
             catch(Exception e) when(HandleError(e))
             { return Enumerable.Empty<WordTrainingStatisticDTO>(); }
+        }
+
+        public async Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime? since)
+        {
+            try
+            {
+                const string sql = "SELECT [TS].[TestType],\n" +
+                                   "       SUM ([TS].[Success]) AS [Success],\n" +
+                                   "       SUM ([TS].[Fail]) AS [Fail],\n" +
+                                   "       MAX ([TS].[LastTraining]) AS [LastTraining]\n" +
+                                   "    FROM [TrainingStatistics] [TS]\n" +
+                                   "    WHERE @Since IS NULL OR [TS].[LastTraining] > @Since\n" +
+                                   "    GROUP BY [TS].[TestType]";
+
+                using(IDbConnection cnn = GetConnection())
+                    return await cnn.QueryAsync<TrainingStatistic>(sql, new { Since = since });
+            }
+            catch(Exception e) when(HandleError(e))
+            { return Enumerable.Empty<TrainingStatistic>(); }
         }
 
         /// <summary>

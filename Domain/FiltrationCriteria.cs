@@ -37,12 +37,24 @@ namespace DDictionary.Domain
         public bool? HasSound { get; set; }
 
         /// <summary>
+        /// Clauses that were added after this date including.
+        /// <c>null</c> means since very beginning.
+        /// </summary>
+        public DateTime? AddedAfter { get; set; }
+
+        /// <summary>
+        /// Clauses that were added after before this including.
+        /// <c>null</c> means up till now.
+        /// </summary>
+        public DateTime? AddedBefore { get; set; }
+
+        /// <summary>
         /// The filter is empty (there is no filtration).
         /// </summary>
         public bool Empty 
         { 
-            get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && 
-                    ShownGroups?.Any() != true && HasSound is null);
+            get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && ShownGroups?.Any() != true && 
+                    HasSound is null && AddedAfter is null && AddedBefore is null);
         }
 
 
@@ -55,6 +67,7 @@ namespace DDictionary.Domain
             ShownGroups = Enumerable.Empty<WordGroup>();
             RelatedFrom = null;
             HasSound = null;
+            AddedAfter = AddedBefore = null;
 
             Debug.Assert(Empty);
         }
