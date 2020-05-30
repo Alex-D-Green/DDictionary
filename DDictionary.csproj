@@ -106,6 +106,7 @@
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />
     <Compile Include="Presentation\Converters\PartOfSpeechTranslator.cs" />
     <Compile Include="Presentation\Converters\RelationToRelationDTOMapper.cs" />
+    <Compile Include="Presentation\Converters\TestTypeTranslator.cs" />
     <Compile Include="Presentation\Converters\TranslationConverter.cs" />
     <Compile Include="Presentation\Converters\WordGroupConverter.cs" />
     <Compile Include="Presentation\Converters\WordGroupTranslator.cs" />
@@ -157,6 +158,9 @@
     <Compile Include="Presentation\Testing\SelectiveTestDlgBase.cs" />
     <Compile Include="Presentation\Testing\SprintDlg.xaml.cs">
       <DependentUpon>SprintDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Presentation\Testing\StatisticsDlg.xaml.cs">
+      <DependentUpon>StatisticsDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="Presentation\Testing\TestAnswer.cs" />
     <Compile Include="Presentation\Testing\TestDlgBase.cs" />
@@ -210,6 +214,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Presentation\Testing\SprintDlg.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Presentation\Testing\StatisticsDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

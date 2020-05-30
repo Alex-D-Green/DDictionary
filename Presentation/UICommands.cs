@@ -110,5 +110,9 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand SprintTestCommand = new RoutedUICommand(
             "Sprint test", "Sprint test", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.F5, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand TestsStatisticsCommand = new RoutedUICommand(
+            "Tests statistics", "Tests statistics", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F12, ModifierKeys.Control) });
     }
 }

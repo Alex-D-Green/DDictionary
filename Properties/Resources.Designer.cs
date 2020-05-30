@@ -372,6 +372,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no training statistic yet..
+        /// </summary>
+        internal static string NoTrainingStatYet {
+            get {
+                return ResourceManager.GetString("NoTrainingStatYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose the dictionary.
         /// </summary>
         internal static string OpenDictionaryTitle {
@@ -593,6 +602,51 @@ namespace DDictionary.Properties {
         internal static string ShowTheOptionsLabel {
             get {
                 return ResourceManager.GetString("ShowTheOptionsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listening.
+        /// </summary>
+        internal static string TestTypeListening {
+            get {
+                return ResourceManager.GetString("TestTypeListening", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sprint.
+        /// </summary>
+        internal static string TestTypeSprint {
+            get {
+                return ResourceManager.GetString("TestTypeSprint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translation - Word.
+        /// </summary>
+        internal static string TestTypeTranslationWord {
+            get {
+                return ResourceManager.GetString("TestTypeTranslationWord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Word Constructor.
+        /// </summary>
+        internal static string TestTypeWordConstructor {
+            get {
+                return ResourceManager.GetString("TestTypeWordConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Word - Translation.
+        /// </summary>
+        internal static string TestTypeWordTranslation {
+            get {
+                return ResourceManager.GetString("TestTypeWordTranslation", resourceCulture);
             }
         }
         

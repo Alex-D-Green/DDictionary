@@ -2,7 +2,7 @@
 
 This is a simple WPF based program to manage the personal dictionary for those who learns a foreign language.
 
-The key features of the program is:
+The key features of the program are:
   - Customizable relations between the words (for better memorizing);
   - Advanced filtration & search;
   - Ranging words by groups depending on how well they are known;

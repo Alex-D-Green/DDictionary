@@ -1171,6 +1171,11 @@ namespace DDictionary.Presentation
             await UpdateDataGridAsync();
         }
 
+        private void OnTrainingStatistics(object sender, ExecutedRoutedEventArgs e)
+        {
+            (new StatisticsDlg() { Owner = this }).ShowDialog();
+        }
+
         private async void OnCreateNewDBCommand(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new SaveFileDialog {

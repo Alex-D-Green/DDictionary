@@ -1,0 +1,66 @@
+﻿<Window x:Class="DDictionary.Presentation.Testing.StatisticsDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Training statistics" MinHeight="100" MinWidth="200" WindowStartupLocation="CenterOwner" 
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <Style x:Key="RightAligned" TargetType="DataGridCell">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+        <Style x:Key="ColumnElementStyle" TargetType="TextBlock">
+            <Setter Property="Padding" Value="7, 1" />
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <Label Content="Total" HorizontalAlignment="Center" Margin="5" FontSize="14"/>
+        <DataGrid x:Name="statDataGrid" MinHeight="100" MaxHeight="600" TabIndex="101" Margin="10, 0" RowHeaderWidth="0"
+                  SelectionMode="Extended" BorderThickness="1" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding TestType}" ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    Header="Test type" Width="Auto"/>
+                <DataGridTextColumn Binding="{Binding Success}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Success"/>
+                <DataGridTextColumn Binding="{Binding Fail}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Fail"/>
+                <DataGridTextColumn Binding="{Binding Total}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Total"/>
+                <DataGridTextColumn Binding="{Binding Percent}" SortMemberPath="PercentSort" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Percent"/>
+                <DataGridTextColumn Binding="{Binding LastTraining}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Last training"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Label Content="Last month" HorizontalAlignment="Center" Margin="5, 10, 5, 5" FontSize="14"/>
+        <DataGrid x:Name="lastStatDataGrid" MinHeight="100" MaxHeight="600" TabIndex="102" Margin="10, 0" RowHeaderWidth="0"
+                  SelectionMode="Extended" BorderThickness="1" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding TestType}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    Header="Test type"/>
+                <DataGridTextColumn Binding="{Binding Success}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Success"/>
+                <DataGridTextColumn Binding="{Binding Fail}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Fail"/>
+                <DataGridTextColumn Binding="{Binding Total}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Total"/>
+                <DataGridTextColumn Binding="{Binding Percent}" SortMemberPath="PercentSort" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Percent"/>
+                <DataGridTextColumn Binding="{Binding Improvement}" SortMemberPath="ImprovementSort" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Improvement"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Orientation="Horizontal">
+            <Label Content="New words:" HorizontalAlignment="Center" Margin="5, 10, 0, 5"/>
+            <Label x:Name="newWordsLbl" Content="0" HorizontalAlignment="Center" Margin="0, 10, 5, 5"/>
+        </StackPanel>
+
+        <Button MinWidth="95" Height="22" Content="Close" Margin="15" IsCancel="True" TabIndex="1001" 
+                HorizontalAlignment="Center"/>
+    </StackPanel>
+</Window>

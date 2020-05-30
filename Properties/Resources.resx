@@ -224,6 +224,9 @@ Must be at least {0} word[s] in the dictionary and at least {1} word[s] selected
 
 Must be at least {0} word[s] with the sound link[s] selected for the training.</value>
   </data>
+  <data name="NoTrainingStatYet" xml:space="preserve">
+    <value>There is no training statistic yet.</value>
+  </data>
   <data name="OpenDictionaryTitle" xml:space="preserve">
     <value>Choose the dictionary</value>
   </data>
@@ -316,6 +319,26 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
   </data>
   <data name="ShowTheOptionsLabel" xml:space="preserve">
     <value>Show the options</value>
+  </data>
+  <data name="TestTypeListening" xml:space="preserve">
+    <value>Listening</value>
+    <comment>TestType</comment>
+  </data>
+  <data name="TestTypeSprint" xml:space="preserve">
+    <value>Sprint</value>
+    <comment>TestType</comment>
+  </data>
+  <data name="TestTypeTranslationWord" xml:space="preserve">
+    <value>Translation - Word</value>
+    <comment>TestType</comment>
+  </data>
+  <data name="TestTypeWordConstructor" xml:space="preserve">
+    <value>Word Constructor</value>
+    <comment>TestType</comment>
+  </data>
+  <data name="TestTypeWordTranslation" xml:space="preserve">
+    <value>Word - Translation</value>
+    <comment>TestType</comment>
   </data>
   <data name="TheClauseDeletionConfirmation" xml:space="preserve">
     <value>Delete "{0}" clause?</value>
