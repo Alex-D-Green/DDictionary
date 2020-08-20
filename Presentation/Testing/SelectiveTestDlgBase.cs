@@ -114,7 +114,10 @@ namespace DDictionary.Presentation.Testing
                             await StartTrainingAsync();
                         }
                         else
+                        {
+                            GoToStatistic = dlg.GoToStatistic; //"Command" retranslation
                             Close();
+                        }
                     }
                     else
                         await NextRoundAsync();

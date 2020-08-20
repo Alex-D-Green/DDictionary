@@ -15,6 +15,7 @@ using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation
@@ -212,8 +213,12 @@ namespace DDictionary.Presentation
                 copy.Name = null; //To show that it's a new item
                 copy.Visibility = Visibility.Visible;
                 copy.MouseLeftButtonUp += OnRelationsLbl_MouseLeftButtonUp;
-                copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
-                    (await dbFacade.GetClauseByIdAsync(rel.ToWordId)).Translations);
+                var cl = await dbFacade.GetClauseByIdAsync(rel.ToWordId);
+                copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(cl.Translations);
+                
+                if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(cl.Sound))
+                    copy.ToolTipOpening += async (s, e) => 
+                        await SoundManager.PlaySoundAsync(cl.Id, cl.Sound, dbFacade.DataSource);
 
                 var newWordLbl = (Label)copy.FindName(nameof(wordLbl));
                 newWordLbl.Content = rel.ToWord;

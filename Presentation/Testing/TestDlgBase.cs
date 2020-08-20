@@ -104,6 +104,9 @@ namespace DDictionary.Presentation.Testing
         /// <summary>Test's type.</summary>
         public TestType TrainingType { get; }
 
+        /// <summary>"Command" that after dialogs closing it's needed to show statistic dialog.</summary>
+        public bool GoToStatistic { get; protected set; }
+
 
         protected TestDlgBase(IEnumerable<int> clausesForTrainingList, TestType type)
         {

@@ -27,6 +27,9 @@ namespace DDictionary.Presentation.Testing
         /// <summary>The object to work with data storage.</summary>
         private IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
 
+        /// <summary>"Command" that after dialogs closing it's needed to show statistic dialog.</summary>
+        public bool GoToStatistic { get; private set; }
+
 
         public ResultDlg(IEnumerable<TestAnswer> answers)
         {
@@ -179,6 +182,13 @@ namespace DDictionary.Presentation.Testing
 
                 UpdateResult(); //Redraw window data
             }
+        }
+
+        private void GoToStatisticBtn_Click(object sender, RoutedEventArgs e)
+        {
+            GoToStatistic = true;
+            DialogResult = false;
+            Close();
         }
     }
 }

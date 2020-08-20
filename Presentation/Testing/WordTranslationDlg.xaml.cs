@@ -121,6 +121,9 @@ namespace DDictionary.Presentation.Testing
                 copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
                     (await dbFacade.GetClauseByIdAsync(rel.ToClause.Id)).Translations);
 
+                if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(rel.ToClause.Sound))
+                    copy.ToolTipOpening += async (s, e) => await PlaySoundAsync(rel.ToClause);
+
                 var newWordLbl = (Label)copy.FindName(nameof(wordLbl));
                 newWordLbl.Content = rel.ToClause.Word;
 

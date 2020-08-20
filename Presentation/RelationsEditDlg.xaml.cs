@@ -12,6 +12,7 @@ using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation
@@ -111,11 +112,14 @@ namespace DDictionary.Presentation
 
             copy.Visibility = Visibility.Visible;
             copy.Tag = relationDTO;
-
+            var cl = await dbFacade.GetClauseByIdAsync(relationDTO.ToWordId);
             var newToWordLbl = (Label)copy.FindName(nameof(toWordLbl));
             newToWordLbl.Content = relationDTO.ToWord;
-            newToWordLbl.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
-                (await dbFacade.GetClauseByIdAsync(relationDTO.ToWordId)).Translations);
+            newToWordLbl.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(cl.Translations);
+
+            if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(cl.Sound))
+                newToWordLbl.ToolTipOpening += async (s, e) =>
+                    await SoundManager.PlaySoundAsync(cl.Id, cl.Sound, dbFacade.DataSource);
 
             var newDescrTBox = (TextBox)copy.FindName(nameof(descrTBox));
             newDescrTBox.Text = relationDTO.Description;

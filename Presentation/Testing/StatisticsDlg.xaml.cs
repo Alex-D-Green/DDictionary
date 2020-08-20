@@ -14,8 +14,28 @@ namespace DDictionary.Presentation.Testing
     /// </summary>
     public partial class StatisticsDlg: Window
     {
+        #region Internal types
+
+        private sealed class TrainingTableClause
+        {
+            public string TestTypeName { get; set; }
+            public object Success { get; set; }
+            public object Fail { get; set; }
+            public object Total { get; set; }
+            public string Percent { get; set; }
+            public int? PercentSort { get; set; }
+            public object LastTraining { get; set; }
+            public TestType TestType { get; set; }
+        }
+
+        #endregion
+
+
         /// <summary>The object to work with data storage.</summary>
         protected IDBFacade dbFacade { get; set; } = CompositionRoot.DBFacade;
+
+        /// <summary>Command on start a certain training after this dialog closing.</summary>
+        public TestType? StartTraining { get; private set; }
 
 
         public StatisticsDlg()
@@ -38,7 +58,6 @@ namespace DDictionary.Presentation.Testing
                 return;
             }
 
-
             foreach(TestType testType in Enum.GetValues(typeof(TestType)).Cast<TestType>())
             {
                 int? per = null;
@@ -48,19 +67,20 @@ namespace DDictionary.Presentation.Testing
                 {
                     per = calcPercent(rowT.Success, rowT.Fail);
 
-                    statDataGrid.Items.Add(new {
-                        TestType = rowT.TestType.ToFullString(),
+                    statDataGrid.Items.Add(new TrainingTableClause {
+                        TestTypeName = rowT.TestType.ToFullString(),
                         Success = rowT.Success,
                         Fail = rowT.Fail,
                         Total = (rowT.Success + rowT.Fail),
                         Percent = per.HasValue ? $"{per} %" : "-",
                         PercentSort = per, //For sorting only
-                        LastTraining = rowT.LastTraining
+                        LastTraining = rowT.LastTraining,
+                        TestType = rowT.TestType
                     });
                 }
                 else
-                    statDataGrid.Items.Add(new { TestType = testType.ToString(), Success = "-", Fail = "-",
-                        Total = "-", Percent = "-", LastTraining = "-" });
+                    statDataGrid.Items.Add(new TrainingTableClause { TestTypeName = testType.ToString(), Success = "-", 
+                        Fail = "-", Total = "-", Percent = "-", LastTraining = "-", TestType = testType });
 
 
                 TrainingStatistic rowL = lastStat.FirstOrDefault(o => o.TestType == testType);
@@ -95,6 +115,15 @@ namespace DDictionary.Presentation.Testing
 
                 return (int)((double)success / (success + fail) * 100);
             }
+        }
+
+        private void StartTestButton_Click(object sender, RoutedEventArgs e)
+        {
+            var data = (TrainingTableClause)((FrameworkElement)sender).DataContext;
+
+            StartTraining = data.TestType;
+            DialogResult = true;
+            Close();
         }
     }
 }

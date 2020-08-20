@@ -1144,21 +1144,35 @@ namespace DDictionary.Presentation
 
         private async void OnStartTesting(object sender, ExecutedRoutedEventArgs e)
         {
+            if(e.Command == UICommands.TranslationWordTestCommand)
+                await ExecuteStartTestCmdAsync(TestType.TranslationWord);
+            else if(e.Command == UICommands.WordTranslationTestCommand)
+                await ExecuteStartTestCmdAsync(TestType.WordTranslation);
+            else if(e.Command == UICommands.WordsConstructorTestCommand)
+                await ExecuteStartTestCmdAsync(TestType.WordConstructor);
+            else if(e.Command == UICommands.ListeningTestCommand)
+                await ExecuteStartTestCmdAsync(TestType.Listening);
+            else if(e.Command == UICommands.SprintTestCommand)
+                await ExecuteStartTestCmdAsync(TestType.Sprint);
+            else
+                Debug.Assert(false);
+        }
+
+        private async Task ExecuteStartTestCmdAsync(TestType testType)
+        {
             TestDlgBase dlg = null;
             var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
-            
+
             mainDataGrid.Effect = new BlurEffect { Radius = 10 }; //To hide data on the background
 
-            if(e.Command == UICommands.TranslationWordTestCommand)
-                dlg = new TranslationWordDlg(lst);
-            else if(e.Command == UICommands.WordTranslationTestCommand)
-                dlg = new WordTranslationDlg(lst);
-            else if(e.Command == UICommands.WordsConstructorTestCommand)
-                dlg = new WordsConstructorDlg(lst);
-            else if(e.Command == UICommands.ListeningTestCommand)
-                dlg = new ListeningDlg(lst);
-            else if(e.Command == UICommands.SprintTestCommand)
-                dlg = new SprintDlg(lst);
+            switch(testType)
+            {
+                case TestType.TranslationWord: dlg = new TranslationWordDlg(lst); break;
+                case TestType.WordTranslation: dlg = new WordTranslationDlg(lst); break;
+                case TestType.WordConstructor: dlg = new WordsConstructorDlg(lst); break;
+                case TestType.Listening: dlg = new ListeningDlg(lst); break;
+                case TestType.Sprint: dlg = new SprintDlg(lst); break;
+            }
 
             Debug.Assert(dlg != null);
 
@@ -1169,11 +1183,19 @@ namespace DDictionary.Presentation
             mainDataGrid.Effect = null;
 
             await UpdateDataGridAsync();
+
+            if(dlg.GoToStatistic)
+                OnTrainingStatistics(null, null);
         }
 
-        private void OnTrainingStatistics(object sender, ExecutedRoutedEventArgs e)
+        private async void OnTrainingStatistics(object sender, ExecutedRoutedEventArgs e)
         {
-            (new StatisticsDlg() { Owner = this }).ShowDialog();
+            var statDlg = new StatisticsDlg() { Owner = this };
+            
+            statDlg.ShowDialog();
+
+            if(statDlg.DialogResult == true && statDlg.StartTraining != null)
+                await ExecuteStartTestCmdAsync(statDlg.StartTraining.Value);
         }
 
         private async void OnCreateNewDBCommand(object sender, ExecutedRoutedEventArgs e)

@@ -11,6 +11,8 @@ using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
 
+using PrgSettings = DDictionary.Properties.Settings;
+
 
 namespace DDictionary.Presentation
 {
@@ -60,6 +62,10 @@ namespace DDictionary.Presentation
                     copy.Visibility = Visibility.Visible;
                     copy.ToolTip = ClauseToDataGridClauseMapper.MakeTranslationsString(
                         dbFacade.GetClauseByIdAsync(rl.ToClause.Id).Result.Translations);
+
+                    if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(rl.ToClause.Sound))
+                        copy.ToolTipOpening += async (s, e) =>
+                            await SoundManager.PlaySoundAsync(rl.ToClause.Id, rl.ToClause.Sound, dbFacade.DataSource);
 
                     var newWordLbl = (Label)copy.FindName(nameof(relationLbl));
                     newWordLbl.Content = rl.ToClause.Word;
