@@ -160,7 +160,12 @@ namespace DDictionary.Domain
         /// <summary>
         /// Get general statistics for all training types (if any).
         /// </summary>
-        /// <param name="since">Consider data that isn't older than this date (<c>null</c> - all data).</param>
-        Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime? since);
+        Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync();
+
+        /// <summary>
+        /// Get statistics for a certain period for all training types.
+        /// </summary>
+        /// <param name="since">Consider data that isn't older than this date.</param>
+        Task<IEnumerable<ShortTrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime since);
     }
 }

@@ -806,7 +806,7 @@ namespace DDictionary.DAL
             { return Enumerable.Empty<WordTrainingStatisticDTO>(); }
         }
 
-        public async Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime? since)
+        public async Task<IEnumerable<TrainingStatistic>> GetGeneralTrainingStatisticsAsync()
         {
             try
             {
@@ -815,14 +815,31 @@ namespace DDictionary.DAL
                                    "       SUM ([TS].[Fail]) AS [Fail],\n" +
                                    "       MAX ([TS].[LastTraining]) AS [LastTraining]\n" +
                                    "    FROM [TrainingStatistics] [TS]\n" +
+                                   "    GROUP BY [TS].[TestType]";
+
+                using(IDbConnection cnn = GetConnection())
+                    return await cnn.QueryAsync<TrainingStatistic>(sql);
+            }
+            catch(Exception e) when(HandleError(e))
+            { return Enumerable.Empty<TrainingStatistic>(); }
+        }
+
+        public async Task<IEnumerable<ShortTrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime since)
+        {
+            try
+            {
+                const string sql = "SELECT [TS].[TestType],\n" +
+                                   "       COUNT (*) AS [Count],\n" +
+                                   "       MAX ([TS].[LastTraining]) AS [LastTraining]\n" +
+                                   "    FROM [TrainingStatistics] [TS]\n" +
                                    "    WHERE @Since IS NULL OR [TS].[LastTraining] > @Since\n" +
                                    "    GROUP BY [TS].[TestType]";
 
                 using(IDbConnection cnn = GetConnection())
-                    return await cnn.QueryAsync<TrainingStatistic>(sql, new { Since = since });
+                    return await cnn.QueryAsync<ShortTrainingStatistic>(sql, new { Since = since });
             }
             catch(Exception e) when(HandleError(e))
-            { return Enumerable.Empty<TrainingStatistic>(); }
+            { return Enumerable.Empty<ShortTrainingStatistic>(); }
         }
 
         /// <summary>

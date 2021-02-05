@@ -89,6 +89,7 @@
     <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
     <Compile Include="Domain\Entities\RelationDTO.cs" />
+    <Compile Include="Domain\Entities\ShortTrainingStatistic.cs" />
     <Compile Include="Domain\Entities\TestType.cs" />
     <Compile Include="Domain\Entities\TrainingStatistic.cs" />
     <Compile Include="Domain\Entities\TrainingStatisticDTO.cs" />

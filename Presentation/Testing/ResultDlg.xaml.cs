@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -63,6 +64,15 @@ namespace DDictionary.Presentation.Testing
         {
             int correct = Answers.Count(o => o.Correct);
             int total = Answers.Count;
+
+            if(correct == total)
+            {
+                resultCongrats.Visibility = Visibility.Visible;
+                resultCongrats.Content = String.Format(PrgResources.WithoutErrorsMessage, correct, total);
+                SystemSounds.Exclamation.Play();
+            }
+            else
+                resultCongrats.Visibility = Visibility.Collapsed;
 
             resultLbl.Content = String.Format(PrgResources.RightTestAnswers, correct, total, 
                                               (int)Math.Round((double)correct / total * 100));
