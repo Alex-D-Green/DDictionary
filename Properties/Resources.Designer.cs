@@ -723,6 +723,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} out of {1}, that&apos;s great!.
+        /// </summary>
+        internal static string WithoutErrorsMessage {
+            get {
+                return ResourceManager.GetString("WithoutErrorsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Word &quot;{0}&quot; already presents in the dictionary..
         /// </summary>
         internal static string WordAlreadyPresents {

@@ -43,11 +43,11 @@ namespace DDictionary.Presentation.Testing
             InitializeComponent();
 
             TrainingStatistic[] total =
-                dbFacade.GetGeneralTrainingStatisticsAsync(null).Result.ToArray();
+                dbFacade.GetGeneralTrainingStatisticsAsync().Result.ToArray();
 
             DateTime lastStatDate = DateTime.Now.AddMonths(-1);
 
-            TrainingStatistic[] lastStat =
+            ShortTrainingStatistic[] lastStat =
                 dbFacade.GetGeneralTrainingStatisticsAsync(lastStatDate).Result.ToArray();
 
             if(total.Length == 0)
@@ -79,29 +79,21 @@ namespace DDictionary.Presentation.Testing
                     });
                 }
                 else
-                    statDataGrid.Items.Add(new TrainingTableClause { TestTypeName = testType.ToString(), Success = "-", 
+                    statDataGrid.Items.Add(new TrainingTableClause { TestTypeName = testType.ToFullString(), Success = "-", 
                         Fail = "-", Total = "-", Percent = "-", LastTraining = "-", TestType = testType });
 
 
-                TrainingStatistic rowL = lastStat.FirstOrDefault(o => o.TestType == testType);
+                ShortTrainingStatistic rowL = lastStat.FirstOrDefault(o => o.TestType == testType);
                 if(rowL != null)
                 {
-                    int? lp = calcPercent(rowL.Success, rowL.Fail);
-
                     lastStatDataGrid.Items.Add(new {
                         TestType = rowL.TestType.ToFullString(),
-                        Success = rowL.Success,
-                        Fail = rowL.Fail,
-                        Total = (rowL.Success + rowL.Fail),
-                        Percent = lp.HasValue ? $"{lp} %" : "-",
-                        PercentSort = per, //For sorting only
-                        Improvement = (lp.HasValue && lp != per) ? $"{lp - per:+#;-#;0} %" : "-",
-                        ImprovementSort = lp.HasValue ? lp - per : null //For sorting only
+                        Count = rowL.Count,
+                        LastTraining = rowL.LastTraining
                     });
                 }
                 else
-                    lastStatDataGrid.Items.Add(new { TestType = testType.ToString(), Success = "-", Fail = "-",
-                        Total = "-", Percent = "-", Improvement = "-" });
+                    lastStatDataGrid.Items.Add(new { TestType = testType.ToFullString(), Count = "-", LastTraining = "-" });
             }
 
             newWordsLbl.Content =

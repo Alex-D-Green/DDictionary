@@ -47,18 +47,10 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding TestType}" ElementStyle="{StaticResource ColumnElementStyle}"
                                     Header="Test type"/>
-                <DataGridTextColumn Binding="{Binding Success}" ElementStyle="{StaticResource ColumnElementStyle}"
-                                    CellStyle="{StaticResource RightAligned}" Header="Success"/>
-                <DataGridTextColumn Binding="{Binding Fail}" ElementStyle="{StaticResource ColumnElementStyle}"
-                                    CellStyle="{StaticResource RightAligned}" Header="Fail"/>
-                <DataGridTextColumn Binding="{Binding Total}" ElementStyle="{StaticResource ColumnElementStyle}"
-                                    CellStyle="{StaticResource RightAligned}" Header="Total"/>
-                <DataGridTextColumn Binding="{Binding Percent}" SortMemberPath="PercentSort" 
-                                    ElementStyle="{StaticResource ColumnElementStyle}"
-                                    CellStyle="{StaticResource RightAligned}" Header="Percent"/>
-                <DataGridTextColumn Binding="{Binding Improvement}" SortMemberPath="ImprovementSort" 
-                                    ElementStyle="{StaticResource ColumnElementStyle}"
-                                    CellStyle="{StaticResource RightAligned}" Header="Improvement"/>
+                <DataGridTextColumn Binding="{Binding Count}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Words count"/>                
+                <DataGridTextColumn Binding="{Binding LastTraining}" ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Last training"/>
             </DataGrid.Columns>
         </DataGrid>
 

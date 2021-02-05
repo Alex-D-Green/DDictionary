@@ -369,6 +369,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
     <value>Well known</value>
     <comment>WordGroup</comment>
   </data>
+  <data name="WithoutErrorsMessage" xml:space="preserve">
+    <value>{0} out of {1}, that's great!</value>
+  </data>
   <data name="WordAlreadyPresents" xml:space="preserve">
     <value>Word "{0}" already presents in the dictionary.</value>
   </data>
