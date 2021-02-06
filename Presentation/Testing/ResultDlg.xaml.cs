@@ -22,6 +22,9 @@ namespace DDictionary.Presentation.Testing
     /// </summary>
     public partial class ResultDlg: Window
     {
+        private bool ExclamationHasBeenPlayed = false;
+
+
         /// <summary>The list of answers with information about changes in the dictionary.</summary>
         public IList<TestAnswer> Answers { get; }
 
@@ -67,9 +70,14 @@ namespace DDictionary.Presentation.Testing
 
             if(correct == total)
             {
-                resultCongrats.Visibility = Visibility.Visible;
-                resultCongrats.Content = String.Format(PrgResources.WithoutErrorsMessage, correct, total);
-                SystemSounds.Exclamation.Play();
+                if(!ExclamationHasBeenPlayed)
+                {
+                    resultCongrats.Visibility = Visibility.Visible;
+                    resultCongrats.Content = String.Format(PrgResources.WithoutErrorsMessage, correct, total);
+                    
+                    SystemSounds.Exclamation.Play();
+                    ExclamationHasBeenPlayed = true;
+                }
             }
             else
                 resultCongrats.Visibility = Visibility.Collapsed;
