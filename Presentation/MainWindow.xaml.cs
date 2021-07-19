@@ -518,8 +518,10 @@ namespace DDictionary.Presentation
                 if(regEx is null)
                 {
                     regEx = new Regex(substring
-                                          .Replace(".", "\\.") //To handle dots as a regular symbol
-                                          .Replace("_", "."),  //To handle underscores as the placeholder
+                                          .Replace(".", "\\.")  //To handle dots as a regular symbol
+                                          .Replace("?", "\\?")  //To handle question mark as a regular symbol
+                                          .Replace("*", "\\*")  //To handle asterisk as a regular symbol
+                                          .Replace("_", "."),   //To handle underscores as the placeholder
                                       RegexOptions.IgnoreCase);
                 }
 
