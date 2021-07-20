@@ -12,7 +12,7 @@
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
     </Window.Resources>
-    <DockPanel Margin="10">
+    <DockPanel Margin="10" x:Name="mainPanel">
         <Button x:Name="playBtn" Margin="10, 5" MaxWidth="40" Click="OnPlayBtn_Click" TabIndex="100" DockPanel.Dock="Top"
                ToolTip="Play sound [Ctrl+Space]">
             <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Margin="5, 0" Height="24" Width="24"/>

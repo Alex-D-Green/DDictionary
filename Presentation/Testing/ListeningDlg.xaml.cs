@@ -55,6 +55,7 @@ namespace DDictionary.Presentation.Testing
             this.clausesForTrainingList = clausesForTrainingList.Except(withoutSound).ToList();
 
             InitializeComponent();
+            ApplyGUIScale(mainPanel);
         }
 
 

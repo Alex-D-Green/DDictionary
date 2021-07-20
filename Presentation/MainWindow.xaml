@@ -101,7 +101,7 @@
         <CommandBinding Command="{x:Static local:UICommands.SprintTestCommand}" Executed="OnStartTesting"/>
         <CommandBinding Command="{x:Static local:UICommands.TestsStatisticsCommand}" Executed="OnTrainingStatistics"/>
     </Window.CommandBindings>
-    <Grid Margin="0">
+    <Grid Margin="0" x:Name="mainWindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="40"/>

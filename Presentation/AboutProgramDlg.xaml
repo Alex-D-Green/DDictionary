@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="About DDictionary" Height="295.303" Width="402.775" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="Height">
-    <StackPanel Margin="20">
+    <StackPanel Margin="20" x:Name="mainWindowGrid">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
             <Image Height="100" Width="100" Source="/DDictionary;component/Icon/DDictionary.png"/>
             <StackPanel>

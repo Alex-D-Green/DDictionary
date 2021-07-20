@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -59,6 +60,7 @@ namespace DDictionary.Presentation.Testing
                              .ToList();
 
             InitializeComponent();
+            ApplyGUIScale();
 
             UpdateResult();
         }
@@ -207,6 +209,19 @@ namespace DDictionary.Presentation.Testing
             GoToStatistic = true;
             DialogResult = false;
             Close();
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

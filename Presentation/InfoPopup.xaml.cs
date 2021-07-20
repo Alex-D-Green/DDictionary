@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
@@ -36,6 +36,7 @@ namespace DDictionary.Presentation
 
 
             InitializeComponent();
+            ApplyGUIScale();
 
             this.clause = clause;
 
@@ -104,6 +105,19 @@ namespace DDictionary.Presentation
                 try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
                 catch(FileNotFoundException) { }
             }
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.PopupScale;
+
+            mainPanel.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

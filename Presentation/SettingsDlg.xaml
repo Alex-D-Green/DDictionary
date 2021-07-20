@@ -6,24 +6,76 @@
         mc:Ignorable="d"
         Title="Program settings" MinHeight="100" MinWidth="350" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
-    <StackPanel Margin="10">
+    <StackPanel Margin="10" x:Name="mainWindowGrid">
         <TabControl MinHeight="120">
-            <TabItem Header="Main" ToolTip="Main settings">
-                <StackPanel Margin="5">
-                    <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 5">
-                        <CheckBox x:Name="showPopupChk" Content="Show info popup" TabIndex="10" 
-                          ToolTip=
+            <TabItem Header="Main">
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 5">
+                            <CheckBox x:Name="showPopupChk" Content="Show info popup" TabIndex="10" 
+                              ToolTip=
 "Show quick info popup while hover over the main table.&#x0A;
 The popup does not appear over the 'active' columns or when the filtration field has focus.&#x0A;
 To hide the popup just click on it or press Escape or hold Shift to prevent it from popping up."/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 5">
+                            <CheckBox x:Name="autoPlayChk" Content="Autoplay sound" TabIndex="20" 
+                              ToolTip="Automatically play the word's sound when the info popup or edit dialog appears."/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 5">
+                            <CheckBox x:Name="saveContextChk" Content="Save browser context" TabIndex="30"
+                              ToolTip="Save filter, sorting, scroll position etc. on exit."/>
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10, 5">
-                        <CheckBox x:Name="autoPlayChk" Content="Autoplay sound" TabIndex="20" 
-                          ToolTip="Automatically play the word's sound when the info popup or edit dialog appears."/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="10, 5">
-                        <CheckBox x:Name="saveContextChk" Content="Save browser context" TabIndex="30"
-                          ToolTip="Save filter, sorting, scroll position etc. on exit."/>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 1">
+                            <ComboBox x:Name="mainScaleCoefCBox" TabIndex="40" SelectedIndex="3" IsReadOnly="True">
+                                <TextBlock Text="50 %"/>
+                                <TextBlock Text="75 %"/>
+                                <TextBlock Text="90 %"/>
+                                <TextBlock Text="100 %"/>
+                                <TextBlock Text="110 %"/>
+                                <TextBlock Text="125 %"/>
+                                <TextBlock Text="150 %"/>
+                                <TextBlock Text="175 %"/>
+                                <TextBlock Text="200 %"/>
+                                <TextBlock Text="250 %"/>
+                                <TextBlock Text="300 %"/>
+                            </ComboBox>
+                            <Label Content="Main window scale coefficient" Margin="5, 0"/>
+                        </StackPanel>                        
+                        <StackPanel Orientation="Horizontal" Margin="10, 1">
+                            <ComboBox x:Name="dlgScaleCoefCBox" TabIndex="50" SelectedIndex="3" IsReadOnly="True">
+                                <TextBlock Text="50 %"/>
+                                <TextBlock Text="75 %"/>
+                                <TextBlock Text="90 %"/>
+                                <TextBlock Text="100 %"/>
+                                <TextBlock Text="110 %"/>
+                                <TextBlock Text="125 %"/>
+                                <TextBlock Text="150 %"/>
+                                <TextBlock Text="175 %"/>
+                                <TextBlock Text="200 %"/>
+                                <TextBlock Text="250 %"/>
+                                <TextBlock Text="300 %"/>
+                            </ComboBox>
+                            <Label Content="Dialogs scale coefficient" Margin="5, 0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 1">
+                            <ComboBox x:Name="popupScaleCoefCBox" TabIndex="60" SelectedIndex="3" IsReadOnly="True">
+                                <TextBlock Text="50 %"/>
+                                <TextBlock Text="75 %"/>
+                                <TextBlock Text="90 %"/>
+                                <TextBlock Text="100 %"/>
+                                <TextBlock Text="110 %"/>
+                                <TextBlock Text="125 %"/>
+                                <TextBlock Text="150 %"/>
+                                <TextBlock Text="175 %"/>
+                                <TextBlock Text="200 %"/>
+                                <TextBlock Text="250 %"/>
+                                <TextBlock Text="300 %"/>
+                            </ComboBox>
+                            <Label Content="Popup info scale coefficient" Margin="5, 0"/>
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </TabItem>

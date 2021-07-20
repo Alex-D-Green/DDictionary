@@ -33,6 +33,7 @@ namespace DDictionary.Presentation.Testing
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
 
             InitializeComponent();
+            ApplyGUIScale(mainPanel);
         }
 
 

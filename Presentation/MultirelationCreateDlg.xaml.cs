@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Presentation.ViewModels;
 
@@ -31,6 +31,7 @@ namespace DDictionary.Presentation
             this.words = words;
 
             InitializeComponent();
+            ApplyGUIScale();
 
             wordsLbl.Content = words.Aggregate("", (s, o) => s + $"{o.Word}, ").TrimEnd(',', ' ');
 
@@ -92,6 +93,19 @@ namespace DDictionary.Presentation
         private void OnNewRelationDescrTBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             createBtn.IsEnabled = !String.IsNullOrEmpty(newRelationDescrTBox.Text);
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = Properties.Settings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

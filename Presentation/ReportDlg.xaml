@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Report" MinHeight="200" MinWidth="300" MaxHeight="600" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" ResizeMode="CanResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
-    <Grid Margin="5">
+    <Grid Margin="5" x:Name="mainWindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>

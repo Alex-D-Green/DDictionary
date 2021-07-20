@@ -12,7 +12,7 @@
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
     </Window.Resources>
-    <Grid Margin="10">
+    <Grid Margin="10" x:Name="mainPanel">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.4*"/>
             <ColumnDefinition Width="0.6*"/>

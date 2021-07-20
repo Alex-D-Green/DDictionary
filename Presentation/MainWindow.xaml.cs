@@ -91,6 +91,7 @@ namespace DDictionary.Presentation
             };
 
             InitializeComponent();
+            ApplyGUIScale();
 
             highlightBrush = mainDataGrid.Resources["HighlightBrush"] as Brush ??
                 new SolidColorBrush(Color.FromRgb(0xFD, 0xC4, 0x4D));
@@ -927,6 +928,13 @@ namespace DDictionary.Presentation
             }
         }
 
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.MainWindowScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+        }
+
         #region Commands' handlers
 
         private void OnExitCommand(object sender, ExecutedRoutedEventArgs e) 
@@ -936,7 +944,15 @@ namespace DDictionary.Presentation
 
         private void OnSettingsCommand(object sender, ExecutedRoutedEventArgs e)
         {
+            double old = PrgSettings.Default.MainWindowScale;
+
             new SettingsDlg() { Owner = this }.ShowDialog();
+
+            if(PrgSettings.Default.MainWindowScale != old)
+            { //Applying scale on the main window in runtime after the settings were changed
+                ApplyGUIScale();
+                mainWindowGrid.UpdateLayout();
+            }
         }
 
         private void OnGoToSiteCommand(object sender, ExecutedRoutedEventArgs e)

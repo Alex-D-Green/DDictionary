@@ -49,6 +49,7 @@ namespace DDictionary.Presentation.Testing
             answerTimer.Tick += OnAnswerTimerTick;
 
             InitializeComponent();
+            ApplyGUIScale(mainPanel);
         }
 
 

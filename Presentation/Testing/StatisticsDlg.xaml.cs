@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 
+using PrgSettings = DDictionary.Properties.Settings;
 
 namespace DDictionary.Presentation.Testing
 {
@@ -41,6 +42,7 @@ namespace DDictionary.Presentation.Testing
         public StatisticsDlg()
         {
             InitializeComponent();
+            ApplyGUIScale();
 
             TrainingStatistic[] total =
                 dbFacade.GetGeneralTrainingStatisticsAsync().Result.ToArray();
@@ -52,7 +54,7 @@ namespace DDictionary.Presentation.Testing
 
             if(total.Length == 0)
             {
-                MessageBox.Show(this, Properties.Resources.NoTrainingStatYet, Properties.Resources.InformationCaption, 
+                MessageBox.Show(this, Properties.Resources.NoTrainingStatYet, Properties.Resources.InformationCaption,
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
                 return;
@@ -79,8 +81,15 @@ namespace DDictionary.Presentation.Testing
                     });
                 }
                 else
-                    statDataGrid.Items.Add(new TrainingTableClause { TestTypeName = testType.ToFullString(), Success = "-", 
-                        Fail = "-", Total = "-", Percent = "-", LastTraining = "-", TestType = testType });
+                    statDataGrid.Items.Add(new TrainingTableClause {
+                        TestTypeName = testType.ToFullString(),
+                        Success = "-",
+                        Fail = "-",
+                        Total = "-",
+                        Percent = "-",
+                        LastTraining = "-",
+                        TestType = testType
+                    });
 
 
                 ShortTrainingStatistic rowL = lastStat.FirstOrDefault(o => o.TestType == testType);
@@ -107,6 +116,19 @@ namespace DDictionary.Presentation.Testing
 
                 return (int)((double)success / (success + fail) * 100);
             }
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
 
         private void StartTestButton_Click(object sender, RoutedEventArgs e)

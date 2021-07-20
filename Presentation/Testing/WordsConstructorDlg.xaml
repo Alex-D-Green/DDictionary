@@ -12,7 +12,7 @@
         <SolidColorBrush x:Key="ErrorBrush" Color="Coral" />
         <SolidColorBrush x:Key="CorrectBrush" Color="LightGreen" />
     </Window.Resources>
-    <DockPanel Margin="10">
+    <DockPanel Margin="10" x:Name="mainPanel">
         <DockPanel DockPanel.Dock="Top" Margin="0, 0, 0, 15">
             <StackPanel x:Name="soundPanel" DockPanel.Dock="Left" Orientation="Horizontal">
                 <Button x:Name="playBtn" Margin="10, 5" MaxWidth="40" Click="OnPlayBtn_Click" TabIndex="100" 

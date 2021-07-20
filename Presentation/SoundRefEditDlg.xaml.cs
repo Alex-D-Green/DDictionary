@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 
@@ -34,6 +34,7 @@ namespace DDictionary.Presentation
 
 
             InitializeComponent();
+            ApplyGUIScale();
 
             this.clause = clause;
 
@@ -187,6 +188,19 @@ namespace DDictionary.Presentation
             SoundManager.StopPlaying();
 
             base.OnClosed(e);
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = Properties.Settings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

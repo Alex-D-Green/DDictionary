@@ -13,6 +13,7 @@ using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 
 using PrgResources = DDictionary.Properties.Resources;
+using PrgSettings = DDictionary.Properties.Settings;
 
 
 namespace DDictionary.Presentation.Testing
@@ -80,7 +81,7 @@ namespace DDictionary.Presentation.Testing
 
             set
             {
-                clausesForTrainingListInternal = value.ToList();
+                clausesForTrainingListInternal = (value is List<int> lst) ? lst : value.ToList();
                 clausesForTrainingListInternal.Sort(Comparer); //Sort words according to their rating for this training
             }
         }
@@ -144,6 +145,8 @@ namespace DDictionary.Presentation.Testing
         protected async Task RefreshAllWords()
         {
             allWords = (await dbFacade.GetWordTrainingStatisticsAsync(TrainingType)).ToDictionary(o => o.Id);
+            
+            clausesForTrainingListInternal?.Sort(Comparer); //Sort words according to their rating for this training
         }
 
         /// <summary>
@@ -316,6 +319,22 @@ namespace DDictionary.Presentation.Testing
 
             //Get the percent of success for the word
             int getPercent(TrainingStatisticDTO tr) => (int)((double)tr.Success / getTotal(tr) * 100);
+        }
+
+        protected virtual void ApplyGUIScale(FrameworkElement mainPanel)
+        {
+            double guiScale = PrgSettings.Default.DialogsScale;
+
+            mainPanel.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
+
+            Width *= guiScale;
+            Height *= guiScale;
         }
     }
 }

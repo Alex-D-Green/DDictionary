@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-
+using System.Windows.Media;
 
 namespace DDictionary.Presentation
 {
@@ -17,6 +17,7 @@ namespace DDictionary.Presentation
 
 
             InitializeComponent();
+            ApplyGUIScale();
 
             Title = title;
 
@@ -25,6 +26,19 @@ namespace DDictionary.Presentation
                 textEdit.AppendText(str);
                 textEdit.AppendText(Environment.NewLine);
             }
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = Properties.Settings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

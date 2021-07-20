@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Translation editing" WindowStyle="ToolWindow" SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" MinWidth="420" MaxWidth="800">
-    <DockPanel Margin="5">
+    <DockPanel Margin="5" x:Name="mainWindowGrid">
         <Button x:Name="acceptBtn" Content="Accept" Width="75" Margin="15,0,0,0" TabIndex="20" IsEnabled="False" 
             IsDefault="True" Click="OnAcceptBtn_Click" DockPanel.Dock="Right"/>            
         <ComboBox x:Name="partOfSpeechCBox" Width="100" Margin="15,0,0,0" TabIndex="10" MaxDropDownHeight="287" 

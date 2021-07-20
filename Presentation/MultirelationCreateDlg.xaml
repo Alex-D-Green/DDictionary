@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Multirelation creating" MinWidth="350" MaxWidth="800" WindowStartupLocation="CenterOwner" 
         WindowStyle="ToolWindow" ShowInTaskbar="False" SizeToContent="WidthAndHeight">
-    <StackPanel>
+    <StackPanel x:Name="mainWindowGrid">
         <Label Content="The description for the relations among words:" Margin="10, 10, 10, 0"/>
         <Label x:Name="wordsLbl" Content="" Margin="10, 0" FontWeight="Bold"/>
         <Label Content="is:" Margin="10, 0"/>

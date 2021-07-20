@@ -14,7 +14,7 @@
             <Setter Property="Padding" Value="7, 1" />
         </Style>
     </Window.Resources>
-    <StackPanel>
+    <StackPanel x:Name="mainWindowGrid">
         <Label Content="Total" HorizontalAlignment="Center" Margin="5" FontSize="14"/>
         <DataGrid x:Name="statDataGrid" MinHeight="100" MaxHeight="600" TabIndex="101" Margin="10, 0" RowHeaderWidth="0"
                   SelectionMode="Extended" BorderThickness="1" IsReadOnly="True" AutoGenerateColumns="False">

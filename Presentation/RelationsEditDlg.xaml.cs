@@ -57,6 +57,7 @@ namespace DDictionary.Presentation
                 this.relations.AddRange(relations);
 
             InitializeComponent();
+            ApplyGUIScale();
 
             errorTextBrush = Resources["TextErrorBrush"] as Brush ??
                 new SolidColorBrush(Color.FromRgb(0xFF, 0x80, 0x80));
@@ -312,6 +313,22 @@ namespace DDictionary.Presentation
 
                 listOfWordsCBox.Foreground = SystemColors.WindowTextBrush;
             }
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.DialogsScale;
+
+            mainStackPanel.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
+
+            Width *= guiScale;
+            Height *= guiScale;
         }
     }
 }

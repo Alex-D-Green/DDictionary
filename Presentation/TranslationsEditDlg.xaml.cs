@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-
+using System.Windows.Media;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;
@@ -22,6 +22,7 @@ namespace DDictionary.Presentation
         public TranslationsEditDlg(string translation = null, PartOfSpeech part = PartOfSpeech.Unknown)
         {
             InitializeComponent();
+            ApplyGUIScale();
 
             PreviewKeyDown += (s, e) =>
             { //To close dialog by Escape key (cuz this dialog has no Cancel button)
@@ -96,6 +97,19 @@ namespace DDictionary.Presentation
 
             //To prevent height changing
             MinHeight = MaxHeight = ActualHeight; //ActualHeight should be updated by this time
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = Properties.Settings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }

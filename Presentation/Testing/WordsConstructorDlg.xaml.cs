@@ -53,6 +53,7 @@ namespace DDictionary.Presentation.Testing
 
 
             InitializeComponent();
+            ApplyGUIScale(mainPanel);
 
             //Hiding these here to have ability to see layout in the editor
             emptyLetterLbl.Visibility = Visibility.Collapsed;

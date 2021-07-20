@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Test results" MaxHeight="800" MinWidth="400" MaxWidth="800" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
-    <StackPanel>
+    <StackPanel x:Name="mainWindowGrid">
         <Label x:Name="resultLbl" Content="Right answers: 5 out of 10 (50%)" HorizontalAlignment="Center" 
                FontSize="16" Margin="0,10,0,0"/>
 

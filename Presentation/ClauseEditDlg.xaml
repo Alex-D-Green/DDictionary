@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Clause editing" MinWidth="380" MaxWidth="800" WindowStartupLocation="CenterOwner" 
         SizeToContent="WidthAndHeight" WindowStyle="ToolWindow" ShowInTaskbar="False" KeyDown="OnWindow_KeyDown">
-    <Grid Margin="0">
+    <Grid Margin="0" x:Name="mainWindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

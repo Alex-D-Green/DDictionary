@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
-
+using System.Windows.Media;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
@@ -79,6 +79,7 @@ namespace DDictionary.Presentation
                 CreateNewClause();
 
             InitializeComponent();
+            ApplyGUIScale();
 
             //ComboBox with groups initialization
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
@@ -742,6 +743,19 @@ namespace DDictionary.Presentation
                         OnScrollBtn_Click(scrollRightBtn, null);
                     break;
             }
+        }
+
+        private void ApplyGUIScale()
+        {
+            double guiScale = PrgSettings.Default.DialogsScale;
+
+            mainWindowGrid.LayoutTransform = new ScaleTransform(guiScale, guiScale);
+
+            MaxWidth *= guiScale;
+            MaxHeight *= guiScale;
+
+            MinWidth *= guiScale;
+            MinHeight *= guiScale;
         }
     }
 }
