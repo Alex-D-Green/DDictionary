@@ -202,8 +202,12 @@ namespace DDictionary.Presentation.Testing
                     ret.Add(id);
             }
 
-            //The rest ones according to their statistic (the list is sorted)
-            foreach(int id in clausesForTrainingList)
+
+            //Then the words without statistics on this type of training
+            List<int> wordsWithoutStat = clausesForTrainingList.Where(o => GetWordStatistics(o) == null).ToList();
+            wordsWithoutStat.Sort((x, y) => random.Next(3) - 1); //Shuffle the list
+
+            foreach(int id in wordsWithoutStat)
             {
                 if(!ret.Contains(id))
                     ret.Add(id);
@@ -212,9 +216,28 @@ namespace DDictionary.Presentation.Testing
                     break;
             }
 
+
+            if(ret.Count != count)
+            { //The rest ones (if needed) according to their statistic (the list is sorted)
+                foreach(int id in clausesForTrainingList)
+                {
+                    if(!ret.Contains(id))
+                        ret.Add(id);
+
+                    if(ret.Count == count)
+                        break;
+                }
+            }
+
+
             ret.Sort((x, y) => random.Next(3) - 1); //Shuffle the list
 
             return ret;
+        }
+
+        private TrainingStatisticDTO GetWordStatistics(int id)
+        {
+            return allWords[id].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
         }
 
         /// <summary>
@@ -293,11 +316,11 @@ namespace DDictionary.Presentation.Testing
         /// </summary>
         private int Comparer(int firstId, int secondId)
         {
-            TrainingStatisticDTO w1 = allWords[firstId].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
-            TrainingStatisticDTO w2 = allWords[secondId].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
+            TrainingStatisticDTO w1 = GetWordStatistics(firstId);
+            TrainingStatisticDTO w2 = GetWordStatistics(secondId);
 
             if(w1 is null && w2 is null)
-                return random.Next(3) - 1; //There is no statistic - random choice
+                return 0; //Both words have no statistic
             else if(w1 is null || w2 is null)
                 return w1 is null ? -1 : 1; //The word with no statistic is "less"
 
