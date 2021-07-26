@@ -181,6 +181,9 @@
 
 Continue and save only filtered clauses?</value>
   </data>
+  <data name="FinishDateLEStartDateMessage" xml:space="preserve">
+    <value>"Before" date must not be less or equal to "after" date.</value>
+  </data>
   <data name="FinishLabel" xml:space="preserve">
     <value>Finish</value>
   </data>
@@ -319,6 +322,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
   </data>
   <data name="ShowTheOptionsLabel" xml:space="preserve">
     <value>Show the options</value>
+  </data>
+  <data name="StartDateGEFinishDateMessage" xml:space="preserve">
+    <value>"After" date must not be greater or equal to "before" date.</value>
   </data>
   <data name="TestTypeListening" xml:space="preserve">
     <value>Listening</value>

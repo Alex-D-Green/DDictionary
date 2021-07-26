@@ -251,6 +251,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;Before&quot; date must not be less or equal to &quot;after&quot; date..
+        /// </summary>
+        internal static string FinishDateLEStartDateMessage {
+            get {
+                return ResourceManager.GetString("FinishDateLEStartDateMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Finish.
         /// </summary>
         internal static string FinishLabel {
@@ -602,6 +611,15 @@ namespace DDictionary.Properties {
         internal static string ShowTheOptionsLabel {
             get {
                 return ResourceManager.GetString("ShowTheOptionsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;After&quot; date must not be greater or equal to &quot;before&quot; date..
+        /// </summary>
+        internal static string StartDateGEFinishDateMessage {
+            get {
+                return ResourceManager.GetString("StartDateGEFinishDateMessage", resourceCulture);
             }
         }
         

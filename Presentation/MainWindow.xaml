@@ -104,7 +104,7 @@
     <Grid Margin="0" x:Name="mainWindowGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="44"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -112,7 +112,7 @@
             <Button x:Name="selectAllBtn" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
                     TabIndex="1" ToolTip="Select all rows or clear selection" Command="local:UICommands.SelectAllCommand"
                     BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}">
-                <Image Source="../Icons/20429544391543238900-128.png"/>
+                <Image Source="../Icons/20429544391543238900-128.png" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Button>
             <TextBox x:Name="textFilterEdit" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
                      Height="22" TabIndex="2" 
@@ -120,7 +120,7 @@
                      TextChanged="OnTextFilter_TextChanged"/>
             <ComboBox x:Name="groupFilterCBox" Width="160" VerticalAlignment="Center" Margin="5,9" Height="22" TabIndex="3" 
                       IsReadOnly="True" IsEditable="True" DropDownClosed="OnGroupFilter_DropDownClosed" 
-                      ToolTip="Select in the dropdown list groups that should be shown" KeyUp="OnGroupFilterCBox_KeyUp">
+                      ToolTip="Select in the dropdown list groups that should be shown" KeyUp="OnGroupFilterCBox_KeyUp" HorizontalAlignment="Left">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel MinWidth="150" Background="Transparent" Orientation="Horizontal" 
@@ -131,22 +131,28 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            <DatePicker x:Name="fromDatePicker" Height="26" Margin="5,9" TabIndex="4" HorizontalAlignment="Left" 
+                        VerticalAlignment="Center" SelectedDateChanged="OnSelectedDateChanged"
+                        ToolTip="Show only words those were added after this date"/>
+            <DatePicker x:Name="toDatePicker" Height="26" Margin="5,9" TabIndex="5" HorizontalAlignment="Left" 
+                        VerticalAlignment="Center" SelectedDateChanged="OnSelectedDateChanged"
+                        ToolTip="Show only words those were added before this date"/>
             <Button x:Name="clearFilterBtn" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
-                    TabIndex="4" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click">
-                <Image Source="../Icons/4177409791543238955-128.png"/>
+                    TabIndex="6" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click">
+                <Image Source="../Icons/4177409791543238955-128.png" VerticalAlignment="Center" HorizontalAlignment="Left"/>
             </Button>
-            <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
-                      DockPanel.Dock="Right" Height="22" TabIndex="7" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
+            <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" 
+                      DockPanel.Dock="Right" Height="22" TabIndex="12" IsEnabled="False" KeyUp="OnToGroupCBox_KeyUp"
                       DropDownClosed="OnToGroupCBox_DropDownClosed" ToolTip="Move selected words to the group"/>
             <Button x:Name="deleteBtn" Width="22" HorizontalAlignment="Left" VerticalAlignment="Center" 
-                    Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="6"  
+                    Margin="5" DockPanel.Dock="Right" Height="22" TabIndex="11"  
                     ToolTip="Delete selected clauses" Command="local:UICommands.DeleteWordsCommand">
-                <Image Source="/DDictionary;component/Icons/20407009431543238936-128.png"/>
+                <Image Source="/DDictionary;component/Icons/20407009431543238936-128.png" VerticalAlignment="Center" HorizontalAlignment="Right"/>
             </Button>
             <Button Width="22" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" 
-                    DockPanel.Dock="Right" Height="22" TabIndex="5" Command="local:UICommands.AddWordCommand"
+                    DockPanel.Dock="Right" Height="22" TabIndex="10" Command="local:UICommands.AddWordCommand"
                     ToolTip="Add new clause to the dictionary">
-                <Image Source="/DDictionary;component/Icons/6362561671543238881-128.png"/>
+                <Image Source="/DDictionary;component/Icons/6362561671543238881-128.png" VerticalAlignment="Center" HorizontalAlignment="Right"/>
             </Button>
         </DockPanel>
         <DataGrid x:Name="mainDataGrid" Margin="0" Grid.Row="2" RowHeaderWidth="0" TabIndex="20" 

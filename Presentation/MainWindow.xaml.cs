@@ -687,6 +687,9 @@ namespace DDictionary.Presentation
 
             groupFilterCBox.Items.Refresh();
 
+            fromDatePicker.SelectedDate = null;
+            toDatePicker.SelectedDate = null;
+
             currentFilter.Clear();
 
             textFilterEdit.Text = "";
@@ -1253,6 +1256,40 @@ namespace DDictionary.Presentation
                 return;
 
             await OpenDBAsync(dlg.FileName);
+        }
+
+        private async void OnSelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(sender == fromDatePicker)
+            {
+                if(fromDatePicker.SelectedDate >= toDatePicker.SelectedDate)
+                {
+                    MessageBox.Show(this, PrgResources.StartDateGEFinishDateMessage,
+                        PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    fromDatePicker.SelectedDate = currentFilter.AddedAfter;
+                }
+                else
+                {
+                    currentFilter.AddedAfter = fromDatePicker.SelectedDate;
+                    await UpdateDataGridAsync();
+                }
+            }
+            else if(sender == toDatePicker)
+            {
+                if(toDatePicker.SelectedDate <= fromDatePicker.SelectedDate)
+                {
+                    MessageBox.Show(this, PrgResources.FinishDateLEStartDateMessage,
+                        PrgResources.InformationCaption, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    toDatePicker.SelectedDate = currentFilter.AddedBefore;
+                }
+                else
+                {
+                    currentFilter.AddedBefore = toDatePicker.SelectedDate;
+                    await UpdateDataGridAsync();
+                }
+            }
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
