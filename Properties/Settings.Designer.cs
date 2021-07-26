@@ -322,5 +322,29 @@ namespace DDictionary.Properties {
                 this["PopupScale"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FilterAfterDate {
+            get {
+                return ((string)(this["FilterAfterDate"]));
+            }
+            set {
+                this["FilterAfterDate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FilterBeforeDate {
+            get {
+                return ((string)(this["FilterBeforeDate"]));
+            }
+            set {
+                this["FilterBeforeDate"] = value;
+            }
+        }
     }
 }

@@ -396,6 +396,41 @@ namespace DDictionary.Presentation
 
                 UpdateGroupFilterText();
 
+                //Filtration by dates
+                if(!String.IsNullOrEmpty(PrgSettings.Default.FilterAfterDate))
+                {
+                    try
+                    {
+                        fromDatePicker.SelectedDate = currentFilter.AddedAfter = 
+                            DateTime.Parse(PrgSettings.Default.FilterAfterDate);
+                    }
+                    catch(Exception ex)
+                    {
+#if DEBUG
+                        throw;
+#endif
+                        Debug.WriteLine(ex.ToString());
+                        PrgSettings.Default.FilterAfterDate = ""; //To clear corrupted value
+                    }
+                }
+
+                if(!String.IsNullOrEmpty(PrgSettings.Default.FilterBeforeDate))
+                {
+                    try
+                    {
+                        toDatePicker.SelectedDate = currentFilter.AddedBefore = 
+                            DateTime.Parse(PrgSettings.Default.FilterBeforeDate);
+                    }
+                    catch(Exception ex)
+                    {
+#if DEBUG
+                        throw;
+#endif
+                        Debug.WriteLine(ex.ToString());
+                        PrgSettings.Default.FilterBeforeDate = ""; //To clear corrupted value
+                    }
+                }
+
                 if(!String.IsNullOrEmpty(PrgSettings.Default.Sorting))
                 { //Restore sorting
                     try
@@ -899,6 +934,8 @@ namespace DDictionary.Presentation
                 PrgSettings.Default.FilterText = currentFilter.TextFilter ?? "";
                 PrgSettings.Default.FilterGroups =
                     currentFilter.ShownGroups?.Aggregate("", (s, o) => s += $"{o.ToGradeStr()},").TrimEnd(',') ?? "";
+                PrgSettings.Default.FilterBeforeDate = toDatePicker.SelectedDate?.ToString() ?? "";
+                PrgSettings.Default.FilterAfterDate = fromDatePicker.SelectedDate?.ToString() ?? "";
 
                 if(mainDataGrid.Items.SortDescriptions.Count > 0)
                 {
