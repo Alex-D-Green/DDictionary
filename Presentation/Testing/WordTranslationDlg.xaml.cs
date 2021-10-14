@@ -148,7 +148,7 @@ namespace DDictionary.Presentation.Testing
             {
                 if(ret.Length > 0)
                 {
-                    if(ret.Length + tr.Length > 45)
+                    if(ret.Length + tr.Length > 40)
                         continue; //Too long let's try to find and add another translation
 
                     ret.Append("; ");
@@ -162,18 +162,7 @@ namespace DDictionary.Presentation.Testing
 
         private void SetWordOnButton(Button btn, Clause clause)
         {
-            string text = MakeTranslationsString(clause.Translations);
-
-            if(text.Length > 38)
-                btn.FontSize = 9;
-            else if(text.Length > 32)
-                btn.FontSize = 11;
-            else if(text.Length > 25)
-                btn.FontSize = 13;
-            else
-                btn.FontSize = 16;
-
-            ((TextBlock)btn.Content).Text = text;
+            SetWordOnButton(btn, MakeTranslationsString(clause.Translations));
             btn.Tag = clause;
         }
 

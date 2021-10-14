@@ -150,16 +150,7 @@ namespace DDictionary.Presentation.Testing
 
         private static void SetWordOnButton(Button btn, Clause clause)
         {
-            if(clause.Word.Length > 29)
-                btn.FontSize = 9;
-            else if(clause.Word.Length > 24)
-                btn.FontSize = 11;
-            else if(clause.Word.Length > 19)
-                btn.FontSize = 13;
-            else
-                btn.FontSize = 16;
-
-            ((TextBlock)btn.Content).Text = clause.Word;
+            SetWordOnButton(btn, clause.Word);
             btn.Tag = clause;
         }
 

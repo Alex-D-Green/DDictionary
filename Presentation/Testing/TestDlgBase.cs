@@ -359,5 +359,30 @@ namespace DDictionary.Presentation.Testing
             Width *= guiScale;
             Height *= guiScale;
         }
+
+        protected static void SetWordOnButton(Button btn, string text, double maxFont = 16, double minFont = 7)
+        {
+            var tb = (TextBlock)btn.Content;
+            tb.Text = text;
+            tb.TextWrapping = TextWrapping.NoWrap;
+
+            double maxWidth = btn.ActualWidth - btn.Padding.Left - btn.Padding.Right -
+                btn.BorderThickness.Left - btn.BorderThickness.Right -
+                tb.Padding.Left - tb.Padding.Right - tb.Margin.Left - tb.Margin.Right;
+
+            double fs = maxFont;
+
+            while(fs >= minFont)
+            {
+                btn.FontSize = fs;
+
+                tb.Measure(new Size(maxWidth, btn.ActualHeight));
+
+                if(tb.DesiredSize.Width < maxWidth)
+                    break;
+
+                fs -= 0.5;
+            }
+        }
     }
 }
