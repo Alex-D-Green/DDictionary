@@ -118,7 +118,7 @@ namespace DDictionary.Presentation.Testing
             ClearPanel(relationsPanel);
 
             answerEdit.Text = "";
-            answerEdit.Visibility = Visibility.Visible;
+            answerEdit.Visibility = enterHereLbl.Visibility = Visibility.Visible;
             answerEdit.Focus();
 
             await PlaySoundAsync(rightAnswerForRound); //Auto play sound
