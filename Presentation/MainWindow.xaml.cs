@@ -279,7 +279,7 @@ namespace DDictionary.Presentation
             { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
 
             //Refresh window
-            currentFilter.Clear();
+            ClearFilter();
             await UpdateDataGridAsync(true);
             UpdateWindowTitle();
         }
