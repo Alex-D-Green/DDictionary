@@ -98,6 +98,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constrains.cs" />
+    <Compile Include="DAL\MigrationManager.cs" />
+    <Compile Include="DAL\Migrations\SQLiteMigrationBase.cs" />
+    <Compile Include="DAL\Migrations\SQLiteMigration_0001.cs" />
+    <Compile Include="DAL\Migrations\SQLiteMigration_0002.cs" />
     <Compile Include="DAL\SQLiteStorage.cs" />
     <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
@@ -107,6 +111,7 @@
     <Compile Include="Domain\Entities\TrainingStatistic.cs" />
     <Compile Include="Domain\Entities\TrainingStatisticDTO.cs" />
     <Compile Include="Domain\Entities\WordTrainingStatisticDTO.cs" />
+    <Compile Include="Domain\IMigration.cs" />
     <Compile Include="Presentation\AboutProgramDlg.xaml.cs">
       <DependentUpon>AboutProgramDlg.xaml</DependentUpon>
     </Compile>

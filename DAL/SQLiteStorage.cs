@@ -5,12 +5,13 @@ using System.Data;
 using System.Data.SQLite;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Dapper;
-
+using DDictionary.DAL.Migrations;
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 
@@ -22,6 +23,7 @@ namespace DDictionary.DAL
     public sealed class SQLiteStorage: IDBFacade
     {
         private static string dataSource = ".\\DictionaryDB.db";
+        private static bool databaseWasChecked = false;
 
 
         public event ErrorHandler OnErrorOccurs;
@@ -36,6 +38,7 @@ namespace DDictionary.DAL
         public void SetUpDataSource(string dataSource)
         {
             SQLiteStorage.dataSource = dataSource ?? throw new ArgumentNullException(nameof(dataSource));
+            databaseWasChecked = false;
         }
 
         public async Task<Clause> GetClauseByIdAsync(int id)
@@ -79,7 +82,7 @@ namespace DDictionary.DAL
             if(filter.RelatedFrom != null)
             {
                 sql.AppendFormat("    {0} [cl].[Id] = {1} OR ", nextJoin, filter.RelatedFrom.Id);
-                sql.AppendFormat(         "EXISTS( SELECT * FROM [Relations] [srl] WHERE ");
+                sql.AppendFormat(         "EXISTS( SELECT 1 FROM [Relations] [srl] WHERE ");
                 sql.AppendFormat(                 "[srl].[ToClauseId] = [cl].[Id] AND [srl].[FromClauseId] = {0})\n", 
                     filter.RelatedFrom.Id);
 
@@ -147,8 +150,8 @@ namespace DDictionary.DAL
             //Tertiary target (relations, excluding the word itself)
             var sqlCopy = new StringBuilder(sql.ToString());
             sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
-            sql.AppendFormat("    AND EXISTS( SELECT * FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
-            sql.Append(      "                AND EXISTS( SELECT * FROM [Clauses] [cltf] ");
+            sql.AppendFormat("    AND EXISTS( SELECT 1 FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
+            sql.Append(      "                AND EXISTS( SELECT 1 FROM [Clauses] [cltf] ");
             sql.Append(                      "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
             sql.Append(                      "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
@@ -158,13 +161,13 @@ namespace DDictionary.DAL
             //Quaternary targets (excluding all previous targets)
             sql = sqlCopy;
             sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
-            sql.Append(      "    AND NOT EXISTS( SELECT * FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
-            sql.Append(      "                    AND EXISTS( SELECT * FROM [Clauses] [cltf] ");
+            sql.Append(      "    AND NOT EXISTS( SELECT 1 FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
+            sql.Append(      "                    AND EXISTS( SELECT 1 FROM [Clauses] [cltf] ");
             sql.Append(                                       "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
             sql.Append(                                       "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
             sql.Append(      "    AND ([cl].[Context] LIKE @PTextP ESCAPE '\\'\n");
-            sql.Append(      "        OR EXISTS( SELECT * FROM [Translations] [trtf] ");
+            sql.Append(      "        OR EXISTS( SELECT 1 FROM [Translations] [trtf] ");
             sql.Append(                         "WHERE [trtf].[ClauseId] = [cl].[Id] ");
             sql.Append(                         "AND [trtf].[Text] LIKE @PTextP ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
@@ -178,7 +181,7 @@ namespace DDictionary.DAL
         {
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     //https://dapper-tutorial.net/result-multi-mapping#example-query-multi-mapping-one-to-many
 
@@ -234,7 +237,7 @@ namespace DDictionary.DAL
         {
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     return await cnn.ExecuteScalarAsync<int>("SELECT Count(*) FROM [Clauses]");
             }
             catch(Exception e) when(HandleError(e))
@@ -245,7 +248,7 @@ namespace DDictionary.DAL
         {
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     IEnumerable<int> ids = 
                         await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE", 
@@ -265,7 +268,7 @@ namespace DDictionary.DAL
         {
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     return await cnn.QueryAsync<JustWordDTO>("SELECT [Id], [Word] FROM [Clauses]");
             }
             catch(Exception e) when(HandleError(e))
@@ -289,7 +292,7 @@ namespace DDictionary.DAL
                         "    VALUES (@Sound, @Word, @Transcription, @Context, @Added, @Updated, @Watched, 0, @Group);\n" +
                         "SELECT last_insert_rowid(); ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         return (await cnn.QueryAsync<int>(sql, new
                         {
                             Sound = clause.Sound,
@@ -316,7 +319,7 @@ namespace DDictionary.DAL
                             " [Context] = @Context, [Updated] = @Updated, [Group] = @Group\n" +
                             "    WHERE [Id] = @Id; ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         await cnn.ExecuteAsync(sql, new
                         {
                             Id = clause.Id,
@@ -349,7 +352,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     return await cnn.ExecuteScalarAsync<int>(sql, new { Id = id, Watched = DateTime.Now });
             }
             catch(Exception e) when(HandleError(e))
@@ -367,7 +370,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     await cnn.ExecuteAsync("DELETE FROM [Clauses] WHERE [Id] IN @Nums", new { Nums = clauseIds });
             }
             catch(Exception e) when(HandleError(e))
@@ -385,7 +388,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     await cnn.ExecuteAsync("UPDATE [Clauses] SET [Group] = @ToGroup WHERE [Id] IN @Nums", 
                         new { ToGroup = (byte)toGroup, Nums = clauseIds });
 
@@ -421,7 +424,7 @@ namespace DDictionary.DAL
                         "    WHERE [Id] = @From;\n" +
                         "SELECT last_insert_rowid(); ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         return (await cnn.QueryAsync<int>(sql, new { 
                             From = fromClauseId, 
                             To = toClauseId, 
@@ -438,7 +441,7 @@ namespace DDictionary.DAL
                         "UPDATE [Clauses] SET [Updated] = @Now\n" +
                         "    WHERE [Id] = @From; ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         await cnn.ExecuteAsync(sql, new { 
                             Id = relationId, 
                             From = fromClauseId, 
@@ -470,7 +473,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     await cnn.ExecuteAsync(sql, new { Now = DateTime.Now, Nums = relationIds });
             }
             catch(Exception e) when(HandleError(e))
@@ -498,7 +501,7 @@ namespace DDictionary.DAL
                         "    WHERE [Id] = @ClauseId;\n" +
                         "SELECT last_insert_rowid(); ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         return (await cnn.QueryAsync<int>(sql, new { 
                             translation.Index, 
                             translation.Text, 
@@ -516,7 +519,7 @@ namespace DDictionary.DAL
                         "UPDATE [Clauses] SET [Updated] = @Now\n" +
                         "    WHERE [Id] = @ClauseId; ";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         await cnn.ExecuteAsync(sql, new { 
                             translation.Id, 
                             translation.Index, 
@@ -549,7 +552,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     await cnn.ExecuteAsync(sql, new { Now = DateTime.Now, Nums = translationIds });
             }
             catch(Exception e) when(HandleError(e))
@@ -585,7 +588,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     //Inner function to quick check if the word already exists
                     async Task<bool> isWordExist(string word) =>
@@ -724,7 +727,7 @@ namespace DDictionary.DAL
                         "INSERT INTO [TrainingStatistics] ([TestType], [ClauseId], [Success], [Fail], [LastTraining])\n" +
                         "VALUES (@TestType, @ClauseId, @Success, @Fail, @LastTraining);";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         cnn.Execute(sql, tmp);
                 }
                 else
@@ -740,7 +743,7 @@ namespace DDictionary.DAL
                         "UPDATE [TrainingStatistics] SET [Success] = @Success, [Fail] = @Fail, [LastTraining] = @LastTraining\n" +
                         "    WHERE [TestType] = @TestType AND [ClauseId] = @ClauseId;";
 
-                    using(IDbConnection cnn = GetConnection())
+                    using(IDbConnection cnn = await GetConnectionAsync())
                         cnn.Execute(sql, tmp);
                 }
             }
@@ -755,7 +758,7 @@ namespace DDictionary.DAL
 
             try
             {
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     IEnumerable<TrainingStatisticDTO> ret =
                         await cnn.QueryAsync<TrainingStatisticDTO>(
@@ -780,7 +783,7 @@ namespace DDictionary.DAL
                 const string sql = "SELECT [CL].[Id], [Cl].[Word], [TS].* FROM [Clauses] [Cl]\n" +
                                    "    LEFT JOIN [TrainingStatistics] [TS] ON [Cl].[Id] = [TS].[ClauseId]";
 
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     var query = 
                         cnn.QueryAsync<(int id, string w, TestType? t, int? clId, int? s, int? f, DateTime? d)>(sql);
@@ -817,7 +820,7 @@ namespace DDictionary.DAL
                                    "    FROM [TrainingStatistics] [TS]\n" +
                                    "    GROUP BY [TS].[TestType]";
 
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     return await cnn.QueryAsync<TrainingStatistic>(sql);
             }
             catch(Exception e) when(HandleError(e))
@@ -835,7 +838,7 @@ namespace DDictionary.DAL
                                    "    WHERE @Since IS NULL OR [TS].[LastTraining] > @Since\n" +
                                    "    GROUP BY [TS].[TestType]";
 
-                using(IDbConnection cnn = GetConnection())
+                using(IDbConnection cnn = await GetConnectionAsync())
                     return await cnn.QueryAsync<ShortTrainingStatistic>(sql, new { Since = since });
             }
             catch(Exception e) when(HandleError(e))
@@ -845,14 +848,18 @@ namespace DDictionary.DAL
         /// <summary>
         /// Get connection to SQLite database with default connection string.
         /// </summary>
-        private IDbConnection GetConnection()
+        private async Task<IDbConnection> GetConnectionAsync()
         {
             try
             {
                 var cnn = new SQLiteConnection(
                     String.Format(ConfigurationManager.ConnectionStrings["Default"].ConnectionString, DataSource));
 
-                CreateDBStructureIfNeeded(cnn);
+                if(!databaseWasChecked)
+                {
+                    await CreateDBStructureIfNeededAsync(cnn);
+                    databaseWasChecked = true;
+                }
 
                 return cnn;
             }
@@ -861,17 +868,19 @@ namespace DDictionary.DAL
         }
 
         /// <summary>
-        /// Create the correct structure in a new data base if needed.
+        /// Create the correct structure in a new database if needed.
         /// </summary>
-        private static void CreateDBStructureIfNeeded(IDbConnection cnn)
+        private static async Task CreateDBStructureIfNeededAsync(IDbConnection cnn)
         {
-            const string sql = "SELECT Count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Clauses'";
+            IOrderedEnumerable<Type> migrations = 
+                Assembly.GetAssembly(typeof(SQLiteStorage)).GetTypes()
+                                                           .Where(o => o.IsSubclassOf(typeof(SQLiteMigrationBase)))
+                                                           .OrderBy(o => o.GetType().Name);
 
-            if(cnn.Query<int>(sql).SingleOrDefault() == 1)
-                return; //Tables are there already
+            var mm = new MigrationManager(migrations.Select(o => Activator.CreateInstance(o, cnn))
+                                                    .Cast<IMigration>());
 
-            //Create correct structure
-            cnn.Execute(Properties.Resources.DictionaryDB);
+            await mm.UpdateDatabaseAsync();
         }
 
         /// <summary>
