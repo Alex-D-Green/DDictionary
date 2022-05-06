@@ -53,6 +53,7 @@ namespace DDictionary.DAL
                  "    LEFT JOIN [Relations] [rl] ON [rl].[FromClauseId] = [cl].[Id]\n" +
                  "    LEFT JOIN [Clauses] [cl2] ON [cl2].[Id] = [rl].[ToClauseId]\n" +
                  "    LEFT JOIN [TrainingStatistics] [trst] ON [trst].[ClauseId] = [cl].[Id]\n" +
+                 "    LEFT JOIN [Asterisks] [ast] ON [ast].[ClauseId] = [cl].[Id]\n" +
                  "    WHERE [cl].[Id] = @ClauseId; ";
 
             try
@@ -76,6 +77,7 @@ namespace DDictionary.DAL
             sql.AppendLine("    LEFT JOIN [Relations] [rl] ON [rl].[FromClauseId] = [cl].[Id]");
             sql.AppendLine("    LEFT JOIN [Clauses] [cl2] ON [cl2].[Id] = [rl].[ToClauseId]");
             sql.AppendLine("    LEFT JOIN [TrainingStatistics] [trst] ON [trst].[ClauseId] = [cl].[Id]");
+            sql.AppendLine("    LEFT JOIN [Asterisks] [ast] ON [ast].[ClauseId] = [cl].[Id]");
 
             string nextJoin = "WHERE";
 
@@ -193,10 +195,9 @@ namespace DDictionary.DAL
                     try
                     {
                         IEnumerable<Clause> clauses =
-                            await cnn.QueryAsync<Clause, Translation, Relation, Clause, TrainingStatistic, Clause>(cmd,
-                                (clause, translation, relation, clauseTo, trainingStatistics) =>
+                            await cnn.QueryAsync<Clause, Translation, Relation, Clause, TrainingStatistic, Asterisk, Clause>(cmd,
+                                (clause, translation, relation, clauseTo, trainingStatistics, asterisk) =>
                                 {
-
                                     if(!clauseDictionary.TryGetValue(clause.Id, out Clause clauseEntry))
                                     {
                                         clauseEntry = clause;
@@ -218,8 +219,10 @@ namespace DDictionary.DAL
                                         clauseEntry.TrainingStatistics.Add(trainingStatistics);
                                     }
 
+                                    clauseEntry.Asterisk = asterisk;
+
                                     return clauseEntry;
-                                }, "Id,TestType");
+                                }, "Id,TestType,ClauseId");
 
                         return clauses.Distinct();
                     }
@@ -293,7 +296,7 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = await GetConnectionAsync())
-                        return (await cnn.QueryAsync<int>(sql, new
+                        return await cnn.QuerySingleAsync<int>(sql, new
                         {
                             Sound = clause.Sound,
                             Word = clause.Word,
@@ -303,8 +306,7 @@ namespace DDictionary.DAL
                             Updated = now,
                             Watched = now,
                             Group = clause.Group
-                        }))
-                        .Single();
+                        });
                 }
                 else
                 { //Update an existing record
@@ -425,13 +427,12 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = await GetConnectionAsync())
-                        return (await cnn.QueryAsync<int>(sql, new { 
+                        return await cnn.QuerySingleAsync<int>(sql, new { 
                             From = fromClauseId, 
                             To = toClauseId, 
                             Descr = relDescription, 
                             Now = DateTime.Now 
-                        }))
-                        .Single();
+                        });
                 }
                 else
                 { //Update an existing record
@@ -502,14 +503,13 @@ namespace DDictionary.DAL
                         "SELECT last_insert_rowid(); ";
 
                     using(IDbConnection cnn = await GetConnectionAsync())
-                        return (await cnn.QueryAsync<int>(sql, new { 
+                        return await cnn.QuerySingleAsync<int>(sql, new { 
                             translation.Index, 
                             translation.Text, 
                             translation.Part, 
                             ClauseId = toClauseId,
                             Now = DateTime.Now
-                        }))
-                        .Single();
+                        });
                 }
                 else
                 { //Update an existing record
@@ -554,6 +554,118 @@ namespace DDictionary.DAL
             {
                 using(IDbConnection cnn = await GetConnectionAsync())
                     await cnn.ExecuteAsync(sql, new { Now = DateTime.Now, Nums = translationIds });
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
+        }
+
+        public async Task SetAsteriskAsync(int clauseId, AsteriskType asteriskType)
+        {
+            if(clauseId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(clauseId), clauseId,
+                    "The identifier has to be greater than 0.");
+
+
+            if(asteriskType == AsteriskType.None)
+            {
+                await RemoveAsteriskAsync(clauseId);
+                
+                return;
+            }
+
+
+            try
+            {
+                using(IDbConnection cnn = await GetConnectionAsync())
+                {
+                    string sql = "SELECT * FROM [Asterisks] WHERE [ClauseId] = @ClauseId; ";
+
+                    Asterisk asterisk = 
+                        await cnn.QuerySingleOrDefaultAsync<Asterisk>(sql, new { ClauseId = clauseId });
+
+                    if(asterisk is null)
+                    {
+                        sql =
+                            "INSERT INTO [Asterisks] ([ClauseId], [Type], [MeaningLastTrain], [SpellingLastTrain], [ListeningLastTrain])\n" +
+                            "    VALUES (@ClauseId, @Type, @MeaningLastTrain, @SpellingLastTrain, @ListeningLastTrain); ";
+
+                        await cnn.ExecuteAsync(sql, new {
+                            ClauseId = clauseId,
+                            Type = asteriskType,
+                            MeaningLastTrain = (DateTime?)null,
+                            SpellingLastTrain = (DateTime?)null,
+                            ListeningLastTrain = (DateTime?)null
+                        });
+                    }
+                    else if(asterisk.Type != asteriskType)
+                    {
+                        sql =
+                            "UPDATE [Asterisks] SET\n" +
+                            "    [Type] = @Type,\n" +
+                            "    [MeaningLastTrain] = @MeaningLastTrain,\n" +
+                            "    [SpellingLastTrain] = @SpellingLastTrain,\n" +
+                            "    [ListeningLastTrain] = @ListeningLastTrain\n" +
+                            "    WHERE [ClauseId] = @ClauseId; ";
+
+                        await cnn.ExecuteAsync(sql, new {
+                            ClauseId = clauseId,
+                            Type = asteriskType,
+                            MeaningLastTrain = (DateTime?)null,
+                            SpellingLastTrain = (DateTime?)null,
+                            ListeningLastTrain = (DateTime?)null
+                        });
+                    }
+                }
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
+        }
+
+        public async Task RemoveAsteriskAsync(params int[] clausesIds)
+        {
+            if(clausesIds?.Any(o => o <= 0) == true)
+                throw new ArgumentException("All identifiers have to be greater than 0.", nameof(clausesIds));
+
+
+            if(clausesIds is null || clausesIds.Length == 0)
+                return;
+
+            const string sql = "DELETE FROM [Asterisks] WHERE [ClauseId] IN @Nums; ";
+
+            try
+            {
+                using(IDbConnection cnn = await GetConnectionAsync())
+                    await cnn.ExecuteAsync(sql, new { Nums = clausesIds });
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
+        }
+
+        public async Task UpdateTimestampsForAsteriskAsync(int clauseId, DateTime? meaning, DateTime? spelling, DateTime? listening)
+        {
+            if(clauseId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(clauseId), clauseId,
+                    "The identifier has to be greater than 0.");
+
+
+            const string sql =
+                "UPDATE [Asterisks] SET\n" +
+                "    [MeaningLastTrain] = IFNULL([MeaningLastTrain], @MeaningLastTrain),\n" +
+                "    [SpellingLastTrain] = IFNULL([SpellingLastTrain], @SpellingLastTrain),\n" +
+                "    [ListeningLastTrain] = IFNULL([ListeningLastTrain], @ListeningLastTrain)\n" +
+                "    WHERE [ClauseId] = @ClauseId; ";
+
+            try
+            {
+                using(IDbConnection cnn = await GetConnectionAsync())
+                {
+                    await cnn.ExecuteAsync(sql, new { 
+                        ClauseId = clauseId,
+                        MeaningLastTrain = meaning,
+                        SpellingLastTrain = spelling,
+                        ListeningLastTrain = listening
+                    });
+                }
             }
             catch(Exception e) when(HandleError(e))
             { }
@@ -645,7 +757,7 @@ namespace DDictionary.DAL
                                 try
                                 {
                                     //Adding the clause itself
-                                    clause.Id = (await cnn.QueryAsync<int>(insertClauseSql, new {
+                                    clause.Id = await cnn.QuerySingleAsync<int>(insertClauseSql, new {
                                         Sound = clause.Sound,
                                         Word = clause.Word,
                                         Transcription = clause.Transcription,
@@ -654,8 +766,7 @@ namespace DDictionary.DAL
                                         Updated = now,
                                         Watched = now,
                                         Group = clause.Group
-                                    }))
-                                    .Single();
+                                    });
 
                                     //Adding all clause's translations
                                     await cnn.ExecuteAsync(insertTranslationSql, clause.Translations.Select(tr =>
@@ -760,12 +871,9 @@ namespace DDictionary.DAL
             {
                 using(IDbConnection cnn = await GetConnectionAsync())
                 {
-                    IEnumerable<TrainingStatisticDTO> ret =
-                        await cnn.QueryAsync<TrainingStatisticDTO>(
-                            "SELECT * FROM [TrainingStatistics] WHERE [TestType] = @Type AND [ClauseId] = @Id",
-                            new { Type = test, Id = clauseId });
-
-                    return ret.SingleOrDefault();
+                    return await cnn.QuerySingleOrDefaultAsync<TrainingStatisticDTO>(
+                        "SELECT * FROM [TrainingStatistics] WHERE [TestType] = @Type AND [ClauseId] = @Id",
+                        new { Type = test, Id = clauseId });
                 }
             }
             catch(Exception e) when(HandleError(e))
@@ -780,29 +888,66 @@ namespace DDictionary.DAL
 
             try
             {
-                const string sql = "SELECT [CL].[Id], [Cl].[Word], [TS].* FROM [Clauses] [Cl]\n" +
-                                   "    LEFT JOIN [TrainingStatistics] [TS] ON [Cl].[Id] = [TS].[ClauseId]";
+                const string sql = "SELECT [CL].[Id], [Cl].[Word], [TS].*, [AST].* FROM [Clauses] [Cl]\n" +
+                                   "    LEFT JOIN [TrainingStatistics] [TS] ON [Cl].[Id] = [TS].[ClauseId]\n" +
+                                   "    LEFT JOIN [Asterisks] [AST] ON [Cl].[Id] = [AST].[ClauseId]; ";
+
+                //https://dapper-tutorial.net/result-multi-mapping#example-query-multi-mapping-one-to-many
+
+                var wtsDictionary = new Dictionary<int, WordTrainingStatisticDTO>();
+                var tsDictionary = new Dictionary<(int ClauseId, TestType), TrainingStatisticDTO>();
 
                 using(IDbConnection cnn = await GetConnectionAsync())
                 {
-                    var query = 
-                        cnn.QueryAsync<(int id, string w, TestType? t, int? clId, int? s, int? f, DateTime? d)>(sql);
+                    IEnumerable<WordTrainingStatisticDTO> wts =
+                        await cnn.QueryAsync<Clause, TrainingStatistic, Asterisk, WordTrainingStatisticDTO>(sql,
+                            (clause, trainingStatistic, asterisk) =>
+                            {
+                                if(!wtsDictionary.TryGetValue(clause.Id, out WordTrainingStatisticDTO wtsEntry))
+                                {
+                                    wtsEntry = new WordTrainingStatisticDTO {
+                                        Id = clause.Id,
+                                        Word = clause.Word
+                                    };
 
-                    return (await query)
-                        .GroupBy(o => new { o.id, o.w })
-                        .Select(gr => new WordTrainingStatisticDTO {
-                            Id = gr.Key.id,
-                            Word = gr.Key.w,
-                            Statistics = gr.Where(o => o.t != null && (types.Length == 0 || types.Contains(o.t.Value)))
-                                           .Select(o => new TrainingStatisticDTO {
-                                               ClauseId = o.clId.Value,
-                                               TestType = o.t.Value,
-                                               Success = o.s.Value,
-                                               Fail = o.f.Value,
-                                               LastTraining = o.d.Value
-                                           })
-                                           .ToArray()
-                        });
+                                    wtsDictionary.Add(wtsEntry.Id, wtsEntry);
+                                }
+
+                                if(trainingStatistic != null &&
+                                    !tsDictionary.ContainsKey((wtsEntry.Id, trainingStatistic.TestType)))
+                                {
+                                    tsDictionary.Add((wtsEntry.Id, trainingStatistic.TestType), new TrainingStatisticDTO {
+                                        ClauseId = wtsEntry.Id,
+                                        TestType = trainingStatistic.TestType,
+                                        Success = trainingStatistic.Success,
+                                        Fail = trainingStatistic.Fail,
+                                        LastTraining = trainingStatistic.LastTraining
+                                    });
+                                }
+
+                                if(wtsEntry.Asterisk is null && asterisk != null)
+                                {
+                                    wtsEntry.Asterisk = new AsteriskDTO {
+                                        ClauseId = wtsEntry.Id,
+                                        Type = asterisk.Type,
+                                        MeaningLastTrain = asterisk.MeaningLastTrain,
+                                        SpellingLastTrain = asterisk.SpellingLastTrain,
+                                        ListeningLastTrain = asterisk.ListeningLastTrain
+                                    };
+                                }
+
+                                return wtsEntry;
+                            }, splitOn: "TestType,ClauseId");
+
+                    return wts.Distinct().Select(o =>
+                    {
+                        o.Statistics = tsDictionary.Where(x => x.Key.ClauseId == o.Id)
+                                                   .Select(x => x.Value)
+                                                   .ToList()
+                                                   .AsReadOnly();
+
+                        return o;
+                    });
                 }
             }
             catch(Exception e) when(HandleError(e))

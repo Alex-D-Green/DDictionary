@@ -19,5 +19,6 @@ namespace DDictionary.Domain.Entities
         public int WatchedCount { get; set; }
         public WordGroup Group { get; set; }
         public List<TrainingStatistic> TrainingStatistics { get; set; } = new List<TrainingStatistic>();
+        public Asterisk Asterisk { get; set; }
     }
 }

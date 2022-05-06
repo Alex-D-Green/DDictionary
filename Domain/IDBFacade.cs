@@ -128,6 +128,29 @@ namespace DDictionary.Domain
         Task RemoveTranslationsAsync(params int[] translationIds);
 
         /// <summary>
+        /// Set (or remove if <paramref name="asterisk"/> equals <see cref="AsteriskType.None"/>) 
+        /// certain type of asterisk for the clause.
+        /// </summary>
+        /// <param name="clauseId">Id of the clause that the asterisk belongs to.</param>
+        /// <param name="asterisk">Asterisk type.</param>
+        Task SetAsteriskAsync(int clauseId, AsteriskType asterisk);
+
+        /// <summary>
+        /// Remove asterisks for given clauses.
+        /// </summary>
+        /// <param name="clausesIds">Clauses ids.</param>
+        Task RemoveAsteriskAsync(params int[] clausesIds);
+
+        /// <summary>
+        /// Update needed timestamps for the clause's asterisk.
+        /// </summary>
+        /// <param name="clauseId">Id of the clause that the asterisk belongs to.</param>
+        /// <param name="meaning">Timestamp for meaning training (<see cref="AsteriskType.Meaning"/>).</param>
+        /// <param name="spelling">Timestamp for spelling training (<see cref="AsteriskType.Spelling"/>).</param>
+        /// <param name="listening">Timestamp for listening training (<see cref="AsteriskType.Listening"/>).</param>
+        Task UpdateTimestampsForAsteriskAsync(int clauseId, DateTime? meaning, DateTime? spelling, DateTime? listening);
+
+        /// <summary>
         /// Add a set of clauses in one sitting.
         /// </summary>
         /// <remarks>This method should work by principle all or nothing.</remarks>

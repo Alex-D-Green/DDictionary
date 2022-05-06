@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 namespace DDictionary.Domain.Entities
@@ -9,5 +10,7 @@ namespace DDictionary.Domain.Entities
         public string Word { get; set; }
 
         public IReadOnlyCollection<TrainingStatisticDTO> Statistics { get; set; }
+       
+        public AsteriskDTO Asterisk { get; set; }
     }
 }
