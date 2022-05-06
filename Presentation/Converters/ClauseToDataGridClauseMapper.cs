@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Media;
 
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.ViewModels;
@@ -23,6 +23,7 @@ namespace DDictionary.Presentation.Converters
                 Id = cl.Id,
                 Sound = cl.Sound,
                 Word = cl.Word,
+                AsteriskType = cl.Asterisk?.Type ?? AsteriskType.None,
                 Transcription = cl.Transcription,
                 Translations = MakeTranslationsString(cl.Translations),
                 Context = cl.Context,
@@ -73,12 +74,7 @@ namespace DDictionary.Presentation.Converters
         /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
         public static double CalculateUnderstandingScore(IEnumerable<TrainingStatistic> statistics)
         {
-            return CalculateScore(statistics, new List<TestType> {
-                TestType.TranslationWord,
-                TestType.WordTranslation,
-                TestType.WordConstructor,
-                TestType.Sprint
-            });
+            return CalculateScore(statistics, TestCategoryMapper.MeaningTestTypes);
         }
 
         /// <summary>
@@ -87,10 +83,7 @@ namespace DDictionary.Presentation.Converters
         /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
         public static double CalculateSpellingScore(IEnumerable<TrainingStatistic> statistics)
         {
-            return CalculateScore(statistics, new List<TestType> {
-                TestType.WordConstructor,
-                TestType.Listening
-            });
+            return CalculateScore(statistics, TestCategoryMapper.SpellingTestTypes);
         }
 
         /// <summary>
@@ -99,20 +92,11 @@ namespace DDictionary.Presentation.Converters
         /// <returns>From 0 to 100 percent, where 100 is the best score.</returns>
         public static double CalculateListeningScore(IEnumerable<TrainingStatistic> statistics)
         {
-            return CalculateScore(statistics, new List<TestType> {
-                TestType.Listening
-            });
+            return CalculateScore(statistics, TestCategoryMapper.ListeningTestTypes);
         }
 
-        private static double CalculateScore(IEnumerable<TrainingStatistic> statistics, IList<TestType> types)
+        private static double CalculateScore(IEnumerable<TrainingStatistic> statistics, IReadOnlyList<TestType> types)
         {
-            //              meaning  spelling  hearing
-            // tr-word         *
-            // word-tr         *
-            // constr          *        *
-            // listening                *         *
-            // sprint          *
-
             if(statistics is null)
                 return 0;
 

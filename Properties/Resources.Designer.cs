@@ -19,7 +19,7 @@ namespace DDictionary.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -66,6 +66,60 @@ namespace DDictionary.Properties {
         internal static string AddRelationPlaceholder {
             get {
                 return ResourceManager.GetString("AddRelationPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set for these {1} selected clause[s] asterisk type &quot;{0}&quot;?.
+        /// </summary>
+        internal static string AsteriskChangeConfirmation {
+            get {
+                return ResourceManager.GetString("AsteriskChangeConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All types.
+        /// </summary>
+        internal static string AsteriskTypeAllTypes {
+            get {
+                return ResourceManager.GetString("AsteriskTypeAllTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listening.
+        /// </summary>
+        internal static string AsteriskTypeListening {
+            get {
+                return ResourceManager.GetString("AsteriskTypeListening", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Meaning.
+        /// </summary>
+        internal static string AsteriskTypeMeaning {
+            get {
+                return ResourceManager.GetString("AsteriskTypeMeaning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        internal static string AsteriskTypeNone {
+            get {
+                return ResourceManager.GetString("AsteriskTypeNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spelling.
+        /// </summary>
+        internal static string AsteriskTypeSpelling {
+            get {
+                return ResourceManager.GetString("AsteriskTypeSpelling", resourceCulture);
             }
         }
         

@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
-
+using DDictionary.Presentation.Converters;
 using PrgResources = DDictionary.Properties.Resources;
 using PrgSettings = DDictionary.Properties.Settings;
 
@@ -203,17 +203,31 @@ namespace DDictionary.Presentation.Testing
             }
 
 
-            //Then the words without statistics on this type of training
-            List<int> wordsWithoutStat = clausesForTrainingList.Where(o => GetWordStatistics(o) == null).ToList();
-            wordsWithoutStat.Sort((x, y) => random.Next(3) - 1); //Shuffle the list
+            //Then words with "active" asterisk for this type of training
+            List<int> wordsWithAsterisk = clausesForTrainingList.Where(o => GetWordAsterisk(o) != null).ToList();
 
-            foreach(int id in wordsWithoutStat)
+            foreach(int id in wordsWithAsterisk)
             {
                 if(!ret.Contains(id))
                     ret.Add(id);
 
                 if(ret.Count == count)
                     break;
+            }
+
+
+            if(ret.Count != count)
+            { //Then words without statistics on this type of training
+                List<int> wordsWithoutStat = clausesForTrainingList.Where(o => GetWordStatistics(o) == null).ToList();
+
+                foreach(int id in wordsWithoutStat)
+                {
+                    if(!ret.Contains(id))
+                        ret.Add(id);
+
+                    if(ret.Count == count)
+                        break;
+                }
             }
 
 
@@ -229,8 +243,9 @@ namespace DDictionary.Presentation.Testing
                 }
             }
 
-
-            ret.Sort((x, y) => random.Next(3) - 1); //Shuffle the list
+            //Shuffle the list
+            for(int i=0; i<3; i++)
+                ret.Sort((x, y) => random.Next(3) - 1);
 
             return ret;
         }
@@ -238,6 +253,31 @@ namespace DDictionary.Presentation.Testing
         private TrainingStatisticDTO GetWordStatistics(int id)
         {
             return allWords[id].Statistics?.FirstOrDefault(o => o.TestType == TrainingType);
+        }
+
+        private AsteriskDTO GetWordAsterisk(int id)
+        {
+            var now = DateTime.Now;
+            var ret = allWords[id].Asterisk;
+
+            if( ((ret?.Type == AsteriskType.AllTypes || ret?.Type == AsteriskType.Meaning) && 
+                     TestCategoryMapper.IsItMeaningCategory(TrainingType) && 
+                     appropriateDate(ret.MeaningLastTrain)) ||
+                ((ret?.Type == AsteriskType.AllTypes || ret?.Type == AsteriskType.Spelling) &&
+                     TestCategoryMapper.IsItSpellingCategory(TrainingType) && 
+                     appropriateDate(ret.SpellingLastTrain)) ||
+                ((ret?.Type == AsteriskType.AllTypes || ret?.Type == AsteriskType.Listening) &&
+                     TestCategoryMapper.IsItListeningCategory(TrainingType) && 
+                     appropriateDate(ret.ListeningLastTrain)) )
+            {
+                return ret;
+            }
+
+            return null;
+
+
+            bool appropriateDate(DateTime? date) => 
+                date is null || (now - date.Value).TotalDays >= 1;
         }
 
         /// <summary>
@@ -305,6 +345,13 @@ namespace DDictionary.Presentation.Testing
             answers.Add(answer);
 
             await dbFacade.AddOrUpdateTrainingStatisticAsync(TrainingType, answer.Word.Id, answer.Correct);
+         
+            var now = DateTime.Now;
+            var meaning = TestCategoryMapper.IsItMeaningCategory(TrainingType) ? now : (DateTime?)null;
+            var spelling = TestCategoryMapper.IsItSpellingCategory(TrainingType) ? now : (DateTime?)null;
+            var listening = TestCategoryMapper.IsItListeningCategory(TrainingType) ? now : (DateTime?)null;
+
+            await dbFacade.UpdateTimestampsForAsteriskAsync(answer.Word.Id, meaning, spelling, listening);
 
             if(!answer.Correct && answer.GivenAnswer != null)
                 await dbFacade.AddOrUpdateTrainingStatisticAsync(TrainingType, answer.GivenAnswer.Id, false);

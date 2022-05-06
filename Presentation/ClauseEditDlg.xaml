@@ -41,6 +41,8 @@
                     <TextBox x:Name="transcriptionEdit" Text="Transcription" Padding="10,2" TabIndex="24" 
                              TextChanged="OnSomeDataWasChanged" 
                              MaxLength="{x:Static DDictionary:Constrains.MaxTranscriptionLength}"/>
+                    <ComboBox x:Name="asteriskCBox" Width="40" Margin="5,0,0,0" TabIndex="25" SelectionChanged="OnSomeDataWasChanged"
+                              ToolTip="Asterisk type"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>

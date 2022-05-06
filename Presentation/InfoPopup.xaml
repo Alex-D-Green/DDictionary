@@ -16,12 +16,14 @@
             <Label x:Name="dateLbl" Content="Watched: 2019-01-18 (999)" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Center" 
                FontSize="9" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" DockPanel.Dock="Right"/>
         </DockPanel>
-        <StackPanel Margin="0" Orientation="Horizontal">
+        <DockPanel Margin="0">
             <Label x:Name="wordLbl" Content="Word" HorizontalAlignment="Left" Margin="0,0,5,0" VerticalAlignment="Center" 
                    FontSize="16" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
             <Label x:Name="transcriptionLbl" Content="[Transcription]" HorizontalAlignment="Left" Margin="0" 
                    VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
-        </StackPanel>
+            <Label x:Name="asteriskLbl" Content="✶ A" HorizontalAlignment="Right" Margin="0" DockPanel.Dock="Right"
+                   VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>            
+        </DockPanel>
         <Label x:Name="translationsLbl" Content="Translations" HorizontalAlignment="Left" Margin="0,-5,0,0" 
                VerticalAlignment="Center" Foreground="{DynamicResource {x:Static SystemColors.InfoTextBrushKey}}"/>
         <StackPanel x:Name="relTemplatePanel" Orientation="Horizontal" Margin="0,-5,0,0">

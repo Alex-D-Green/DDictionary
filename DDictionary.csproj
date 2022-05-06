@@ -102,7 +102,11 @@
     <Compile Include="DAL\Migrations\SQLiteMigrationBase.cs" />
     <Compile Include="DAL\Migrations\SQLiteMigration_0001.cs" />
     <Compile Include="DAL\Migrations\SQLiteMigration_0002.cs" />
+    <Compile Include="DAL\Migrations\SQLiteMigration_0003.cs" />
     <Compile Include="DAL\SQLiteStorage.cs" />
+    <Compile Include="Domain\Entities\Asterisk.cs" />
+    <Compile Include="Domain\Entities\AsteriskDTO.cs" />
+    <Compile Include="Domain\Entities\AsteriskType.cs" />
     <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
     <Compile Include="Domain\Entities\JustWordDTO.cs" />
     <Compile Include="Domain\Entities\RelationDTO.cs" />
@@ -120,6 +124,9 @@
       <DependentUpon>ClauseEditDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="CompositionRoot.cs" />
+    <Compile Include="Presentation\Converters\AsteriskTextConverter.cs" />
+    <Compile Include="Presentation\Converters\AsteriskTypeTranslator.cs" />
+    <Compile Include="Presentation\Converters\TestCategoryMapper.cs" />
     <Compile Include="Presentation\Converters\ClauseToCsvClauseMapper.cs" />
     <Compile Include="Presentation\Converters\ClauseToDataGridClauseMapper.cs" />
     <Compile Include="Presentation\Converters\JustWordDTOConverter.cs" />

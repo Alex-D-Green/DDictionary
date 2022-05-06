@@ -85,6 +85,10 @@ namespace DDictionary.Presentation
             foreach(WordGroup gr in Enum.GetValues(typeof(WordGroup)).Cast<WordGroup>().OrderByDescending(o => o))
                 groupCBox.Items.Add(new CheckBoxItem<WordGroup> { Text = gr.ToFullStr(), ItemValue = gr });
 
+            //ComboBox with asterisk initialization
+            foreach(AsteriskType item in Enum.GetValues(typeof(AsteriskType)).Cast<AsteriskType>().OrderBy(o => o))
+                asteriskCBox.Items.Add(new CheckBoxItem<AsteriskType> { Text = item.ToShortStr(), ItemValue = item });
+
             UpdateWindowInfo();
         }
 
@@ -171,6 +175,10 @@ namespace DDictionary.Presentation
 
             groupCBox.SelectedItem = groupCBox.Items.Cast<CheckBoxItem<WordGroup>>()
                                                     .Single(o => o.ItemValue == clause.Group);
+
+            asteriskCBox.SelectedItem = 
+                asteriskCBox.Items.Cast<CheckBoxItem<AsteriskType>>()
+                                  .Single(o => o.ItemValue == (clause.Asterisk?.Type ?? AsteriskType.None));
 
             wordEdit.Text = clause.Word;
             transcriptionEdit.Text = clause.Transcription;
@@ -631,6 +639,9 @@ namespace DDictionary.Presentation
 
             clause.Id = await dbFacade.AddOrUpdateClauseAsync(clauseDTO, 
                 !watchedClauses.Contains(clause.Id)); //To prevent multiple updates of the clause's watch data
+
+            //Handle asterisk
+            await dbFacade.SetAsteriskAsync(clause.Id, ((CheckBoxItem<AsteriskType>)asteriskCBox.SelectedItem).ItemValue);
 
             //Handle relations
             await dbFacade.RemoveRelationsAsync(clause.Relations.Select(o => o.Id)

@@ -114,5 +114,25 @@ namespace DDictionary.Presentation
         public static readonly RoutedUICommand TestsStatisticsCommand = new RoutedUICommand(
             "Tests statistics", "Tests statistics", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.F12, ModifierKeys.Control) });
+
+        public static readonly RoutedUICommand RemoveAsteriskCommand = new RoutedUICommand(
+            "Remove asterisk for selected words", "Remove asterisk for selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.Z, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand SetAllTypesAsteriskCommand = new RoutedUICommand(
+            "Set all types asterisk for selected words", "Set all types asterisk for selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.T, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand SetMeaningAsteriskCommand = new RoutedUICommand(
+            "Set meaning asterisk for selected words", "Set meaning asterisk for selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.M, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand SetSpellingAsteriskCommand = new RoutedUICommand(
+            "Set spelling asterisk for selected words", "Set spelling asterisk for selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift) });
+
+        public static readonly RoutedUICommand SetListeningAsteriskCommand = new RoutedUICommand(
+            "Set listening asterisk for selected words", "Set listening asterisk for selected words", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.L, ModifierKeys.Control | ModifierKeys.Shift) });
     }
 }

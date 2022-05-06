@@ -104,7 +104,12 @@ namespace DDictionary.Presentation.Testing
             {
                 var copy = (FrameworkElement)XamlReader.Parse(XamlWriter.Save(resultPanel));
                 copy.Name = null; //To show that it's a new item
-                
+
+                var newAsteriskLbl = (TextBlock)copy.FindName(nameof(asteriskLbl));
+                newAsteriskLbl.Text = "";
+                if(ans.Word.Asterisk != null && ans.Word.Asterisk.Type != AsteriskType.None)
+                    newAsteriskLbl.Text = $"{ans.Word.Asterisk.Type.ToShortStr()}✶";
+
                 var newTimeLbl = (TextBlock)copy.FindName(nameof(timeLbl));
                 newTimeLbl.Text = $"{ans.Time.TotalSeconds:F0} s";
 

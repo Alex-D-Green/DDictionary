@@ -611,6 +611,19 @@ namespace DDictionary.Presentation
             await UpdateDataGridAsync();
         }
 
+        private async Task SetAsteriskForSelectedWords(AsteriskType type)
+        {
+            if(MessageBox.Show(this,
+                String.Format(PrgResources.AsteriskChangeConfirmation, type.ToFullStr(), mainDataGrid.SelectedItems.Count),
+                PrgResources.QuestionCaption, MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+                return;
+
+            foreach(var id in mainDataGrid.SelectedItems.Cast<DataGridClause>().Select(o => o.Id))
+                await dbFacade.SetAsteriskAsync(id, type);
+
+            await UpdateDataGridAsync();
+        }
+
         /// <summary>
         /// Show all checked groups (in short form) separated by comma in group filter combo box.
         /// And update main data grid.
@@ -1184,7 +1197,23 @@ namespace DDictionary.Presentation
             { MessageBox.Show(this, ex.Message, PrgResources.ErrorCaption, MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
-        private async void OnMoveWordsToAGroup(object sender, ExecutedRoutedEventArgs e)
+        private async void OnSetAsterisk(object sender, ExecutedRoutedEventArgs e)
+        {
+            if(e.Command == UICommands.RemoveAsteriskCommand)
+                await SetAsteriskForSelectedWords(AsteriskType.None);
+            else if(e.Command == UICommands.SetAllTypesAsteriskCommand)
+                await SetAsteriskForSelectedWords(AsteriskType.AllTypes);
+            else if(e.Command == UICommands.SetMeaningAsteriskCommand)
+                await SetAsteriskForSelectedWords(AsteriskType.Meaning);
+            else if(e.Command == UICommands.SetSpellingAsteriskCommand)
+                await SetAsteriskForSelectedWords(AsteriskType.Spelling);
+            else if(e.Command == UICommands.SetListeningAsteriskCommand)
+                await SetAsteriskForSelectedWords(AsteriskType.Listening);
+            else
+                Debug.Assert(false);
+        }
+
+        private async void OnMoveWordsToGroup(object sender, ExecutedRoutedEventArgs e)
         {
             if(e.Command == UICommands.MoveWordsToAGroupCommand)
                 await MoveSelectedWordsToGroup(WordGroup.A_DefinitelyKnown);
@@ -1354,6 +1383,13 @@ namespace DDictionary.Presentation
                e.Command == UICommands.MoveWordsToEGroupCommand)
             { 
                 e.CanExecute = (mainDataGrid?.SelectedItems?.Count > 0); 
+            }
+
+            if(e.Command == UICommands.RemoveAsteriskCommand || e.Command == UICommands.SetAllTypesAsteriskCommand ||
+               e.Command == UICommands.SetMeaningAsteriskCommand || e.Command == UICommands.SetSpellingAsteriskCommand ||
+               e.Command == UICommands.SetListeningAsteriskCommand)
+            {
+                e.CanExecute = (mainDataGrid?.SelectedItems?.Count > 0);
             }
         }
 

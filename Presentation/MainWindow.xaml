@@ -11,6 +11,7 @@
         PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
+        <converters:AsteriskTextConverter x:Key="AsteriskTextConverter" />
         <collections:ArrayList x:Key="actionMenuItems" x:Shared="False">
             <MenuItem Header="_Copy" Command="ApplicationCommands.Copy">
                 <MenuItem.Icon>
@@ -26,6 +27,14 @@
             <Separator/>
             <MenuItem Header="Clear _filter" Command="local:UICommands.ClearFilterCommand"/>
             <MenuItem Header="Clear _sorting" Command="local:UICommands.ClearSortingCommand"/>
+            <Separator/>
+            <MenuItem Header="_Remove asterisk" Command="local:UICommands.RemoveAsteriskCommand"/>
+            <MenuItem Header="Set asteris_k">
+                <MenuItem Header="_All types asterisk (A)" Command="local:UICommands.SetAllTypesAsteriskCommand"/>
+                <MenuItem Header="_Meaning asterisk (M)" Command="local:UICommands.SetMeaningAsteriskCommand"/>
+                <MenuItem Header="_Spelling asterisk (S)" Command="local:UICommands.SetSpellingAsteriskCommand"/>
+                <MenuItem Header="_Listening asterisk (L)" Command="local:UICommands.SetListeningAsteriskCommand"/>
+            </MenuItem>            
             <Separator/>
             <MenuItem Header="Add _word" Command="local:UICommands.AddWordCommand">
                 <MenuItem.Icon>
@@ -73,6 +82,16 @@
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.ClearSortingCommand}" Executed="OnClearSortingCommand" 
                         CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.RemoveAsteriskCommand}" Executed="OnSetAsterisk" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.SetAllTypesAsteriskCommand}" Executed="OnSetAsterisk" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.SetMeaningAsteriskCommand}" Executed="OnSetAsterisk" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.SetSpellingAsteriskCommand}" Executed="OnSetAsterisk" 
+                        CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static local:UICommands.SetListeningAsteriskCommand}" Executed="OnSetAsterisk" 
+                        CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.AddWordCommand}" Executed="OnAddWordCommand" />
         <CommandBinding Command="{x:Static local:UICommands.DeleteWordsCommand}" Executed="OnDeleteWordsCommand" 
                         CanExecute="CommandBinding_CanExecute"/>
@@ -83,15 +102,15 @@
         <CommandBinding Command="{x:Static local:UICommands.ExportToHtmlCommand}" Executed="OnExportToHtmlCommand"
                         CanExecute="CommandBinding_CanExecute"/>
         <CommandBinding Command="{x:Static local:UICommands.ImportFromCSVCommand}" Executed="OnImportFromCSVCommand"/>
-        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToAGroupCommand}" Executed="OnMoveWordsToAGroup"
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToAGroupCommand}" Executed="OnMoveWordsToGroup"
                         CanExecute="CommandBinding_CanExecute"/>
-        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToBGroupCommand}" Executed="OnMoveWordsToAGroup"
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToBGroupCommand}" Executed="OnMoveWordsToGroup"
                         CanExecute="CommandBinding_CanExecute"/>
-        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToCGroupCommand}" Executed="OnMoveWordsToAGroup"
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToCGroupCommand}" Executed="OnMoveWordsToGroup"
                         CanExecute="CommandBinding_CanExecute"/>
-        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToDGroupCommand}" Executed="OnMoveWordsToAGroup"
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToDGroupCommand}" Executed="OnMoveWordsToGroup"
                         CanExecute="CommandBinding_CanExecute"/>
-        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToEGroupCommand}" Executed="OnMoveWordsToAGroup"
+        <CommandBinding Command="{x:Static local:UICommands.MoveWordsToEGroupCommand}" Executed="OnMoveWordsToGroup"
                         CanExecute="CommandBinding_CanExecute"/>
 
         <CommandBinding Command="{x:Static local:UICommands.TranslationWordTestCommand}" Executed="OnStartTesting"/>
@@ -279,6 +298,10 @@
                 <DataGridTextColumn Binding="{Binding ListeningScore, StringFormat=\{0:F0\}%}" Header="Listening score" 
                                     ElementStyle="{StaticResource ColumnElementStyle}"
                                     MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}"/>
+                <DataGridTextColumn x:Name="mainDataGridAsteriskColumn"
+                                    Binding="{Binding AsteriskType, Converter={StaticResource AsteriskTextConverter}}" Header="Asterisk" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    MinWidth="{x:Static local:MainWindow.ZeroColumnWidth}" />
             </DataGrid.Columns>
         </DataGrid>
         <StatusBar Margin="0" Grid.Row="3" VerticalAlignment="Top" 

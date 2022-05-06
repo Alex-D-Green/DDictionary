@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Media;
 
 using DDictionary.Domain.Entities;
 
@@ -10,6 +11,7 @@ namespace DDictionary.Presentation.ViewModels
         public int Id { get; set; }
         public string Sound { get; set; }
         public string Word { get; set; }
+        public AsteriskType AsteriskType { get; set; }
         public string Transcription { get; set; }
         public string Translations { get; set; }
         public string Context { get; set; }

@@ -120,6 +120,29 @@
   <data name="AddRelationPlaceholder" xml:space="preserve">
     <value>add</value>
   </data>
+  <data name="AsteriskChangeConfirmation" xml:space="preserve">
+    <value>Set for these {1} selected clause[s] asterisk type "{0}"?</value>
+  </data>
+  <data name="AsteriskTypeAllTypes" xml:space="preserve">
+    <value>All types</value>
+    <comment>AsteriskType</comment>
+  </data>
+  <data name="AsteriskTypeListening" xml:space="preserve">
+    <value>Listening</value>
+    <comment>AsteriskType</comment>
+  </data>
+  <data name="AsteriskTypeMeaning" xml:space="preserve">
+    <value>Meaning</value>
+    <comment>AsteriskType</comment>
+  </data>
+  <data name="AsteriskTypeNone" xml:space="preserve">
+    <value>None</value>
+    <comment>AsteriskType</comment>
+  </data>
+  <data name="AsteriskTypeSpelling" xml:space="preserve">
+    <value>Spelling</value>
+    <comment>AsteriskType</comment>
+  </data>
   <data name="CannotPlaySound" xml:space="preserve">
     <value>Cannot play the sound: "{0}"
 
