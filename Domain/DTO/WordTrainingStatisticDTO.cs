@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 
-namespace DDictionary.Domain.Entities
+namespace DDictionary.Domain.DTO
 {
     public class WordTrainingStatisticDTO
     {

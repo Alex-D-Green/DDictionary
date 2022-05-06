@@ -1,7 +1,9 @@
 ﻿using System;
 
+using DDictionary.Domain.Entities;
 
-namespace DDictionary.Domain.Entities
+
+namespace DDictionary.Domain.DTO
 {
     public class TrainingStatisticDTO
     {

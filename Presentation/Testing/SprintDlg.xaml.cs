@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
+using DDictionary.Domain.DTO;
 using DDictionary.Domain.Entities;
 
 using PrgResources = DDictionary.Properties.Resources;

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-using DDictionary.Domain.Entities;
+using DDictionary.Domain.DTO;
 
 
 namespace DDictionary.Presentation.Converters

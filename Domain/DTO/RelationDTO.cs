@@ -1,5 +1,5 @@
 ﻿
-namespace DDictionary.Domain.Entities
+namespace DDictionary.Domain.DTO
 {
     public sealed class RelationDTO
     {

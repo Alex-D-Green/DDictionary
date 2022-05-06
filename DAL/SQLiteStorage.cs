@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Dapper;
 using DDictionary.DAL.Migrations;
 using DDictionary.Domain;
+using DDictionary.Domain.DTO;
 using DDictionary.Domain.Entities;
 
 

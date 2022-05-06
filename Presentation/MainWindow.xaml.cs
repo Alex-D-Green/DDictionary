@@ -18,6 +18,7 @@ using System.Windows.Media.Effects;
 using CsvHelper;
 
 using DDictionary.Domain;
+using DDictionary.Domain.DTO;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.Testing;

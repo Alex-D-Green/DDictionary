@@ -105,16 +105,16 @@
     <Compile Include="DAL\Migrations\SQLiteMigration_0003.cs" />
     <Compile Include="DAL\SQLiteStorage.cs" />
     <Compile Include="Domain\Entities\Asterisk.cs" />
-    <Compile Include="Domain\Entities\AsteriskDTO.cs" />
+    <Compile Include="Domain\DTO\AsteriskDTO.cs" />
     <Compile Include="Domain\Entities\AsteriskType.cs" />
-    <Compile Include="Domain\Entities\ClauseUpdateDTO.cs" />
-    <Compile Include="Domain\Entities\JustWordDTO.cs" />
-    <Compile Include="Domain\Entities\RelationDTO.cs" />
+    <Compile Include="Domain\DTO\ClauseUpdateDTO.cs" />
+    <Compile Include="Domain\DTO\JustWordDTO.cs" />
+    <Compile Include="Domain\DTO\RelationDTO.cs" />
     <Compile Include="Domain\Entities\ShortTrainingStatistic.cs" />
     <Compile Include="Domain\Entities\TestType.cs" />
     <Compile Include="Domain\Entities\TrainingStatistic.cs" />
-    <Compile Include="Domain\Entities\TrainingStatisticDTO.cs" />
-    <Compile Include="Domain\Entities\WordTrainingStatisticDTO.cs" />
+    <Compile Include="Domain\DTO\TrainingStatisticDTO.cs" />
+    <Compile Include="Domain\DTO\WordTrainingStatisticDTO.cs" />
     <Compile Include="Domain\IMigration.cs" />
     <Compile Include="Presentation\AboutProgramDlg.xaml.cs">
       <DependentUpon>AboutProgramDlg.xaml</DependentUpon>

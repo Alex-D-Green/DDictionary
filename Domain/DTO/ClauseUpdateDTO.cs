@@ -1,5 +1,7 @@
-﻿
-namespace DDictionary.Domain.Entities
+﻿using DDictionary.Domain.Entities;
+
+
+namespace DDictionary.Domain.DTO
 {
     public class ClauseUpdateDTO
     {

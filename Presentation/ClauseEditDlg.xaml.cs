@@ -9,7 +9,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+
 using DDictionary.Domain;
+using DDictionary.Domain.DTO;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
 using DDictionary.Presentation.ViewModels;

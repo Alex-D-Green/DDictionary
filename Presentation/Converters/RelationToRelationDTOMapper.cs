@@ -1,5 +1,6 @@
 ﻿using System;
 
+using DDictionary.Domain.DTO;
 using DDictionary.Domain.Entities;
 
 
