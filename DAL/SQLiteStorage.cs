@@ -284,6 +284,7 @@ namespace DDictionary.DAL
             if(clause is null)
                 throw new ArgumentNullException(nameof(clause));
 
+
             DateTime now = DateTime.Now;
 
             try
@@ -360,6 +361,31 @@ namespace DDictionary.DAL
             }
             catch(Exception e) when(HandleError(e))
             { return -1; }
+        }
+
+        public async Task UpdateClauseGroupAsync(int id, WordGroup group)
+        {
+            if(id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id), id, "The identifier has to be greater than 0.");
+
+
+            const string sql =
+                "UPDATE [Clauses] SET [Updated] = @Updated, [Watched] = @Watched, [Group] = @Group WHERE [Id] = @Id; ";
+
+            DateTime now = DateTime.Now;
+
+            try
+            {
+                using(IDbConnection cnn = await GetConnectionAsync())
+                    await cnn.ExecuteAsync(sql, new { 
+                        Id = id,
+                        Updated = now,
+                        Watched = now,
+                        Group = group 
+                    });
+            }
+            catch(Exception e) when(HandleError(e))
+            { }
         }
 
         public async Task RemoveClausesAsync(params int[] clauseIds)

@@ -79,6 +79,14 @@ namespace DDictionary.Domain
         Task<int> UpdateClauseWatchAsync(int id);
 
         /// <summary>
+        /// Update clause's group.
+        /// </summary>
+        /// <remarks>Also update and watch timestamps will be updated.</remarks>
+        /// <param name="id">Clause identifier.</param>
+        /// <param name="group">Needed group for clause.</param>
+        Task UpdateClauseGroupAsync(int id, WordGroup group);
+
+        /// <summary>
         /// Remove these clauses.
         /// </summary>
         /// <param name="clauseIds">Ids of the clauses that should be deleted.</param>

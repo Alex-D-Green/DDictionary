@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
+
 using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.Converters;
@@ -109,12 +110,16 @@ namespace DDictionary.Presentation.Testing
                 newAsteriskLbl.Text = "";
                 if(ans.Word.Asterisk != null && ans.Word.Asterisk.Type != AsteriskType.None)
                     newAsteriskLbl.Text = $"{ans.Word.Asterisk.Type.ToShortStr()}✶";
+                newAsteriskLbl.MouseWheel += OnAsteriskLbl_MouseWheel;
+                newAsteriskLbl.Tag = ans.Word;
 
                 var newTimeLbl = (TextBlock)copy.FindName(nameof(timeLbl));
                 newTimeLbl.Text = $"{ans.Time.TotalSeconds:F0} s";
 
                 var newGroupLbl = (TextBlock)copy.FindName(nameof(groupLbl));
                 newGroupLbl.Text = ans.Word.Group.ToGradeStr();
+                newGroupLbl.MouseWheel += OnGroupLbl_MouseWheel;
+                newGroupLbl.Tag = ans.Word;
 
                 var newPlayBtn = (Button)copy.FindName(nameof(playBtn));
                 newPlayBtn.IsEnabled = !String.IsNullOrEmpty(ans.Word.Sound);
@@ -209,6 +214,31 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
+        private async void OnGroupLbl_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var clause = (Clause)((FrameworkElement)sender).Tag;
+
+            clause.Group = GetNextEnumValue(clause.Group, e.Delta > 0);
+
+            await dbFacade.UpdateClauseGroupAsync(clause.Id, clause.Group);
+
+            UpdateResult();
+        }
+
+        private async void OnAsteriskLbl_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            var clause = (Clause)((FrameworkElement)sender).Tag;
+
+            if(clause.Asterisk == null)
+                clause.Asterisk = new Asterisk { ClauseId = clause.Id };
+
+            clause.Asterisk.Type = GetNextEnumValue(clause.Asterisk.Type, e.Delta > 0);
+
+            await dbFacade.SetAsteriskAsync(clause.Id, clause.Asterisk.Type);
+
+            UpdateResult();
+        }
+
         private void GoToStatisticBtn_Click(object sender, RoutedEventArgs e)
         {
             GoToStatistic = true;
@@ -227,6 +257,20 @@ namespace DDictionary.Presentation.Testing
 
             MinWidth *= guiScale;
             MinHeight *= guiScale;
+        }
+
+
+        private static T GetNextEnumValue<T>(T val, bool moveUp)
+            where T: Enum
+        {
+            List<T> values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+
+            int idx = values.IndexOf(val);
+
+            idx = moveUp ? (++idx % values.Count) 
+                         : ((values.Count + --idx) % values.Count);
+
+            return values[idx];
         }
     }
 }

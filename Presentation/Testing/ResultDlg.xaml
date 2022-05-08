@@ -22,13 +22,15 @@
                 <StackPanel x:Name="resultPanel" Orientation="Horizontal" Margin="5">
                     <TextBlock x:Name="asteriskLbl" Text="M✶" VerticalAlignment="Center" TextAlignment="Center" Margin="5,0"
                                FontSize="16" FontWeight="Bold" MinWidth="30" ToolTip="Type of asterisk"
-                               Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>                    
+                               Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+                               MouseWheel="OnAsteriskLbl_MouseWheel" Cursor="ScrollNS"/>                    
                     <TextBlock x:Name="timeLbl" Text="133 s" MinWidth="30" TextAlignment="Right" VerticalAlignment="Center"
                                Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Margin="5"
                                ToolTip="Time was spent"/>
                     <TextBlock x:Name="groupLbl" Text="A" VerticalAlignment="Center" TextAlignment="Center" Margin="5,0"
                                FontSize="16" FontWeight="Bold" MinWidth="18" ToolTip="The group of the word"
-                               Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                               Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+                               MouseWheel="OnGroupLbl_MouseWheel" Cursor="ScrollNS"/>
                     <Button x:Name="playBtn" Margin="5, 0" Click="OnPlayBtn_Click" TabIndex="100">
                         <Image Source="/DDictionary;component/Icons/4623858101543238953-128.png" Margin="5, 0" 
                                Height="24" Width="24"/>
