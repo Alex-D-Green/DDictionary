@@ -677,9 +677,9 @@ namespace DDictionary.DAL
 
             const string sql =
                 "UPDATE [Asterisks] SET\n" +
-                "    [MeaningLastTrain] = IFNULL([MeaningLastTrain], @MeaningLastTrain),\n" +
-                "    [SpellingLastTrain] = IFNULL([SpellingLastTrain], @SpellingLastTrain),\n" +
-                "    [ListeningLastTrain] = IFNULL([ListeningLastTrain], @ListeningLastTrain)\n" +
+                "    [MeaningLastTrain] = IFNULL(@MeaningLastTrain, [MeaningLastTrain]),\n" +
+                "    [SpellingLastTrain] = IFNULL(@SpellingLastTrain, [SpellingLastTrain]),\n" +
+                "    [ListeningLastTrain] = IFNULL(@ListeningLastTrain, [ListeningLastTrain])\n" +
                 "    WHERE [ClauseId] = @ClauseId; ";
 
             try

@@ -43,6 +43,8 @@
                              MaxLength="{x:Static DDictionary:Constrains.MaxTranscriptionLength}"/>
                     <ComboBox x:Name="asteriskCBox" Width="40" Margin="5,0,0,0" TabIndex="25" SelectionChanged="OnSomeDataWasChanged"
                               ToolTip="Asterisk type"/>
+                    <TextBlock x:Name="asteriskLbl" Text="✶" VerticalAlignment="Center" TextAlignment="Center" Margin="5,0,0,0"
+                               FontSize="16" FontWeight="Bold" Foreground="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>
