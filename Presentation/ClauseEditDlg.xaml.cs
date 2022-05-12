@@ -75,11 +75,6 @@ namespace DDictionary.Presentation
 
             this.clausesIdsLst = clausesIdsLst ?? new List<int>(0);
 
-            if(clauseId.HasValue)
-                LoadClauseData(clauseId.Value);
-            else
-                CreateNewClause();
-
             InitializeComponent();
             ApplyGUIScale();
 
@@ -90,6 +85,11 @@ namespace DDictionary.Presentation
             //ComboBox with asterisk initialization
             foreach(AsteriskType item in Enum.GetValues(typeof(AsteriskType)).Cast<AsteriskType>().OrderBy(o => o))
                 asteriskCBox.Items.Add(new CheckBoxItem<AsteriskType> { Text = item.ToShortStr(), ItemValue = item });
+
+            if(clauseId.HasValue)
+                LoadClauseData(clauseId.Value);
+            else
+                CreateNewClause();
 
             UpdateWindowInfo();
         }
@@ -102,7 +102,7 @@ namespace DDictionary.Presentation
             clause = new Clause
             {
                 Id = 0, //A new clause mark
-                Group = WordGroup.E_TotallyUnknown,
+                Group = ((CheckBoxItem<WordGroup>)groupCBox.SelectedItem)?.ItemValue ?? WordGroup.E_TotallyUnknown,
                 Added = DateTime.Now,
             };
         }
@@ -132,7 +132,7 @@ namespace DDictionary.Presentation
                 watchedClauses.Add(clauseId); //Remember updated clause's id
             }
 
-            if(Properties.Settings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
+            if(PrgSettings.Default.AutoplaySound && !String.IsNullOrEmpty(clause.Sound))
             {
                 try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
                 catch(FileNotFoundException) { }
