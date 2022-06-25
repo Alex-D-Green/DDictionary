@@ -279,7 +279,7 @@ namespace DDictionary.Presentation.Testing
 
 
             bool appropriateDate(DateTime? date) => 
-                date is null || (now - date.Value).TotalDays >= 1;
+                date is null || (now - date.Value).TotalHours > 16;
         }
 
         /// <summary>
