@@ -84,7 +84,7 @@ namespace DDictionary.Presentation.Testing
             set
             {
                 clausesForTrainingListInternal = (value is List<int> lst) ? lst : value.ToList();
-                clausesForTrainingListInternal.Sort(Comparer); //Sort words according to their rating for this training
+                SortClausesForTrainingList();
             }
         }
 
@@ -116,10 +116,12 @@ namespace DDictionary.Presentation.Testing
             if(clausesForTrainingList is null)
                 throw new ArgumentNullException(nameof(clausesForTrainingList));
 
+
+            TrainingType = type;
+
             RefreshAllWords().Wait();
 
             this.clausesForTrainingList = clausesForTrainingList.ToList();
-            TrainingType = type;
 
             errorBrush = Resources["ErrorBrush"] as Brush ??
                 new SolidColorBrush(Colors.Coral);
@@ -147,8 +149,8 @@ namespace DDictionary.Presentation.Testing
         protected async Task RefreshAllWords()
         {
             allWords = (await dbFacade.GetWordTrainingStatisticsAsync(TrainingType)).ToDictionary(o => o.Id);
-            
-            clausesForTrainingListInternal?.Sort(Comparer); //Sort words according to their rating for this training
+
+            SortClausesForTrainingList();
         }
 
         /// <summary>
@@ -360,37 +362,32 @@ namespace DDictionary.Presentation.Testing
         }
 
         /// <summary>
-        /// Compare two words in terms of desirability for this training type.
-        /// More desirable word will be "less".
+        /// Sort words in terms of desirability for this training type.
+        /// More desirable words go first.
         /// </summary>
-        private int Comparer(int firstId, int secondId)
+        private void SortClausesForTrainingList()
         {
-            TrainingStatisticDTO w1 = GetWordStatistics(firstId);
-            TrainingStatisticDTO w2 = GetWordStatistics(secondId);
+            var clausesWithoutStatistic = clausesForTrainingListInternal.Where(o => GetWordStatistics(o) is null)
+                                                                        .OrderBy(o => o)
+                                                                        .ToList();
 
-            if(w1 is null && w2 is null)
-                return 0; //Both words have no statistic
-            else if(w1 is null || w2 is null)
-                return w1 is null ? -1 : 1; //The word with no statistic is "less"
+            var clausesWithStatistic = clausesForTrainingListInternal.Except(clausesWithoutStatistic)
+                                                                     .Select(o => GetWordStatistics(o))
+                                                                         .OrderBy(o => getPercent(o))
+                                                                         .ThenByDescending(o => getTotal(o))
+                                                                         .ThenBy(o => o.Success)
+                                                                         .ThenBy(o => o.LastTraining)
+                                                                     .Select(o => o.ClauseId);
 
-            //Both words have statistics, let's calculate the estimation
-            int dPercent = getPercent(w1) - getPercent(w2); //The less successful word is "less"
-            int dTries = getTotal(w1) - getTotal(w2); //The less trained word is "less"
-            int dDays = (int)(w1.LastTraining - w2.LastTraining).TotalDays; //The word that was trained earlier is "less"
-
-            int estimate = dPercent + dTries*10 + dDays;
-
-            if(estimate != 0)
-                return estimate; //Consider the estimate as words are not "equal"
-            else //Words are "equal" by the estimation
-                return DateTime.Compare(w1.LastTraining, w2.LastTraining); //Then let's consider their date and time
+            clausesForTrainingListInternal = clausesWithoutStatistic.Concat(clausesWithStatistic)
+                                                                    .ToList();
 
 
             //Get the total tries for the word
             int getTotal(TrainingStatisticDTO tr) => tr.Success + tr.Fail;
 
             //Get the percent of success for the word
-            int getPercent(TrainingStatisticDTO tr) => (int)((double)tr.Success / getTotal(tr) * 100);
+            double getPercent(TrainingStatisticDTO tr) => (double)tr.Success / getTotal(tr) * 100;
         }
 
         protected virtual void ApplyGUIScale(FrameworkElement mainPanel)
