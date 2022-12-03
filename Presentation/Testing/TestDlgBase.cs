@@ -367,6 +367,9 @@ namespace DDictionary.Presentation.Testing
         /// </summary>
         private void SortClausesForTrainingList()
         {
+            if (!(clausesForTrainingListInternal?.Count > 0))
+                return;
+
             var clausesWithoutStatistic = clausesForTrainingListInternal.Where(o => GetWordStatistics(o) is null)
                                                                         .OrderBy(o => o)
                                                                         .ToList();
