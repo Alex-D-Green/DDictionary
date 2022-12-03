@@ -35,6 +35,14 @@ namespace DDictionary.Presentation.Testing
         #endregion
 
 
+        /// <summary>
+        /// Counter of runs of this type of test.
+        /// Counts value during the current run of the program.
+        /// </summary>
+        /// <seealso cref="testRunsCounter"/>
+        private static int testRunsCount;
+
+
         /// <summary>What the user correctly typed so far.</summary>
         private string givenAnswer = "";
 
@@ -44,6 +52,9 @@ namespace DDictionary.Presentation.Testing
         /// <summary>The amount of hints that left before the round will be failed.</summary>
         private int hintsCount;
 
+
+        protected override int testRunsCounter { get => testRunsCount; set => testRunsCount = value; }
+        
 
         public WordsConstructorDlg(IEnumerable<int> clausesForTrainingList)
             : base(clausesForTrainingList, TestType.WordConstructor)

@@ -24,8 +24,18 @@ namespace DDictionary.Presentation.Testing
     /// </summary>
     public partial class WordTranslationDlg: SelectiveTestDlgBase
     {
+        /// <summary>
+        /// Counter of runs of this type of test.
+        /// Counts value during the current run of the program.
+        /// </summary>
+        /// <seealso cref="testRunsCounter"/>
+        private static int testRunsCount;
+
+
         protected override Button actionButton { get => actionBtn; }
 
+        protected override int testRunsCounter { get => testRunsCount; set => testRunsCount = value; }
+        
 
         public WordTranslationDlg(IEnumerable<int> clausesForTrainingList)
             : base(clausesForTrainingList, TestType.WordTranslation)

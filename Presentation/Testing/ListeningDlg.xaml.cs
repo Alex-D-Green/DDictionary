@@ -35,8 +35,19 @@ namespace DDictionary.Presentation.Testing
         #endregion
 
 
+        /// <summary>
+        /// Counter of runs of this type of test.
+        /// Counts value during the current run of the program.
+        /// </summary>
+        /// <seealso cref="testRunsCounter"/>
+        private static int testRunsCount;
+
+
         /// <summary>How many additional tries were made by this round.</summary>
         private int triesWereMade;
+
+
+        protected override int testRunsCounter { get => testRunsCount; set => testRunsCount = value; }
 
 
         public ListeningDlg(IEnumerable<int> clausesForTrainingList)

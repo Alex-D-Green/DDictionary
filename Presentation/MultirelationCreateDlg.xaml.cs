@@ -35,15 +35,15 @@ namespace DDictionary.Presentation
 
             wordsLbl.Content = words.Aggregate("", (s, o) => s + $"{o.Word}, ").TrimEnd(',', ' ');
 
-            Activated += OnRelationsEditDlg_Activated; //To do initial actions when form will be shown
+            Activated += OnActivated; //To do initial actions when form will be shown
         }
 
         /// <summary>
         /// Initial actions.
         /// </summary>
-        private void OnRelationsEditDlg_Activated(object sender, EventArgs e)
+        private void OnActivated(object sender, EventArgs e)
         {
-            Activated -= OnRelationsEditDlg_Activated; //Not need to replay
+            Activated -= OnActivated; //No need to repeat
 
             FixHeight();
 

@@ -34,8 +34,19 @@ namespace DDictionary.Presentation.Testing
         #endregion
 
 
+        /// <summary>
+        /// Counter of runs of this type of test.
+        /// Counts value during the current run of the program.
+        /// </summary>
+        /// <seealso cref="testRunsCounter"/>
+        private static int testRunsCount;
+
+
         /// <summary>Timer that count time on answer.</summary>
         private readonly DispatcherTimer answerTimer;
+
+
+        protected override int testRunsCounter { get => testRunsCount; set => testRunsCount = value; }
 
 
         public SprintDlg(IEnumerable<int> clausesForTrainingList)

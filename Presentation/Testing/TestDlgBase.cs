@@ -72,6 +72,10 @@ namespace DDictionary.Presentation.Testing
         protected DateTime answerTime;
 
 
+        /// <summary>Counter of runs of this type of test.</summary>
+        /// <seealso cref="UpdateTitle"/>
+        protected abstract int testRunsCounter { get; set; }
+
         /// <summary>All words from the dictionary. Key it's clause's id.</summary>
         protected IReadOnlyDictionary<int, WordTrainingStatisticDTO> allWords { get; private set; }
 
@@ -129,18 +133,34 @@ namespace DDictionary.Presentation.Testing
             correctBrush = Resources["CorrectBrush"] as Brush ??
                 new SolidColorBrush(Colors.LightGreen);
 
-            Activated += OnRelationsEditDlg_Activated; //To auto start training when form will be shown
+            Activated += OnActivated; //To auto start training when form will be shown
         }
 
 
         /// <summary>
         /// Auto start of the training.
         /// </summary>
-        private async void OnRelationsEditDlg_Activated(object sender, EventArgs e)
+        private async void OnActivated(object sender, EventArgs e)
         {
-            Activated -= OnRelationsEditDlg_Activated; //Not need to replay
+            Activated -= OnActivated; //No need to repeat
 
             await StartTrainingAsync();
+        }
+
+        /// <summary>
+        /// Show <see cref="testRunsCounter"/> in the title of this window.
+        /// </summary>
+        private void UpdateTitle()
+        {
+            if(Title is null)
+                return;
+
+            int idx = Title.IndexOf(" [");
+
+            if(idx != -1)
+                Title = Title.Substring(0, idx);
+
+            Title += $" [{++testRunsCounter}]";
         }
 
         /// <summary>
@@ -161,6 +181,8 @@ namespace DDictionary.Presentation.Testing
         /// </remarks>
         protected virtual Task StartTrainingAsync()
         {
+            UpdateTitle();
+
             answers.Clear();
 
             return Task.CompletedTask;
