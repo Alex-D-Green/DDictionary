@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -19,6 +20,7 @@ namespace DDictionary.Presentation.Testing
 
         private sealed class TrainingTableClause
         {
+            public int TestRuns { get; set; }
             public string TestTypeName { get; set; }
             public object Success { get; set; }
             public object Fail { get; set; }
@@ -44,15 +46,14 @@ namespace DDictionary.Presentation.Testing
             InitializeComponent();
             ApplyGUIScale();
 
-            TrainingStatistic[] total =
-                dbFacade.GetGeneralTrainingStatisticsAsync().Result.ToArray();
+            List<TrainingStatistic> total = dbFacade.GetGeneralTrainingStatisticsAsync().Result.ToList();
 
             DateTime lastStatDate = DateTime.Now.AddMonths(-1);
 
-            ShortTrainingStatistic[] lastStat =
-                dbFacade.GetGeneralTrainingStatisticsAsync(lastStatDate).Result.ToArray();
+            List<ShortTrainingStatistic> lastStat =
+                dbFacade.GetGeneralTrainingStatisticsAsync(lastStatDate).Result.ToList();
 
-            if(total.Length == 0)
+            if(total.Count == 0)
             {
                 MessageBox.Show(this, Properties.Resources.NoTrainingStatYet, Properties.Resources.InformationCaption,
                     MessageBoxButton.OK, MessageBoxImage.Information);
@@ -70,6 +71,7 @@ namespace DDictionary.Presentation.Testing
                     per = calcPercent(rowT.Success, rowT.Fail);
 
                     statDataGrid.Items.Add(new TrainingTableClause {
+                        TestRuns = TestDlgBase.GetTestRunsCounter(rowT.TestType),
                         TestTypeName = rowT.TestType.ToFullString(),
                         Success = rowT.Success,
                         Fail = rowT.Fail,

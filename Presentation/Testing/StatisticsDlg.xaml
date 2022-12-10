@@ -19,6 +19,14 @@
         <DataGrid x:Name="statDataGrid" MinHeight="100" MaxHeight="600" TabIndex="101" Margin="10, 0" RowHeaderWidth="0"
                   SelectionMode="Extended" BorderThickness="1" IsReadOnly="True" AutoGenerateColumns="False">
             <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding TestRuns}" ElementStyle="{StaticResource ColumnElementStyle}" 
+                                    CellStyle="{StaticResource RightAligned}" Header="Runs">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ToolTip" Value="Count of test's runs since the application start" />
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding TestTypeName}" ElementStyle="{StaticResource ColumnElementStyle}" 
                                     Header="Test type" Width="Auto"/>
                 <DataGridTextColumn Binding="{Binding Success}" ElementStyle="{StaticResource ColumnElementStyle}"

@@ -45,6 +45,10 @@ namespace DDictionary.Presentation.Testing
 
         #endregion
 
+        /// <summary>Counters of tests runs (within current session).</summary>
+        private static readonly Dictionary<TestType, int> testRunsCounters = 
+            new Dictionary<TestType, int>();
+
 
         /// <summary>Random generator for this training.</summary>
         protected readonly Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
@@ -71,10 +75,6 @@ namespace DDictionary.Presentation.Testing
         /// <summary>Time since the beginning of the try.</summary>
         protected DateTime answerTime;
 
-
-        /// <summary>Counter of runs of this type of test.</summary>
-        /// <seealso cref="UpdateTitle"/>
-        protected abstract int testRunsCounter { get; set; }
 
         /// <summary>All words from the dictionary. Key it's clause's id.</summary>
         protected IReadOnlyDictionary<int, WordTrainingStatisticDTO> allWords { get; private set; }
@@ -148,8 +148,9 @@ namespace DDictionary.Presentation.Testing
         }
 
         /// <summary>
-        /// Show <see cref="testRunsCounter"/> in the title of this window.
+        /// Show counter of runs for this test type in the title of this window.
         /// </summary>
+        /// <seealso cref="testRunsCounters"/>
         private void UpdateTitle()
         {
             if(Title is null)
@@ -160,7 +161,11 @@ namespace DDictionary.Presentation.Testing
             if(idx != -1)
                 Title = Title.Substring(0, idx);
 
-            Title += $" [{++testRunsCounter}]";
+            int counter = GetTestRunsCounter(TrainingType);
+
+            Title += $" [run #{++counter}]";
+
+            testRunsCounters[TrainingType] = counter;
         }
 
         /// <summary>
@@ -454,6 +459,16 @@ namespace DDictionary.Presentation.Testing
 
                 fs -= 0.5;
             }
+        }
+
+        /// <summary>
+        /// Get runs counter for the given test type.
+        /// </summary>
+        /// <param name="testType">Test type.</param>
+        /// <returns>Runs counter for the given test type.</returns>
+        public static int GetTestRunsCounter(TestType testType)
+        {
+            return testRunsCounters.TryGetValue(testType, out var result) ? result : 0;
         }
     }
 }
