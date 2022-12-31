@@ -62,7 +62,7 @@ namespace DDictionary.Presentation.Testing
         /// Start the next round.
         /// Base method set up the <see cref="rightAnswerForRound"/> and <see cref="answerTime"/>,
         /// resets buttons' decorations and update their state 
-        /// <see cref="DDictionary.Presentation.Testing.SelectiveTestDlgBase.UpdateActionButtons"/>.
+        /// <see cref="DDictionary.Presentation.Testing.SelectiveTestDlgBase.UpdateActionButtonsAsync"/>.
         /// </summary>
         protected virtual async Task NextRoundAsync()
         {
@@ -73,7 +73,7 @@ namespace DDictionary.Presentation.Testing
 
             DecorateButton(actionButton, ButtonDecoration.ResetDecoration);
 
-            UpdateActionButtons();
+            await UpdateActionButtonsAsync();
 
             answerTime = DateTime.UtcNow;
         }
@@ -88,7 +88,7 @@ namespace DDictionary.Presentation.Testing
                 if(answerId is null)
                 { //Space button was pressed
                     currentAction = CurrentAction.WaitingForUserAnswer;
-                    UpdateActionButtons();
+                    await UpdateActionButtonsAsync();
                 }
 
                 return;
@@ -164,7 +164,7 @@ namespace DDictionary.Presentation.Testing
             });
 
             currentAction = CurrentAction.ShowingRoundResult;
-            UpdateActionButtons();
+            await UpdateActionButtonsAsync();
 
             ShowRightAnswerData();
 
@@ -188,7 +188,7 @@ namespace DDictionary.Presentation.Testing
         /// <summary>
         /// Update the area of action buttons according to <see cref="currentAction"/>.
         /// </summary>
-        protected abstract void UpdateActionButtons();
+        protected abstract Task UpdateActionButtonsAsync();
 
         /// <summary>
         /// Get one of the answers buttons by given index.

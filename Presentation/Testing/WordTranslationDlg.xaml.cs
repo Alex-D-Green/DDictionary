@@ -57,21 +57,6 @@ namespace DDictionary.Presentation.Testing
 
             answerWordLbl.Text = rightAnswerForRound.Word;
 
-            if(!String.IsNullOrEmpty(rightAnswerForRound.Sound))
-            {
-                playBtn.Visibility = Visibility.Visible;
-                await PlaySoundAsync(rightAnswerForRound); //Auto play sound
-            }
-            else
-                playBtn.Visibility = Visibility.Collapsed;
-
-            if(!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
-            {
-                transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
-                transcriptionLbl.Visibility = Visibility.Visible;
-            }
-            else
-                transcriptionLbl.Visibility = Visibility.Hidden;
 
             relationsPanel.Visibility = contextLbl.Visibility = Visibility.Hidden;
             ClearPanel(relationsPanel);
@@ -182,7 +167,7 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        protected override void UpdateActionButtons()
+        protected override async Task UpdateActionButtonsAsync()
         {
             switch(currentAction)
             {
@@ -190,6 +175,8 @@ namespace DDictionary.Presentation.Testing
                     buttonsPanel.Visibility = Visibility.Hidden;
                     eyePanel.Visibility = Visibility.Visible;
                     actionBtn.Content = PrgResources.ShowTheOptionsLabel;
+                    transcriptionLbl.Visibility = Visibility.Hidden;
+                    playBtn.Visibility = Visibility.Collapsed;
                     break;
 
                 case CurrentAction.WaitingForUserAnswer:
@@ -199,6 +186,18 @@ namespace DDictionary.Presentation.Testing
                     
                     foreach(Button btn in Enumerable.Range(0, AnswersPerRound).Select(o => GetAnswerButton(o)))
                         btn.ToolTip = null;
+
+                    if (!String.IsNullOrEmpty(rightAnswerForRound.Transcription))
+                    {
+                        transcriptionLbl.Text = $"[{rightAnswerForRound.Transcription}]";
+                        transcriptionLbl.Visibility = Visibility.Visible;
+                    }
+
+                    if (!String.IsNullOrEmpty(rightAnswerForRound.Sound))
+                    {
+                        playBtn.Visibility = Visibility.Visible;
+                        await PlaySoundAsync(rightAnswerForRound); //Auto play sound
+                    }
 
                     break;
 

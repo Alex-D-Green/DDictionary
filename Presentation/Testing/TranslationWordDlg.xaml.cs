@@ -170,7 +170,7 @@ namespace DDictionary.Presentation.Testing
             }
         }
 
-        protected override void UpdateActionButtons()
+        protected override Task UpdateActionButtonsAsync()
         {
             switch(currentAction)
             {
@@ -205,6 +205,8 @@ namespace DDictionary.Presentation.Testing
                 default:
                     throw new InvalidProgramException($"Unexpected current action value ({currentAction}).");
             }
+
+            return Task.CompletedTask;
         }
 
         private async Task<IList<Clause>> GetAnswersForWordAsync(Clause word, int count)
