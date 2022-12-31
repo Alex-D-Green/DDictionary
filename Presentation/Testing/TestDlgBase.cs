@@ -326,20 +326,17 @@ namespace DDictionary.Presentation.Testing
         }
 
         /// <summary>
-        /// Play clause's sound or beep if it has no sound.
+        /// Play clause's sound.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types",
             Justification = "<Pending>")]
         protected async Task PlaySoundAsync(Clause clause)
         {
-            if(String.IsNullOrEmpty(clause.Sound))
-            {
-                SystemSounds.Beep.Play();
+            if (String.IsNullOrEmpty(clause.Sound))
                 return;
-            }
 
             try { await SoundManager.PlaySoundAsync(clause.Id, clause.Sound, dbFacade.DataSource); }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
 
