@@ -118,6 +118,7 @@ To hide the popup just click on it or press Escape or hold Shift to prevent it f
                             <TextBlock Text="2"/>
                             <TextBlock Text="3"/>
                             <TextBlock Text="4"/>
+                            <TextBlock Text="5"/>
                         </ComboBox>
                         <Label Content="Seconds on answer" Margin="10, 0"/>
                     </StackPanel>
