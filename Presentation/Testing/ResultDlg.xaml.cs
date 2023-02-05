@@ -24,7 +24,7 @@ namespace DDictionary.Presentation.Testing
     /// </summary>
     public partial class ResultDlg: Window
     {
-        private bool ExclamationHasBeenPlayed = false;
+        private bool exclamationHasBeenPlayed = false;
 
 
         /// <summary>The list of answers with information about changes in the dictionary.</summary>
@@ -73,13 +73,13 @@ namespace DDictionary.Presentation.Testing
 
             if(correct == total)
             {
-                if(!ExclamationHasBeenPlayed)
+                if(!exclamationHasBeenPlayed)
                 {
                     resultCongrats.Visibility = Visibility.Visible;
                     resultCongrats.Content = String.Format(PrgResources.WithoutErrorsMessage, correct, total);
                     
                     SystemSounds.Exclamation.Play();
-                    ExclamationHasBeenPlayed = true;
+                    exclamationHasBeenPlayed = true;
                 }
             }
             else

@@ -171,8 +171,12 @@ namespace DDictionary.Presentation.Testing
         /// <summary>
         /// Load all words from the data source into <see cref="allWords"/>.
         /// </summary>
-        protected async Task RefreshAllWords()
+        /// <param name="wordsToRemove">List of deleted words.</param>
+        protected async Task RefreshAllWords(IEnumerable<int> wordsToRemove = null)
         {
+            if (wordsToRemove?.Any() == true)
+                clausesForTrainingList = clausesForTrainingList.Except(wordsToRemove).ToList();
+
             allWords = (await dbFacade.GetWordTrainingStatisticsAsync(TrainingType)).ToDictionary(o => o.Id);
 
             SortClausesForTrainingList();
@@ -229,7 +233,7 @@ namespace DDictionary.Presentation.Testing
             {
                 int id = clausesForTrainingList[random.Next(clausesForTrainingList.Count)];
 
-                if(!ret.Contains(id))
+                if (!ret.Contains(id))
                     ret.Add(id);
             }
 

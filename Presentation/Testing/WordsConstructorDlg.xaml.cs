@@ -343,7 +343,7 @@ namespace DDictionary.Presentation.Testing
 
                     if(dlg.ShowDialog() == true)
                     {
-                        await RefreshAllWords();
+                        await RefreshAllWords(dlg.Answers.Where(x => x.Deleted).Select(x => x.Word.Id));
 
                         //Update the list of clauses
                         clausesForTrainingList = clausesForTrainingList
