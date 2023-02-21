@@ -8,9 +8,9 @@ using System.Windows;
 [assembly: AssemblyTitle("DDictionary")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("das2010@bk.ru")]
+[assembly: AssemblyCompany("alexdgreen2019@gmail.com")]
 [assembly: AssemblyProduct("DDictionary")]
-[assembly: AssemblyCopyright("Copyright © Alex Dyachenko 2019-2022")]
+[assembly: AssemblyCopyright("Copyright © Alex Dyachenko 2019-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

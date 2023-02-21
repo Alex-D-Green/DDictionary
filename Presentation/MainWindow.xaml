@@ -7,7 +7,7 @@
         xmlns:converters="clr-namespace:DDictionary.Presentation.Converters"
         xmlns:collections="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="DDictionary" Height="450" Width="800" MinWidth="800" MinHeight="200" MouseMove="OnMainWindow_MouseMove"
+        Title="DDictionary" Height="450" Width="920" MinWidth="920" MinHeight="200" MouseMove="OnMainWindow_MouseMove"
         PreviewKeyDown="OnWindow_PreviewKeyDown">
     <Window.Resources>
         <converters:WordGroupConverter x:Key="WordGroupConverter" />
@@ -150,14 +150,17 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <DatePicker x:Name="fromDatePicker" Height="26" Margin="5,9" TabIndex="4" HorizontalAlignment="Left" 
+            <ComboBox x:Name="partOfSpeechCBox" Width="100" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" 
+                      Height="22" TabIndex="4" KeyUp="OnCBox_KeyUp_AddSpaceHandling" 
+                      SelectionChanged="OnPartOfSpeechCBox_SelectionChanged" ToolTip="Show only clauses which contain given part of speech"/>
+            <DatePicker x:Name="fromDatePicker" Height="26" Margin="5,9" TabIndex="5" HorizontalAlignment="Left" 
                         VerticalAlignment="Center" SelectedDateChanged="OnSelectedDateChanged"
                         ToolTip="Show only words those were added after this date"/>
-            <DatePicker x:Name="toDatePicker" Height="26" Margin="5,9" TabIndex="5" HorizontalAlignment="Left" 
+            <DatePicker x:Name="toDatePicker" Height="26" Margin="5,9" TabIndex="6" HorizontalAlignment="Left" 
                         VerticalAlignment="Center" SelectedDateChanged="OnSelectedDateChanged"
                         ToolTip="Show only words those were added before this date"/>
             <Button x:Name="clearFilterBtn" HorizontalAlignment="Left" Margin="5" Width="22" Height="22" 
-                    TabIndex="6" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click">
+                    TabIndex="7" ToolTip="Clear filter.&#x0A;Or sorting (hold Alt key)." Click="OnClearFilterBtn_Click">
                 <Image Source="../Icons/4177409791543238955-128.png" VerticalAlignment="Center" HorizontalAlignment="Left"/>
             </Button>
             <ComboBox x:Name="toGroupCBox" Width="120" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" 

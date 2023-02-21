@@ -160,7 +160,7 @@ namespace DDictionary.Presentation
             
             await dbFacade.UpdateClauseWatchAsync(clause.Id);
 
-            DataGridClause updated = (await dbFacade.GetClauseByIdAsync(clause.Id)).MapToDataGridClause();
+            DataGridClause updated = (await dbFacade.GetClauseByIdAsync(clause.Id)).MapToDataGridClause(currentFilter);
 
             clause.Watched = updated.Watched;
             clause.WatchedCount = updated.WatchedCount;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
 
 using DDictionary.Domain.Entities;
 
@@ -13,7 +12,18 @@ namespace DDictionary.Presentation.ViewModels
         public string Word { get; set; }
         public AsteriskType AsteriskType { get; set; }
         public string Transcription { get; set; }
+
+        /// <summary>Translations according to selected part of speech.</summary>
         public string Translations { get; set; }
+
+        /// <summary>
+        /// All possible translations (all parts of speech).
+        /// <para><see langword="null"/> if there is no difference between 
+        /// <see cref="AllTranslations"/> and <see cref="Translations"/>.
+        /// </para>
+        /// </summary>
+        public string AllTranslations { get; set; }
+        
         public string Context { get; set; }
         public string Relations { get; set; }
         public bool HasRelations { get; set; }

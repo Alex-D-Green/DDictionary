@@ -42,7 +42,7 @@ namespace DDictionary.Presentation
 
             groupLbl.Content = clause.Group.ToFullStr();
             wordLbl.Content = clause.Word;
-            translationsLbl.Content = clause.Translations;
+            translationsLbl.Content = clause.AllTranslations ?? clause.Translations;
             asteriskLbl.Content = clause.AsteriskType != AsteriskType.None ? $"✶ {clause.AsteriskType.ToShortStr()}" : "";
             dateLbl.Content = String.Format(Properties.Resources.WatchedDateCount, clause.Watched, clause.WatchedCount);
 

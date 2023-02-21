@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 
+using DDictionary.Domain;
 using DDictionary.Domain.Entities;
 using DDictionary.Presentation.ViewModels;
 
@@ -13,11 +13,18 @@ namespace DDictionary.Presentation.Converters
         /// <summary>
         /// Make ClauseDataGrid from Clause.
         /// </summary>
-        public static DataGridClause MapToDataGridClause(this Clause cl)
+        /// <param name="filter">Current filter.</param>
+        public static DataGridClause MapToDataGridClause(this Clause cl, FiltrationCriteria filter = null)
         {
             if(cl is null)
                 throw new System.ArgumentNullException(nameof(cl));
 
+
+            string translations = MakeTranslationsString(cl.Translations, filter);
+            string allTranslations = MakeTranslationsString(cl.Translations, null);
+
+            if(translations == allTranslations)
+                allTranslations = null;
 
             return new DataGridClause {
                 Id = cl.Id,
@@ -25,7 +32,8 @@ namespace DDictionary.Presentation.Converters
                 Word = cl.Word,
                 AsteriskType = cl.Asterisk?.Type ?? AsteriskType.None,
                 Transcription = cl.Transcription,
-                Translations = MakeTranslationsString(cl.Translations),
+                Translations = translations,
+                AllTranslations = allTranslations,
                 Context = cl.Context,
                 Relations = MakeRelationsString(cl.Relations.Select(o => o.ToClause.Word)),
                 HasRelations = (cl.Relations.Count > 0),
@@ -44,8 +52,13 @@ namespace DDictionary.Presentation.Converters
         /// <summary>
         /// Get a string representation of the translations.
         /// </summary>
-        public static string MakeTranslationsString(IEnumerable<Translation> translations)
+        /// <param name="filter">Current filter.</param>
+        public static string MakeTranslationsString(IEnumerable<Translation> translations, 
+            FiltrationCriteria filter = null)
         {
+            if(filter?.PartOfSpeech != null && translations != null)
+                translations = translations.Where(o => o.Part == filter.PartOfSpeech);
+
             if(translations?.Any() != true)
                 return "";
 

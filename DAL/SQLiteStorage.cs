@@ -129,6 +129,15 @@ namespace DDictionary.DAL
                 nextJoin = "AND";
             }
 
+            if(filter.PartOfSpeech.HasValue)
+            {
+                sql.AppendFormat("    {0} EXISTS( SELECT 1 FROM [Translations] [str] WHERE ", nextJoin);
+                sql.AppendFormat(                "[str].[ClauseId] = [cl].[Id] AND [str].[Part] = {0})\n", 
+                    (byte)filter.PartOfSpeech);
+
+                nextJoin = "AND";
+            }
+
             if(String.IsNullOrEmpty(filter.TextFilter))
                 return await GetClauses(sql.ToString(), cancellationToken: cancellationToken);
 

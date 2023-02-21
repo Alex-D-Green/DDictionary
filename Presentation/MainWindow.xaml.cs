@@ -109,6 +109,16 @@ namespace DDictionary.Presentation
 
             #endregion
 
+            partOfSpeechCBox.Items.Add(new CheckBoxItem<PartOfSpeech?> { Text = "", ItemValue = null }); //Empty selection
+
+            foreach(PartOfSpeech item in Enum.GetValues(typeof(PartOfSpeech)).Cast<PartOfSpeech>())
+            {
+                partOfSpeechCBox.Items.Add(
+                    new CheckBoxItem<PartOfSpeech?> { Text = item.ToFullString(), ItemValue = item });
+            }
+
+            partOfSpeechCBox.SelectedIndex = 0;
+
             //Set up data source
             dbFacade.SetUpDataSource(PrgSettings.Default.DataSource);
             UpdateWindowTitle();
@@ -473,7 +483,7 @@ namespace DDictionary.Presentation
         /// </summary>
         private async Task<IEnumerable<DataGridClause>> LoadDataAsync(CancellationToken cancellationToken = default)
         {
-            return (await dbFacade.GetClausesAsync(currentFilter, cancellationToken)).Select(o => o.MapToDataGridClause());
+            return (await dbFacade.GetClausesAsync(currentFilter, cancellationToken)).Select(o => o.MapToDataGridClause(currentFilter));
         }
 
         /// <summary>
@@ -639,6 +649,20 @@ namespace DDictionary.Presentation
         }
 
         /// <summary>
+        /// Set part of speech in filter.
+        /// And update main data grid.
+        /// </summary>
+        private async void OnPartOfSpeechCBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (partOfSpeechCBox.SelectedItem is null)
+                return;
+
+            currentFilter.PartOfSpeech = ((CheckBoxItem<PartOfSpeech?>)partOfSpeechCBox.SelectedItem).ItemValue;
+
+            await UpdateDataGridAsync();
+        }
+
+        /// <summary>
         /// Show all checked groups (in short form) separated by comma in group filter combo box.
         /// </summary>
         private void UpdateGroupFilterText()
@@ -738,6 +762,7 @@ namespace DDictionary.Presentation
 
             fromDatePicker.SelectedDate = null;
             toDatePicker.SelectedDate = null;
+            partOfSpeechCBox.SelectedIndex = 0;
 
             currentFilter.Clear();
 
@@ -801,6 +826,18 @@ namespace DDictionary.Presentation
 
             if((e.Key == Key.Up || e.Key == Key.Down) && !toGroupCBox.IsDropDownOpen)
                 toGroupCBox.SelectedItem = null; //Restore shown text IN THE CLOSED combo box after keyboard "selection"
+        }
+
+        /// <summary>
+        /// Keyboard handler for combo boxes, adds opening by Space key.
+        /// </summary>
+        private void OnCBox_KeyUp_AddSpaceHandling(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (!(sender is ComboBox cb))
+                return;
+
+            if (e.Key == Key.Space && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt) && !cb.IsDropDownOpen)
+                cb.IsDropDownOpen = true; //Show the dropdown by Space key
         }
 
         /// <summary>

@@ -49,12 +49,17 @@ namespace DDictionary.Domain
         public DateTime? AddedBefore { get; set; }
 
         /// <summary>
+        /// Clauses have to contain given part of speech in their translations.
+        /// </summary>
+        public PartOfSpeech? PartOfSpeech { get; set; }
+
+        /// <summary>
         /// The filter is empty (there is no filtration).
         /// </summary>
         public bool Empty 
         { 
             get => (RelatedFrom is null && String.IsNullOrEmpty(TextFilter) && ShownGroups?.Any() != true && 
-                    HasSound is null && AddedAfter is null && AddedBefore is null);
+                    HasSound is null && AddedAfter is null && AddedBefore is null && PartOfSpeech is null);
         }
 
 
@@ -68,6 +73,7 @@ namespace DDictionary.Domain
             RelatedFrom = null;
             HasSound = null;
             AddedAfter = AddedBefore = null;
+            PartOfSpeech = null;
 
             Debug.Assert(Empty);
         }
