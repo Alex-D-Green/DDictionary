@@ -15,8 +15,10 @@ namespace DDictionary.Presentation
             InitializeComponent();
             ApplyGUIScale();
 
-            versionLbl.Content += 
-                Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            versionLbl.Content += assembly.GetName().Version.ToString();
+            copyrightLbl.Content = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright;
         }
 
         private void ApplyGUIScale()
