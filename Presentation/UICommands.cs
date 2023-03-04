@@ -115,6 +115,10 @@ namespace DDictionary.Presentation
             "Tests statistics", "Tests statistics", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.F12, ModifierKeys.Control) });
 
+        public static readonly RoutedUICommand TestsHistoryCommand = new RoutedUICommand(
+            "Tests history", "Tests history", typeof(UICommands),
+            new InputGestureCollection() { new KeyGesture(Key.F11, ModifierKeys.Control) });
+
         public static readonly RoutedUICommand RemoveAsteriskCommand = new RoutedUICommand(
             "Remove asterisk for selected words", "Remove asterisk for selected words", typeof(UICommands),
             new InputGestureCollection() { new KeyGesture(Key.Z, ModifierKeys.Control | ModifierKeys.Shift) });

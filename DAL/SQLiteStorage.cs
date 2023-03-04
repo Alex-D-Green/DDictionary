@@ -1026,6 +1026,72 @@ namespace DDictionary.DAL
             { return Enumerable.Empty<ShortTrainingStatistic>(); }
         }
 
+        public async Task<IEnumerable<TrainingHistoryEntryDTO>> GetTrainingHistoryAsync(int limit)
+        {
+            if (limit <= 0)
+                throw new ArgumentException("Limit has to be greater than 0.", nameof(limit));
+
+            try
+            {
+                const string sql = "SELECT * FROM [TrainingHistory] [TH]\n" +
+                                   "    LEFT JOIN [Clauses] [Cl] ON [Cl].[Id] = [TH].[ClauseId]\n" +
+                                   "    LEFT JOIN [Asterisks] [At] ON [CL].[Id] = [At].[ClauseId]\n" +
+                                   "  ORDER BY [TH].[TrainingDate] DESC, [TH].[Id] DESC\n" +
+                                   "  LIMIT @Limit; ";
+
+                using (IDbConnection cnn = await GetConnectionAsync())
+                    return await cnn.QueryAsync<TrainingHistoryEntryDTO>(sql, new { Limit = limit });
+            }
+            catch (Exception e) when (HandleError(e))
+            { return Enumerable.Empty<TrainingHistoryEntryDTO>(); }
+        }
+
+        public async Task AddTrainingHistoryAsync(int clauseId, bool success, TestType test)
+        {
+            if (clauseId <= 0)
+                throw new ArgumentException("Identifier has to be greater than 0.", nameof(clauseId));
+
+            try
+            {
+                var tmp = new TrainingHistoryEntry {
+                    ClauseId = clauseId,
+                    Success = success,
+                    TrainingType = test,
+                    TrainingDate = DateTime.Now
+                };
+
+                const string sql =
+                    "INSERT INTO [TrainingHistory] ([ClauseId], [Success], [TrainingType], [TrainingDate])\n" +
+                    "  VALUES (@ClauseId, @Success, @TrainingType, @TrainingDate); ";
+
+                using (IDbConnection cnn = await GetConnectionAsync())
+                    cnn.Execute(sql, tmp);
+            }
+            catch (Exception e) when (HandleError(e))
+            { }
+        }
+
+        public async Task RemoveOldTrainingHistoryAsync(int leaveRecords)
+        {
+            if (leaveRecords <= 0)
+                throw new ArgumentException("Value has to be greater than 0.", nameof(leaveRecords));
+
+
+            const string sql = "DELETE FROM [TrainingHistory] WHERE [Id] NOT IN (\n" +
+                               "    SELECT [Id] FROM [TrainingHistory]\n" +
+                               "        ORDER BY [TrainingDate] DESC, [Id] DESC\n" +
+                               "        LIMIT @Limit\n" +
+                               "); ";
+
+            try
+            {
+                using (IDbConnection cnn = await GetConnectionAsync())
+                    await cnn.ExecuteAsync(sql, new { Limit = leaveRecords });
+            }
+            catch (Exception e) when (HandleError(e))
+            { }
+        }
+
         /// <summary>
         /// Get connection to SQLite database with default connection string.
         /// </summary>

@@ -67,7 +67,9 @@
             <Label x:Name="newWordsLbl" Content="0" HorizontalAlignment="Center" Margin="0, 10, 5, 5"/>
         </StackPanel>
 
-        <Button MinWidth="95" Height="22" Content="Close" Margin="15" IsCancel="True" TabIndex="1001" 
-                HorizontalAlignment="Center"/>
-    </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button MinWidth="95" Height="22" Content="History" Margin="15" TabIndex="1001" Click="OnHistoryButtonClick" />
+            <Button MinWidth="95" Height="22" Content="Close" Margin="15" IsCancel="True" TabIndex="1002" />
+        </StackPanel>
+  </StackPanel>
 </Window>

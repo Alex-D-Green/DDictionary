@@ -1323,6 +1323,13 @@ namespace DDictionary.Presentation
                 await ExecuteStartTestCmdAsync(statDlg.StartTraining.Value);
         }
 
+        private void OnTrainingHistory(object sender, ExecutedRoutedEventArgs e)
+        {
+            var historyDlg = new HistoryDlg() { Owner = this };
+
+            historyDlg.ShowDialog();
+        }
+
         private async void OnCreateNewDBCommand(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new SaveFileDialog {

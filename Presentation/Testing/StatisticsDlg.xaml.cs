@@ -141,5 +141,12 @@ namespace DDictionary.Presentation.Testing
             DialogResult = true;
             Close();
         }
+
+        private void OnHistoryButtonClick(object sender, RoutedEventArgs e)
+        {
+            var historyDlg = new HistoryDlg() { Owner = this };
+
+            historyDlg.ShowDialog();
+        }
     }
 }

@@ -387,6 +387,9 @@ namespace DDictionary.Presentation.Testing
 
             if(!answer.Correct && answer.GivenAnswer != null)
                 await dbFacade.AddOrUpdateTrainingStatisticAsync(TrainingType, answer.GivenAnswer.Id, false);
+
+            await dbFacade.AddTrainingHistoryAsync(answer.Word.Id, answer.Correct, TrainingType);
+            await dbFacade.RemoveOldTrainingHistoryAsync(300);
         }
 
         /// <summary>

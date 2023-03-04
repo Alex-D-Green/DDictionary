@@ -199,5 +199,26 @@ namespace DDictionary.Domain
         /// </summary>
         /// <param name="since">Consider data that isn't older than this date.</param>
         Task<IEnumerable<ShortTrainingStatistic>> GetGeneralTrainingStatisticsAsync(DateTime since);
+
+        /// <summary>
+        /// Get training history.
+        /// </summary>
+        /// <param name="limit">Count of records to retrieve.</param>
+        Task<IEnumerable<TrainingHistoryEntryDTO>> GetTrainingHistoryAsync(int limit);
+
+        /// <summary>
+        /// Add training history. 
+        /// Creates a new record for the pair Test type + Word with current date.
+        /// </summary>
+        /// <param name="clauseId">Clause's id.</param>
+        /// <param name="success">Word's training was success.</param>
+        /// <param name="test">Test type.</param>
+        Task AddTrainingHistoryAsync(int clauseId, bool success, TestType test);
+
+        /// <summary>
+        /// Remove older records from training history (except <paramref name="leaveRecords"/>).
+        /// </summary>
+        /// <param name="leaveRecords">The amount of records should be leaved in the table.</param>
+        Task RemoveOldTrainingHistoryAsync(int leaveRecords);
     }
 }
