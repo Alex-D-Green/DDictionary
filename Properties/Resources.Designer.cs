@@ -498,6 +498,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to numeral.
+        /// </summary>
+        internal static string POFFullNumeral {
+            get {
+                return ResourceManager.GetString("POFFullNumeral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to preposition.
         /// </summary>
         internal static string POFFullPreposition {
@@ -575,6 +584,15 @@ namespace DDictionary.Properties {
         internal static string POFShortNoun {
             get {
                 return ResourceManager.GetString("POFShortNoun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to num.
+        /// </summary>
+        internal static string POFShortNumeral {
+            get {
+                return ResourceManager.GetString("POFShortNumeral", resourceCulture);
             }
         }
         

@@ -20,6 +20,7 @@ namespace DDictionary.Presentation.Converters
                 case PartOfSpeech.Preposition:  return PrgResources.POFShortPreposition;
                 case PartOfSpeech.Conjunction:  return PrgResources.POFShortConjunction;
                 case PartOfSpeech.Interjection: return PrgResources.POFShortInterjection;
+                case PartOfSpeech.Numeral:      return PrgResources.POFShortNumeral;
 
                 default: 
                     return pos.ToString();
@@ -39,6 +40,7 @@ namespace DDictionary.Presentation.Converters
                 case PartOfSpeech.Preposition:  return PrgResources.POFFullPreposition;
                 case PartOfSpeech.Conjunction:  return PrgResources.POFFullConjunction;
                 case PartOfSpeech.Interjection: return PrgResources.POFFullInterjection;
+                case PartOfSpeech.Numeral:      return PrgResources.POFFullNumeral;
 
                 default:
                     return pos.ToString();

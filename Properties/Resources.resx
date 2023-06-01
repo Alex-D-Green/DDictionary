@@ -276,6 +276,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
     <value>noun</value>
     <comment>PartOfSpeech</comment>
   </data>
+  <data name="POFFullNumeral" xml:space="preserve">
+    <value>numeral</value>
+  </data>
   <data name="POFFullPreposition" xml:space="preserve">
     <value>preposition</value>
     <comment>PartOfSpeech</comment>
@@ -311,6 +314,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
   <data name="POFShortNoun" xml:space="preserve">
     <value>n</value>
     <comment>PartOfSpeech</comment>
+  </data>
+  <data name="POFShortNumeral" xml:space="preserve">
+    <value>num</value>
   </data>
   <data name="POFShortPreposition" xml:space="preserve">
     <value>prep</value>

@@ -13,6 +13,7 @@ namespace DDictionary.Domain.Entities
         Adverb,
         Preposition,
         Conjunction, //and, but, or, so, yet, with
-        Interjection //ah, whoops, ouch, yabba dabba do!
+        Interjection, //ah, whoops, ouch, yabba dabba do!
+        Numeral
     }
 }
