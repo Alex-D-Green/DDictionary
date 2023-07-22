@@ -27,6 +27,12 @@ namespace DDictionary.DAL
         private static bool databaseWasChecked = false;
 
 
+        static SQLiteStorage()
+        {
+            SQLiteFunction.RegisterFunction(typeof(MyUpperSQLiteFunction));
+        }
+
+
         public event ErrorHandler OnErrorOccurs;
 
         /// <summary>
@@ -150,38 +156,40 @@ namespace DDictionary.DAL
             };
 
             //Primary search target (the word itself - the beginning is matched), in alphabet order
-            var tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @TextP ESCAPE '\\'\nORDER BY [cl].[Word]\n";
+            var tmpSql = $"{sql}    {nextJoin} MYUPPER([cl].[Word]) LIKE MYUPPER(@TextP) ESCAPE '\\'\n"+
+                          "ORDER BY [cl].[Word]\n";
             
             IEnumerable<Clause> ret = await GetClauses(tmpSql, parameters, cancellationToken);
 
             //Secondary target (the word itself except primary target - matched but not the beginning)
-            tmpSql = $"{sql}    {nextJoin} [cl].[Word] LIKE @PTextP ESCAPE '\\' AND [cl].[Word] NOT LIKE @TextP ESCAPE '\\'\n";
+            tmpSql = $"{sql}    {nextJoin} MYUPPER([cl].[Word]) LIKE MYUPPER(@PTextP) ESCAPE '\\' "+
+                      "AND MYUPPER([cl].[Word]) NOT LIKE MYUPPER(@TextP) ESCAPE '\\'\n";
             
             ret = ret.Concat(await GetClauses(tmpSql, parameters, cancellationToken));
 
             //Tertiary target (relations, excluding the word itself)
             var sqlCopy = new StringBuilder(sql.ToString());
-            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
+            sql.AppendFormat("    {0} MYUPPER([cl].[Word]) NOT LIKE MYUPPER(@PTextP) ESCAPE '\\'\n", nextJoin);
             sql.AppendFormat("    AND EXISTS( SELECT 1 FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
             sql.Append(      "                AND EXISTS( SELECT 1 FROM [Clauses] [cltf] ");
             sql.Append(                      "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
-            sql.Append(                      "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
+            sql.Append(                      "AND MYUPPER([cltf].[Word]) LIKE MYUPPER(@PTextP) ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
             ret = ret.Concat(await GetClauses(sql.ToString(), parameters, cancellationToken));
 
             //Quaternary targets (excluding all previous targets)
             sql = sqlCopy;
-            sql.AppendFormat("    {0} [cl].[Word] NOT LIKE @PTextP ESCAPE '\\'\n", nextJoin);
+            sql.AppendFormat("    {0} MYUPPER([cl].[Word]) NOT LIKE MYUPPER(@PTextP) ESCAPE '\\'\n", nextJoin);
             sql.Append(      "    AND NOT EXISTS( SELECT 1 FROM [Relations] [rltf] WHERE [rltf].[FromClauseId] = [cl].[Id]\n");
             sql.Append(      "                    AND EXISTS( SELECT 1 FROM [Clauses] [cltf] ");
             sql.Append(                                       "WHERE [rltf].[ToClauseId] = [cltf].[Id] ");
-            sql.Append(                                       "AND [cltf].[Word] LIKE @PTextP ESCAPE '\\' )\n");
+            sql.Append(                                       "AND MYUPPER([cltf].[Word]) LIKE MYUPPER(@PTextP) ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
-            sql.Append(      "    AND ([cl].[Context] LIKE @PTextP ESCAPE '\\'\n");
+            sql.Append(      "    AND (MYUPPER([cl].[Context]) LIKE MYUPPER(@PTextP) ESCAPE '\\'\n");
             sql.Append(      "        OR EXISTS( SELECT 1 FROM [Translations] [trtf] ");
             sql.Append(                         "WHERE [trtf].[ClauseId] = [cl].[Id] ");
-            sql.Append(                         "AND [trtf].[Text] LIKE @PTextP ESCAPE '\\' )\n");
+            sql.Append(                         "AND MYUPPER([trtf].[Text]) LIKE MYUPPER(@PTextP) ESCAPE '\\' )\n");
             sql.Append(      "    )\n");
 
             //To get the words' matches in the beginning
@@ -264,7 +272,7 @@ namespace DDictionary.DAL
                 using(IDbConnection cnn = await GetConnectionAsync())
                 {
                     IEnumerable<int> ids = 
-                        await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE", 
+                        await cnn.QueryAsync<int>("SELECT [Id] FROM [Clauses] WHERE MYUPPER([Word]) = MYUPPER(@Word)", 
                             new { Word = word });
 
                     if(ids.Count() > 1)
@@ -726,9 +734,9 @@ namespace DDictionary.DAL
 
             const string insertRelationSql =
                 "INSERT INTO [Relations] ([FromClauseId], [ToClauseId], [Description])\n" +
-                "    VALUES (@From, (SELECT [Id] FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE), @Descr); ";
+                "    VALUES (@From, (SELECT [Id] FROM [Clauses] WHERE MYUPPER([Word]) = MYUPPER(@Word)), @Descr); ";
 
-            const string isWordExistSql = "SELECT 1 FROM [Clauses] WHERE [Word] = @Word COLLATE NOCASE; ";
+            const string isWordExistSql = "SELECT 1 FROM [Clauses] WHERE MYUPPER([Word]) = MYUPPER(@Word); ";
 
             DateTime now = DateTime.Now;
 
