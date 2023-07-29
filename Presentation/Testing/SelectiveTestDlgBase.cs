@@ -99,7 +99,7 @@ namespace DDictionary.Presentation.Testing
                 { //Space button was pressed
                     if(++currentRound >= TotalRounds)
                     { //Showing final result
-                        var dlg = new ResultDlg(answers) { Owner = this };
+                        var dlg = new ResultDlg(answers, GetTestRunsStatistics(TrainingType).RunsCounter) { Owner = this };
 
                         if(dlg.ShowDialog() == true)
                         {

@@ -339,7 +339,7 @@ namespace DDictionary.Presentation.Testing
             {
                 if(++currentRound >= TotalRounds)
                 { //Showing final result
-                    var dlg = new ResultDlg(answers) { Owner = this };
+                    var dlg = new ResultDlg(answers, GetTestRunsStatistics(TrainingType).RunsCounter) { Owner = this };
 
                     if(dlg.ShowDialog() == true)
                     {

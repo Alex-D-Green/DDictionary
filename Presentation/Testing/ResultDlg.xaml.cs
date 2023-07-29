@@ -37,7 +37,14 @@ namespace DDictionary.Presentation.Testing
         public bool GoToStatistic { get; private set; }
 
 
-        public ResultDlg(IEnumerable<TestAnswer> answers)
+        /// <summary>
+        /// Create an instance of <see cref="ResultDlg"/>.
+        /// </summary>
+        /// <param name="answers">Answers to show in dialog.</param>
+        /// <param name="runsCount">Current counter of runs of this type of training in this session.</param>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="ArgumentException"/>
+        public ResultDlg(IEnumerable<TestAnswer> answers, int runsCount)
         {
             if(answers is null)
                 throw new ArgumentNullException(nameof(answers));
@@ -62,8 +69,22 @@ namespace DDictionary.Presentation.Testing
 
             InitializeComponent();
             ApplyGUIScale();
+            UpdateTitle(runsCount);
 
             UpdateResult();
+        }
+
+        private void UpdateTitle(int runsCount)
+        {
+            if (Title is null)
+                return;
+
+            int idx = Title.IndexOf(" [");
+
+            if (idx != -1)
+                Title = Title.Substring(0, idx);
+
+            Title += $" [run #{runsCount}]";
         }
 
         private void UpdateResult()

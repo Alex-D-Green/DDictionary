@@ -93,7 +93,7 @@ namespace DDictionary.Presentation.Testing
             { //The training is over
 
                 //Showing final result
-                var dlg = new ResultDlg(answers) { Owner = this };
+                var dlg = new ResultDlg(answers, GetTestRunsStatistics(TrainingType).RunsCounter) { Owner = this };
 
                 if(dlg.ShowDialog() == true)
                 {
