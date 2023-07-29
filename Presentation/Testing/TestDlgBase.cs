@@ -43,11 +43,20 @@ namespace DDictionary.Presentation.Testing
             RightAnswer
         }
 
+        public sealed class RunStatistics
+        {
+            public int RunsCounter { get; set; }
+
+            public int Success { get; set; }
+
+            public int Fail { get; set; }
+        }
+
         #endregion
 
         /// <summary>Counters of tests runs (within current session).</summary>
-        private static readonly Dictionary<TestType, int> testRunsCounters = 
-            new Dictionary<TestType, int>();
+        private static readonly Dictionary<TestType, RunStatistics> testRunsStatistics = 
+            new Dictionary<TestType, RunStatistics>();
 
 
         /// <summary>Random generator for this training.</summary>
@@ -150,7 +159,7 @@ namespace DDictionary.Presentation.Testing
         /// <summary>
         /// Show counter of runs for this test type in the title of this window.
         /// </summary>
-        /// <seealso cref="testRunsCounters"/>
+        /// <seealso cref="testRunsStatistics"/>
         private void UpdateTitle()
         {
             if(Title is null)
@@ -161,11 +170,11 @@ namespace DDictionary.Presentation.Testing
             if(idx != -1)
                 Title = Title.Substring(0, idx);
 
-            int counter = GetTestRunsCounter(TrainingType);
+            int counter = GetTestRunsStatistics(TrainingType).RunsCounter;
 
             Title += $" [run #{++counter}]";
 
-            testRunsCounters[TrainingType] = counter;
+            testRunsStatistics[TrainingType].RunsCounter = counter;
         }
 
         /// <summary>
@@ -466,13 +475,43 @@ namespace DDictionary.Presentation.Testing
         }
 
         /// <summary>
-        /// Get runs counter for the given test type.
+        /// Get runs statistics for the given test type.
         /// </summary>
         /// <param name="testType">Test type.</param>
-        /// <returns>Runs counter for the given test type.</returns>
-        public static int GetTestRunsCounter(TestType testType)
+        /// <returns>Runs statistics for the given test type.</returns>
+        public static RunStatistics GetTestRunsStatistics(TestType testType)
         {
-            return testRunsCounters.TryGetValue(testType, out var result) ? result : 0;
+            return testRunsStatistics[testType];
+        }
+
+        /// <summary>
+        /// Set initial runs statistics for all types of tests.
+        /// </summary>
+        /// <param name="data">Data for initialization.</param>
+        public static void SetupRunsStatistics(IEnumerable<(TestType testType, int success, int fail)> data)
+        {
+            testRunsStatistics.Clear();
+
+            foreach(var (testType, success, fail) in data)
+            {
+                testRunsStatistics.Add(testType, new RunStatistics {  
+                    RunsCounter = 0,
+                    Success = success,
+                    Fail = fail
+                });
+            }
+
+            foreach(TestType type in Enum.GetValues(typeof(TestType)).Cast<TestType>())
+            {
+                if(testRunsStatistics.ContainsKey(type))
+                    continue;
+
+                testRunsStatistics.Add(type, new RunStatistics {
+                    RunsCounter = 0,
+                    Success = 0,
+                    Fail = 0
+                });
+            }
         }
     }
 }

@@ -27,6 +27,8 @@ namespace DDictionary.Presentation.Testing
             public object Total { get; set; }
             public string Percent { get; set; }
             public int? PercentSort { get; set; }
+            public string PercentChange { get; set; }
+            public int? PercentChangeSort { get; set; }
             public object LastTraining { get; set; }
             public TestType TestType { get; set; }
         }
@@ -63,21 +65,27 @@ namespace DDictionary.Presentation.Testing
 
             foreach(TestType testType in Enum.GetValues(typeof(TestType)).Cast<TestType>())
             {
-                int? per = null;
-
                 TrainingStatistic rowT = total.FirstOrDefault(o => o.TestType == testType);
                 if(rowT != null)
                 {
-                    per = calcPercent(rowT.Success, rowT.Fail);
+                    TestDlgBase.RunStatistics runStat = TestDlgBase.GetTestRunsStatistics(rowT.TestType);
+
+                    int? per = calcPercent(rowT.Success, rowT.Fail);
+                    int? initPer = calcPercent(runStat.Success, runStat.Fail);
+                    int? delta = (per.HasValue && initPer.HasValue) ? per - initPer : null;
 
                     statDataGrid.Items.Add(new TrainingTableClause {
-                        TestRuns = TestDlgBase.GetTestRunsCounter(rowT.TestType),
+                        TestRuns = runStat.RunsCounter,
                         TestTypeName = rowT.TestType.ToFullString(),
                         Success = rowT.Success,
                         Fail = rowT.Fail,
                         Total = (rowT.Success + rowT.Fail),
                         Percent = per.HasValue ? $"{per} %" : "-",
                         PercentSort = per, //For sorting only
+                        PercentChange = delta > 0 ? $"+{delta}%" 
+                                                  : delta < 0 ? $"{delta}%"
+                                                              : "-",
+                        PercentChangeSort = delta, //For sorting only
                         LastTraining = rowT.LastTraining,
                         TestType = rowT.TestType
                     });
@@ -89,6 +97,7 @@ namespace DDictionary.Presentation.Testing
                         Fail = "-",
                         Total = "-",
                         Percent = "-",
+                        PercentChange = "-",
                         LastTraining = "-",
                         TestType = testType
                     });

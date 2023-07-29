@@ -23,7 +23,7 @@
                                     CellStyle="{StaticResource RightAligned}" Header="Runs">
                     <DataGridTextColumn.HeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="ToolTip" Value="Count of test's runs since the application start" />
+                            <Setter Property="ToolTip" Value="Count of test runs in this training session" />
                         </Style>
                     </DataGridTextColumn.HeaderStyle>
                 </DataGridTextColumn>
@@ -38,6 +38,15 @@
                 <DataGridTextColumn Binding="{Binding Percent}" SortMemberPath="PercentSort" 
                                     ElementStyle="{StaticResource ColumnElementStyle}"
                                     CellStyle="{StaticResource RightAligned}" Header="Percent"/>
+                <DataGridTextColumn Binding="{Binding PercentChange}" SortMemberPath="PercentChangeSort" 
+                                    ElementStyle="{StaticResource ColumnElementStyle}"
+                                    CellStyle="{StaticResource RightAligned}" Header="Delta">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ToolTip" Value="Change of the percent in this training session" />
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                </DataGridTextColumn>
                 <DataGridTextColumn Binding="{Binding LastTraining}" ElementStyle="{StaticResource ColumnElementStyle}"
                                     CellStyle="{StaticResource RightAligned}" Header="Last training"/>
                 <DataGridTemplateColumn CanUserSort="False">

@@ -121,6 +121,7 @@ namespace DDictionary.Presentation
 
             //Set up data source
             dbFacade.SetUpDataSource(PrgSettings.Default.DataSource);
+            OnDataSourceChanged();
             UpdateWindowTitle();
             
             UpdateRecentSourcesList(null);
@@ -279,6 +280,7 @@ namespace DDictionary.Presentation
             {
                 dbFacade.SetUpDataSource(fileName); //Switch on new DB
                 await dbFacade.GetClauseByIdAsync(1); //Create DB structure
+                OnDataSourceChanged();
 
                 //Save data source
                 UpdateRecentSourcesList(fileName);
@@ -293,6 +295,12 @@ namespace DDictionary.Presentation
             ClearFilter();
             await UpdateDataGridAsync(true);
             UpdateWindowTitle();
+        }
+
+        private void OnDataSourceChanged()
+        {
+            List<TrainingStatistic> total = dbFacade.GetGeneralTrainingStatisticsAsync().Result.ToList();
+            TestDlgBase.SetupRunsStatistics(total.Select(x => (x.TestType, x.Success, x.Fail)));
         }
 
         protected override void OnSourceInitialized(EventArgs e)
