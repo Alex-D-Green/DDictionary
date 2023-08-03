@@ -526,6 +526,8 @@ namespace DDictionary.Presentation
 
             Dispatcher.Invoke(() =>
             {
+                var selectedItems = mainDataGrid.SelectedItems.Cast<DataGridClause>().ToList();
+
                 //Update items
                 mainDataGrid.ItemsSource = data;
 
@@ -537,6 +539,13 @@ namespace DDictionary.Presentation
                                         .SortDirection = sorting.Value.Direction; //Column header arrow
 
                     mainDataGrid.Items.Refresh();
+                }
+
+                //Restore selection
+                foreach (DataGridClause item in mainDataGrid.Items.Cast<DataGridClause>()
+                                                                 .Where(x => selectedItems.Any(o => o.Id == x.Id)))
+                { 
+                    mainDataGrid.SelectedItems.Add(item); 
                 }
 
                 UpdateStatusBar();
@@ -1293,8 +1302,14 @@ namespace DDictionary.Presentation
 
         private async Task ExecuteStartTestCmdAsync(TestType testType)
         {
+            bool trainSelected = mainDataGrid.SelectedItems.Count > 0 && 
+                MessageBox.Show(this, String.Format(PrgResources.TrainingSourceQuestion, mainDataGrid.SelectedItems.Count), 
+                    PrgResources.QuestionCaption, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+            var lst = trainSelected ? mainDataGrid.SelectedItems.Cast<DataGridClause>().Select(o => o.Id)
+                                    : mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id);
+
             TestDlgBase dlg = null;
-            var lst = mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id).ToList();
 
             mainDataGrid.Effect = new BlurEffect { Radius = 10 }; //To hide data on the background
 

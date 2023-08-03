@@ -759,6 +759,15 @@ namespace DDictionary.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Train only {0} selected clause[s]?.
+        /// </summary>
+        internal static string TrainingSourceQuestion {
+            get {
+                return ResourceManager.GetString("TrainingSourceQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Watched: {0:yyyy-MM-dd} ({1}).
         /// </summary>
         internal static string WatchedDateCount {

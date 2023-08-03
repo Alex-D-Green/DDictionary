@@ -381,6 +381,9 @@ Must be at least {0} word[s] with the sound link[s] selected for the training.</
   <data name="TrainingIsNotFinishedWarning" xml:space="preserve">
     <value>The training is not finished yet, do you want to stop it and close the window?</value>
   </data>
+  <data name="TrainingSourceQuestion" xml:space="preserve">
+    <value>Train only {0} selected clause[s]?</value>
+  </data>
   <data name="WatchedDateCount" xml:space="preserve">
     <value>Watched: {0:yyyy-MM-dd} ({1})</value>
   </data>
