@@ -26,9 +26,9 @@ namespace DDictionary.Presentation.Testing
             public object Fail { get; set; }
             public object Total { get; set; }
             public string Percent { get; set; }
-            public int? PercentSort { get; set; }
+            public double? PercentSort { get; set; }
             public string PercentChange { get; set; }
-            public int? PercentChangeSort { get; set; }
+            public double? PercentChangeSort { get; set; }
             public object LastTraining { get; set; }
             public TestType TestType { get; set; }
         }
@@ -70,9 +70,9 @@ namespace DDictionary.Presentation.Testing
                 {
                     TestDlgBase.RunStatistics runStat = TestDlgBase.GetTestRunsStatistics(rowT.TestType);
 
-                    int? per = calcPercent(rowT.Success, rowT.Fail);
-                    int? initPer = calcPercent(runStat.Success, runStat.Fail);
-                    int? delta = (per.HasValue && initPer.HasValue) ? per - initPer : null;
+                    double? per = calcPercent(rowT.Success, rowT.Fail);
+                    double? initPer = calcPercent(runStat.Success, runStat.Fail);
+                    double? delta = (per.HasValue && initPer.HasValue) ? per - initPer : null;
 
                     statDataGrid.Items.Add(new TrainingTableClause {
                         TestRuns = runStat.RunsCounter,
@@ -80,10 +80,10 @@ namespace DDictionary.Presentation.Testing
                         Success = rowT.Success,
                         Fail = rowT.Fail,
                         Total = (rowT.Success + rowT.Fail),
-                        Percent = per.HasValue ? $"{per} %" : "-",
+                        Percent = per.HasValue ? $"{per:0.0} %" : "-",
                         PercentSort = per, //For sorting only
-                        PercentChange = delta > 0 ? $"+{delta}%" 
-                                                  : delta < 0 ? $"{delta}%"
+                        PercentChange = delta > 0 ? $"+{delta:0.0} %" 
+                                                  : delta < 0 ? $"{delta:0.0} %"
                                                               : "-",
                         PercentChangeSort = delta, //For sorting only
                         LastTraining = rowT.LastTraining,
@@ -120,12 +120,12 @@ namespace DDictionary.Presentation.Testing
                 dbFacade.GetClausesAsync(new FiltrationCriteria { AddedAfter = lastStatDate }).Result.Count();
 
 
-            int? calcPercent(int success, int fail)
+            double? calcPercent(double success, double fail)
             {
                 if(success + fail == 0)
                     return null;
 
-                return (int)((double)success / (success + fail) * 100);
+                return success / (success + fail) * 100;
             }
         }
 
