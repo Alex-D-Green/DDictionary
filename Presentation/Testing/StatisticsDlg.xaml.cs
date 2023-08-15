@@ -72,7 +72,10 @@ namespace DDictionary.Presentation.Testing
 
                     double? per = calcPercent(rowT.Success, rowT.Fail);
                     double? initPer = calcPercent(runStat.Success, runStat.Fail);
-                    double? delta = (per.HasValue && initPer.HasValue) ? per - initPer : null;
+                    double? delta = per - initPer;
+
+                    if(delta.HasValue && Math.Abs(delta.Value) < 0.05)
+                        delta = null; //To exclude showing of 0.0 as delta
 
                     statDataGrid.Items.Add(new TrainingTableClause {
                         TestRuns = runStat.RunsCounter,
