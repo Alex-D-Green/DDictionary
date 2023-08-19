@@ -130,7 +130,7 @@
         </Grid.RowDefinitions>
         <DockPanel Margin="0" LastChildFill="False" Grid.Row="1">
             <Button x:Name="selectAllBtn" HorizontalAlignment="Left" Margin="10,5,5,5" Width="22" Height="22" 
-                    TabIndex="1" ToolTip="Select all rows or clear selection" Command="local:UICommands.SelectAllCommand"
+                    TabIndex="1" ToolTip="Select all rows or clear selection (hold Alt key)" Command="local:UICommands.SelectAllCommand"
                     BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}">
                 <Image Source="../Icons/20429544391543238900-128.png" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Button>

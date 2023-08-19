@@ -1088,7 +1088,10 @@ namespace DDictionary.Presentation
 
         private void OnSelectAllCommand(object sender, ExecutedRoutedEventArgs e)
         {
-            if(!Equals(shownWordsLbl.Content, selectedWordsLbl.Content))
+            bool selectAll = !Equals(shownWordsLbl.Content, selectedWordsLbl.Content) && 
+                             !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
+
+            if(selectAll)
                 mainDataGrid.SelectAll();
             else
                 mainDataGrid.UnselectAll();
