@@ -1305,12 +1305,21 @@ namespace DDictionary.Presentation
 
         private async Task ExecuteStartTestCmdAsync(TestType testType)
         {
-            bool trainSelected = mainDataGrid.SelectedItems.Count > 0 && 
-                MessageBox.Show(this, String.Format(PrgResources.TrainingSourceQuestion, mainDataGrid.SelectedItems.Count), 
-                    PrgResources.QuestionCaption, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+            var trainSelectedAnswer = MessageBoxResult.None;
 
-            var lst = trainSelected ? mainDataGrid.SelectedItems.Cast<DataGridClause>().Select(o => o.Id)
-                                    : mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id);
+            if (mainDataGrid.SelectedItems.Count > 0)
+            {
+                trainSelectedAnswer = MessageBox.Show(
+                    this, String.Format(PrgResources.TrainingSourceQuestion, mainDataGrid.SelectedItems.Count),
+                    PrgResources.QuestionCaption, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            }
+
+            if (trainSelectedAnswer == MessageBoxResult.Cancel)
+                return;
+
+            var lst = trainSelectedAnswer == MessageBoxResult.Yes 
+                          ? mainDataGrid.SelectedItems.Cast<DataGridClause>().Select(o => o.Id)
+                          : mainDataGrid.Items.Cast<DataGridClause>().Select(o => o.Id);
 
             TestDlgBase dlg = null;
 
