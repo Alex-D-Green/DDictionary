@@ -14,7 +14,7 @@ namespace DDictionary.DAL
             if(args?.Length != 1)
                 throw new ArgumentException("The function takes one string parameter.");
 
-            if(args[0] is null)
+            if(args[0] is null || args[0] is DBNull)
                 return null;
 
             if(!(args[0] is string))
